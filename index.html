@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0a0a0a" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -32,7 +32,10 @@
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
   font-family:'Sora',-apple-system,BlinkMacSystemFont,sans-serif;
-  -webkit-font-smoothing:antialiased; overscroll-behavior-y:contain; overflow-x:hidden;}
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  min-height:100%; -webkit-overflow-scrolling:touch;}
+html{height:auto;}
+body{position:relative; min-height:100vh;}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(800px 400px at 80% -10%, rgba(212,255,58,.06), transparent 60%),
              radial-gradient(600px 300px at -10% 30%, rgba(255,87,34,.04), transparent 60%);}
@@ -44,7 +47,7 @@ input,textarea,select{background:var(--surface-2);border:1px solid var(--line);c
 input:focus,textarea:focus,select:focus{border-color:var(--accent);}
 textarea{resize:vertical;min-height:80px;}
 
-#app{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100dvh;
+#app{position:relative;z-index:1;max-width:480px;margin:0 auto;
   padding-bottom:calc(96px + var(--safe-bottom));}
 
 /* Top bar */
@@ -208,7 +211,7 @@ textarea{resize:vertical;min-height:80px;}
 .empty{text-align:center;padding:30px 16px;color:var(--text-3);font-size:13px;}
 
 /* Setup screen */
-.setup{padding:30px 22px;max-width:480px;margin:0 auto;min-height:100dvh;
+.setup{padding:30px 22px;max-width:480px;margin:0 auto;min-height:100vh;
   display:flex;flex-direction:column;justify-content:center;}
 .setup h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin:0 0 6px;}
 .setup p{color:var(--text-2);font-size:14px;line-height:1.55;}
