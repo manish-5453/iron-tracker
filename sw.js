@@ -1,12 +1,6 @@
-// IRON Gym Tracker - Service Worker
-const CACHE = 'iron-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+// IRON Gym Tracker - Service Worker (v3)
+const CACHE = 'iron-v3';
+const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(()=>{}));
@@ -24,9 +18,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // Never cache API calls
   if (url.hostname.includes('script.google.com')) return;
-  // Network-first for HTML, cache-first for assets
   if (e.request.mode === 'navigate' || e.request.destination === 'document') {
     e.respondWith(
       fetch(e.request).then(r => {
