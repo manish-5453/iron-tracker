@@ -50,7 +50,6 @@ textarea{resize:vertical;min-height:80px;}
 #app{position:relative;z-index:1;max-width:480px;margin:0 auto;
   padding-bottom:calc(96px + var(--safe-bottom));}
 
-/* Top bar */
 .topbar{position:sticky;top:0;z-index:20;
   padding:calc(14px + var(--safe-top)) 20px 12px;
   background:linear-gradient(to bottom, rgba(10,10,10,.95), rgba(10,10,10,.7) 80%, transparent);
@@ -64,18 +63,15 @@ textarea{resize:vertical;min-height:80px;}
 .topbar .day{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-2);
   text-transform:uppercase;letter-spacing:1.5px;text-align:right;}
 
-/* Pages */
 .page{display:none;padding:4px 16px 8px;animation:fadeUp .3s ease both;}
 .page.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;}}
 
-/* Hero */
 .hero{padding:8px 4px 16px;}
 .hero h1{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:1px;line-height:.95;margin:0;}
 .hero h1 .accent{color:var(--accent);}
 .hero p{margin:8px 0 0;color:var(--text-2);font-size:14px;}
 
-/* Cards */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:18px;margin-bottom:14px;box-shadow:var(--shadow-card);position:relative;overflow:hidden;}
 .card-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;
@@ -106,14 +102,12 @@ textarea{resize:vertical;min-height:80px;}
 .grid-2 .stat-num{font-size:30px;}
 .grid-2 .card-title{margin-bottom:6px;}
 
-/* Workout card */
 .workout-name{font-size:22px;font-weight:700;margin-top:4px;line-height:1.2;}
 .muscle-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
 .tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;
   padding:4px 10px;border-radius:999px;background:var(--surface-3);color:var(--text-2);}
 .tag.accent{background:var(--accent);color:#000;font-weight:700;}
 
-/* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:14px 20px;border-radius:var(--radius-sm);font-weight:600;font-size:14px;
   letter-spacing:.3px;transition:transform .15s, background .2s;width:100%;}
@@ -142,11 +136,56 @@ textarea{resize:vertical;min-height:80px;}
   font-size:10px;letter-spacing:2px;color:var(--text-3);
   text-transform:uppercase;margin-bottom:6px;}
 .form-group .hint{color:var(--text-3);font-size:11px;margin-top:4px;}
-.toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.toggle-btn{padding:14px;border-radius:var(--radius-sm);background:var(--surface-2);
-  border:1px solid var(--line);text-align:center;font-size:14px;font-weight:600;
-  transition:all .15s;}
-.toggle-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+
+/* === EXERCISE CHECKLIST === */
+.workout-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.workout-header .title{font-size:20px;font-weight:700;line-height:1.1;}
+.workout-header .pct{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);letter-spacing:1px;}
+.workout-sub{font-size:12px;color:var(--text-3);margin-bottom:12px;}
+
+.exercise{display:flex;gap:12px;align-items:center;padding:14px 0;
+  border-top:1px solid var(--line-soft);}
+.exercise:first-of-type{border-top:0;padding-top:4px;}
+.ex-check{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);
+  background:var(--surface-2);display:flex;align-items:center;justify-content:center;
+  color:transparent;font-size:14px;font-weight:700;flex-shrink:0;
+  transition:all .15s; cursor:pointer;}
+.ex-check.done{background:var(--accent);color:#000;border-color:var(--accent);}
+.ex-body{flex:1;min-width:0;}
+.ex-name{font-size:14px;font-weight:600;line-height:1.2;}
+.ex-name.done{text-decoration:line-through;color:var(--text-3);}
+.ex-meta{display:flex;gap:10px;margin-top:4px;font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--text-3);letter-spacing:.5px;}
+.ex-meta span.sets{color:var(--accent);}
+.ex-info{flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);font-size:14px;border-radius:6px;}
+.ex-info:active{background:var(--surface-3);color:var(--text);}
+
+.ex-tip{margin-top:6px;padding:10px 12px;background:var(--surface-2);border-radius:10px;
+  font-size:11px;color:var(--text-2);line-height:1.5;border-left:2px solid var(--accent);
+  display:none;}
+.ex-tip.show{display:block;}
+
+/* Add custom exercise */
+.add-row{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft);}
+.add-row input{padding:10px 12px;font-size:13px;}
+.add-row button{padding:10px 16px;background:var(--accent);color:#000;border-radius:var(--radius-sm);
+  font-weight:600;font-size:13px;white-space:nowrap;}
+
+/* === MEAL CHECKLIST === */
+.meal{display:flex;gap:12px;padding:12px 0;align-items:center;
+  border-top:1px solid var(--line-soft);}
+.meal:first-of-type{border-top:0;padding-top:4px;}
+.meal-check{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);
+  background:var(--surface-2);display:flex;align-items:center;justify-content:center;
+  color:transparent;font-size:14px;font-weight:700;flex-shrink:0;transition:all .15s;}
+.meal-check.done{background:var(--accent);color:#000;border-color:var(--accent);}
+.meal-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);
+  letter-spacing:1px;width:64px;flex-shrink:0;}
+.meal-food{flex:1;font-size:13px;line-height:1.4;}
+.meal-food.done{text-decoration:line-through;color:var(--text-3);}
+.meal-macros{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
+  letter-spacing:.5px;margin-top:2px;}
 
 /* Plan items */
 .plan-item{display:flex;align-items:center;gap:12px;padding:14px 0;
@@ -164,14 +203,7 @@ textarea{resize:vertical;min-height:80px;}
 .plan-check.done{background:var(--accent);color:#000;border-color:var(--accent);}
 .plan-check.missed{background:rgba(248,113,113,.12);color:var(--bad);border-color:rgba(248,113,113,.3);}
 
-/* Diet items */
-.diet-item{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line-soft);align-items:flex-start;}
-.diet-item:first-of-type{border-top:0;}
-.diet-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);
-  letter-spacing:1px;width:64px;flex-shrink:0;padding-top:2px;}
-.diet-food{flex:1;font-size:13px;line-height:1.5;}
-
-/* Stats — chart */
+/* Stats charts */
 .chart-wrap{margin-top:8px;}
 .chart{width:100%;height:160px;display:block;}
 .chart-legend{display:flex;justify-content:space-between;margin-top:8px;
@@ -197,20 +229,13 @@ textarea{resize:vertical;min-height:80px;}
   background:var(--surface-3);color:var(--text);padding:12px 18px;border-radius:999px;
   font-size:13px;font-weight:500;border:1px solid var(--line);
   box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:50;
-  opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+  opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;max-width:90%;text-align:center;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
 .toast.good{color:var(--accent);}
 .toast.bad{color:var(--bad);}
 
-/* Loading */
-.loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:80px 0;color:var(--text-3);}
-.spinner{width:34px;height:34px;border:2px solid var(--surface-3);border-top-color:var(--accent);
-  border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
 .empty{text-align:center;padding:30px 16px;color:var(--text-3);font-size:13px;}
 
-/* Setup screen */
 .setup{padding:30px 22px;max-width:480px;margin:0 auto;min-height:100vh;
   display:flex;flex-direction:column;justify-content:center;}
 .setup h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin:0 0 6px;}
@@ -219,7 +244,6 @@ textarea{resize:vertical;min-height:80px;}
 .setup ol code{background:var(--surface-2);padding:1px 6px;border-radius:4px;
   font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);}
 
-/* Profile rows */
 .profile-row{display:flex;justify-content:space-between;align-items:center;
   padding:14px 0;border-top:1px solid var(--line-soft);}
 .profile-row:first-of-type{border-top:0;}
@@ -228,7 +252,6 @@ textarea{resize:vertical;min-height:80px;}
 .profile-row .value small{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);
   letter-spacing:1px;margin-left:4px;}
 
-/* Sync indicator */
 .sync-pill{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;
   font-size:9px;letter-spacing:1.5px;color:var(--text-3);text-transform:uppercase;}
 .sync-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--good);}
@@ -236,13 +259,11 @@ textarea{resize:vertical;min-height:80px;}
 .sync-pill.syncing .dot{background:var(--warn);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.3;}}
 
-/* Scrollbar hidden */
 ::-webkit-scrollbar{display:none;}
 </style>
 </head>
 <body>
 
-<!-- ============ SETUP SCREEN (shown if no API URL configured) ============ -->
 <div id="setupScreen" class="setup" style="display:none;">
   <h2>IRON <span style="color:var(--accent)">SETUP</span></h2>
   <p style="margin-bottom:20px;">Connect your Google Sheet to start tracking.</p>
@@ -251,7 +272,7 @@ textarea{resize:vertical;min-height:80px;}
     <ol>
       <li>Go to <code>script.google.com</code> → New project</li>
       <li>Paste the <code>Code.gs</code> file contents into the editor</li>
-      <li>Run <code>setupSheet()</code> once (approve permissions)</li>
+      <li>Run <code>testConnection</code> to verify</li>
       <li>Deploy → New deployment → Web app → "Anyone" access</li>
       <li>Copy the Web App URL and paste it below</li>
     </ol>
@@ -262,11 +283,10 @@ textarea{resize:vertical;min-height:80px;}
   </div>
   <button class="btn btn-primary" onclick="App.saveApiUrl()">Connect & Launch</button>
   <p style="margin-top:14px;font-size:11px;color:var(--text-3);text-align:center;">
-    Your data stays in your Google Sheet. Nothing is sent elsewhere.
+    Your data stays in your Google Sheet.
   </p>
 </div>
 
-<!-- ============ MAIN APP ============ -->
 <div id="app" style="display:none;">
   <div class="topbar">
     <div class="brand">
@@ -284,7 +304,6 @@ textarea{resize:vertical;min-height:80px;}
       <p id="heroSub">Loading your day…</p>
     </div>
 
-    <!-- Calories -->
     <div class="card">
       <div class="card-title">
         <span>Calories Today</span>
@@ -302,7 +321,6 @@ textarea{resize:vertical;min-height:80px;}
       </div>
     </div>
 
-    <!-- Protein + Weight -->
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Protein</div>
@@ -330,7 +348,6 @@ textarea{resize:vertical;min-height:80px;}
       </div>
     </div>
 
-    <!-- Workout -->
     <div class="card workout-card">
       <div class="card-title">
         <span>Today's Workout</span>
@@ -339,15 +356,14 @@ textarea{resize:vertical;min-height:80px;}
       <div class="workout-name" id="workoutName">—</div>
       <div class="muscle-tags" id="workoutTags"></div>
       <div class="btn-row">
-        <button class="btn btn-primary" id="markDoneBtn" onclick="App.toggleTodayWorkout()">Mark Done</button>
+        <button class="btn btn-secondary" onclick="App.go('track')">Open Checklist →</button>
       </div>
     </div>
 
-    <!-- Smart suggestions -->
     <div class="card">
       <div class="card-title">
         <span>Coach Insights</span>
-        <span class="badge good" id="coachBadge">LIVE</span>
+        <span class="badge good">LIVE</span>
       </div>
       <div id="suggestions"></div>
     </div>
@@ -356,41 +372,59 @@ textarea{resize:vertical;min-height:80px;}
   <!-- TRACK -->
   <section class="page" data-page="track">
     <div class="hero">
-      <h1>LOG <span class="accent">TODAY.</span></h1>
-      <p>Quick daily check-in. Saves to your sheet.</p>
+      <h1>TRACK <span class="accent">TODAY.</span></h1>
+      <p id="trackSub">Tap each exercise & meal as you do them.</p>
     </div>
 
-    <div class="card">
-      <div class="form-group">
-        <label>Date</label>
-        <input type="date" id="t_date" />
+    <!-- Workout Checklist -->
+    <div class="card" id="exerciseCard">
+      <div class="card-title">
+        <span>Today's Workout</span>
+        <span class="badge" id="exerciseBadge">0/0</span>
       </div>
+      <div class="workout-header">
+        <div class="title" id="exerciseTitle">—</div>
+        <div class="pct" id="exercisePct">0%</div>
+      </div>
+      <div class="workout-sub" id="exerciseSub">—</div>
+      <div class="progress"><i id="exerciseProgress" style="width:0%"></i></div>
+      <div id="exerciseList" style="margin-top:6px;"></div>
+      <div class="add-row">
+        <input id="customExName" type="text" placeholder="Add custom exercise…" />
+        <button onclick="App.addCustomExercise()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- Meal Checklist -->
+    <div class="card">
+      <div class="card-title">
+        <span>Today's Diet</span>
+        <span class="badge" id="mealBadge">0/0</span>
+      </div>
+      <div class="workout-header">
+        <div class="title">Nutrition Plan</div>
+        <div class="pct" id="mealPct">0%</div>
+      </div>
+      <div class="workout-sub" id="mealSub">~2800 kcal · ~110g protein</div>
+      <div class="progress"><i id="mealProgress" style="width:0%"></i></div>
+      <div id="mealList" style="margin-top:6px;"></div>
+    </div>
+
+    <!-- Quick metrics -->
+    <div class="card">
+      <div class="card-title">Daily Metrics</div>
       <div class="form-group">
         <label>Weight (kg)</label>
         <input type="number" id="t_weight" step="0.1" inputmode="decimal" placeholder="51.0" />
       </div>
       <div class="form-group">
-        <label>Workout Done?</label>
-        <div class="toggle-row">
-          <button class="toggle-btn" data-val="yes" onclick="App.setWorkoutDone(true)">Yes</button>
-          <button class="toggle-btn" data-val="no" onclick="App.setWorkoutDone(false)">No</button>
-        </div>
+        <label>Total Calories</label>
+        <input type="number" id="t_calories" inputmode="numeric" placeholder="auto-filled from meals" />
+        <div class="hint">Leave blank to auto-calculate from checked meals.</div>
       </div>
       <div class="form-group">
-        <label>Workout Type</label>
-        <input type="text" id="t_workoutType" placeholder="Chest + Triceps" />
-      </div>
-      <div class="form-group">
-        <label>Calories (kcal)</label>
-        <input type="number" id="t_calories" inputmode="numeric" placeholder="2800" />
-      </div>
-      <div class="form-group">
-        <label>Protein (g)</label>
-        <input type="number" id="t_protein" inputmode="numeric" placeholder="110" />
-      </div>
-      <div class="form-group">
-        <label>Meals (optional)</label>
-        <textarea id="t_meals" placeholder="Oats, eggs, dal, paneer, milk…"></textarea>
+        <label>Total Protein (g)</label>
+        <input type="number" id="t_protein" inputmode="numeric" placeholder="auto-filled from meals" />
       </div>
       <div class="form-group">
         <label>Sleep (hours)</label>
@@ -400,7 +434,7 @@ textarea{resize:vertical;min-height:80px;}
         <label>Notes</label>
         <textarea id="t_notes" placeholder="How you felt today…"></textarea>
       </div>
-      <button class="btn btn-primary" onclick="App.saveTrack()">Save & Analyze</button>
+      <button class="btn btn-primary" onclick="App.saveTrack()">Save Daily Log</button>
     </div>
   </section>
 
@@ -408,17 +442,51 @@ textarea{resize:vertical;min-height:80px;}
   <section class="page" data-page="plan">
     <div class="hero">
       <h1>YOUR <span class="accent">PLAN.</span></h1>
-      <p>Workout split + structured diet.</p>
+      <p>Science-based hypertrophy + structured nutrition.</p>
     </div>
 
     <div class="card">
-      <div class="card-title">Workout Split</div>
+      <div class="card-title">
+        <span>Weekly Workout Split</span>
+        <span class="badge">PPL + SPORT</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 12px;">
+        Push / Pull / Legs is the gold-standard hypertrophy split. Each muscle group hit ~2x/week
+        for optimal MPS (muscle protein synthesis). Compound lifts first when fresh, isolation after.
+        Volleyball = active recovery + power.
+      </p>
       <div id="planList"></div>
     </div>
 
+    <div class="card" id="dayDetailCard">
+      <div class="card-title">
+        <span>Day Detail</span>
+        <span class="badge" id="dayDetailDay">TODAY</span>
+      </div>
+      <div id="dayDetail"></div>
+    </div>
+
     <div class="card">
-      <div class="card-title">Daily Nutrition Plan</div>
+      <div class="card-title">
+        <span>Daily Nutrition Plan</span>
+        <span class="badge">~2800 KCAL</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 12px;">
+        Lean bulk: caloric surplus of ~300 kcal over maintenance. Protein 2.0g/kg bodyweight
+        for muscle synthesis. Carbs around training, fats spread across the day.
+      </p>
       <div id="dietList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Why This Works</div>
+      <p style="font-size:12px;color:var(--text-2);line-height:1.6;margin:0;">
+        <strong style="color:var(--text)">Progressive overload:</strong> Add weight or reps every 1–2 weeks. <br>
+        <strong style="color:var(--text)">RIR (Reps in Reserve):</strong> Stop sets with 1–2 reps left in the tank, not failure. <br>
+        <strong style="color:var(--text)">Volume:</strong> 10–20 sets per muscle per week is the proven hypertrophy zone. <br>
+        <strong style="color:var(--text)">Rest:</strong> 90–180s for compounds, 60–90s for isolation. <br>
+        <strong style="color:var(--text)">Sleep + surplus:</strong> Muscle is built outside the gym. 8h sleep + 300 kcal surplus.
+      </p>
     </div>
   </section>
 
@@ -495,9 +563,9 @@ textarea{resize:vertical;min-height:80px;}
         <span class="label">Install to Home Screen</span>
         <span class="value" style="font-size:14px;color:var(--accent)">→</span>
       </div>
-      <div class="profile-row" style="cursor:pointer" onclick="App.openSheet()">
-        <span class="label">Open Google Sheet</span>
-        <span class="value" style="font-size:14px;color:var(--accent)">→</span>
+      <div class="profile-row" style="cursor:pointer" onclick="App.refresh(true)">
+        <span class="label">Force Sync Now</span>
+        <span class="value" style="font-size:14px;color:var(--accent)">↻</span>
       </div>
       <div class="profile-row" style="cursor:pointer" onclick="App.resetApiUrl()">
         <span class="label">Reset Connection</span>
@@ -506,7 +574,6 @@ textarea{resize:vertical;min-height:80px;}
     </div>
   </section>
 
-  <!-- Bottom nav -->
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button class="nav-btn active" data-nav="home" onclick="App.go('home')">
@@ -518,7 +585,7 @@ textarea{resize:vertical;min-height:80px;}
         Plan
       </button>
       <button class="nav-btn" data-nav="track" onclick="App.go('track')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
         Track
       </button>
       <button class="nav-btn" data-nav="stats" onclick="App.go('stats')">
@@ -537,35 +604,139 @@ textarea{resize:vertical;min-height:80px;}
 
 <script>
 // ============================================================
-// IRON Gym Tracker — Mobile PWA
+// IRON — Science-Based Hypertrophy Plan + Checklists
 // ============================================================
-
 const STORAGE_KEY_API = 'iron_api_url';
 const STORAGE_KEY_CACHE = 'iron_cache';
 
-// Workout split — also used for analysis
-const WORKOUT_PLAN = {
-  0: { name: 'Rest Day',           tags: ['Recovery'],            sub: 'Sleep & nutrition focus' },
-  1: { name: 'Chest + Triceps',    tags: ['Chest','Triceps','Push'],sub: 'Bench, incline, dips, pushdowns' },
-  2: { name: 'Back + Biceps',      tags: ['Back','Biceps','Pull'], sub: 'Rows, pull-ups, curls' },
-  3: { name: 'Legs',               tags: ['Quads','Hams','Glutes'],sub: 'Squat, deadlift, lunges' },
-  4: { name: 'Shoulders',          tags: ['Delts','Traps'],        sub: 'Press, lateral raises, shrugs' },
-  5: { name: 'Full Body',          tags: ['Compound','Power'],     sub: 'Big lifts, low volume' },
-  6: { name: 'Volleyball',         tags: ['Cardio','Sport','Active'],sub: 'Weekend match — fuel well' }
+/* === SCIENCE-BASED WORKOUT PLAN ===
+ * Push / Pull / Legs split (proven optimal for hypertrophy).
+ * Each exercise: sets × reps, with RIR (reps in reserve) targets.
+ * Compounds first (heavy, lower reps for strength + size),
+ * isolations after (higher reps, focus on muscle pump & MMC).
+ * Volume per muscle per week falls in 12-20 sets (Schoenfeld meta-analysis).
+ */
+const WORKOUT_PROGRAM = {
+  // Sunday = 0
+  0: {
+    name: 'Active Recovery',
+    sub: 'Light walk · stretch · mobility',
+    tags: ['Recovery'],
+    rationale: 'Recovery is when muscle is built. Sleep 8h, eat full surplus.',
+    exercises: [
+      { id:'rec1', name:'10-min light walk', sets:'1', reps:'10 min', tip:'Boosts circulation, aids recovery' },
+      { id:'rec2', name:'Foam rolling — full body', sets:'1', reps:'8 min', tip:'Reduces DOMS, improves mobility' },
+      { id:'rec3', name:'Static stretches (hams, hips, chest)', sets:'1', reps:'30s × 2', tip:'Hold each stretch 30 sec' }
+    ]
+  },
+  // Monday = Push (Chest + Shoulders + Triceps)
+  1: {
+    name: 'Push Day — Chest, Shoulders, Triceps',
+    sub: 'Heavy compounds → isolations · 16 sets total',
+    tags: ['Chest','Shoulders','Triceps'],
+    rationale: 'Push compounds first when CNS is fresh. Bench drives chest & front delts. Shoulder press hits delts. Isolations finish triceps & rear delts.',
+    exercises: [
+      { id:'p1', name:'Barbell Bench Press', sets:'4', reps:'6-8', tip:'Compound. Drives chest mass. RIR 1-2. Pause briefly at chest.' },
+      { id:'p2', name:'Incline Dumbbell Press', sets:'3', reps:'8-10', tip:'Targets upper chest (clavicular head). 30° incline is optimal.' },
+      { id:'p3', name:'Seated Shoulder Press (DB)', sets:'3', reps:'8-10', tip:'Front + lateral delts. Stop just before lockout to keep tension.' },
+      { id:'p4', name:'Lateral Raises (DB)', sets:'3', reps:'12-15', tip:'Side delts = wider shoulders. Light weight, slow tempo.' },
+      { id:'p5', name:'Cable Tricep Pushdown', sets:'3', reps:'10-12', tip:'Lateral & medial heads. Elbows pinned to sides.' },
+      { id:'p6', name:'Overhead Tricep Extension', sets:'3', reps:'10-12', tip:'Long head of triceps — only stretches in this position.' }
+    ]
+  },
+  // Tuesday = Pull (Back + Biceps)
+  2: {
+    name: 'Pull Day — Back, Biceps, Rear Delts',
+    sub: 'Vertical + horizontal pulls · 16 sets total',
+    tags: ['Back','Biceps','Rear Delts'],
+    rationale: 'Back needs both vertical pulls (lats) & horizontal pulls (mid-back). Biceps trained after to maximize pulling force on compounds.',
+    exercises: [
+      { id:'pl1', name:'Pull-ups / Lat Pulldown', sets:'4', reps:'6-10', tip:'Vertical pull = lat width. Use band assist if needed for pull-ups.' },
+      { id:'pl2', name:'Barbell Row (or Pendlay)', sets:'4', reps:'6-8', tip:'Horizontal pull = mid-back thickness. Pull to lower chest.' },
+      { id:'pl3', name:'Seated Cable Row', sets:'3', reps:'10-12', tip:'Squeeze shoulder blades at end. Constant tension.' },
+      { id:'pl4', name:'Face Pulls', sets:'3', reps:'12-15', tip:'Rear delts + rotator cuff — saves shoulder health long term.' },
+      { id:'pl5', name:'Barbell / EZ-bar Curl', sets:'3', reps:'8-10', tip:'Bicep mass builder. Don\'t swing the body.' },
+      { id:'pl6', name:'Hammer Curl (DB)', sets:'3', reps:'10-12', tip:'Hits brachialis = thicker arms. Neutral grip.' }
+    ]
+  },
+  // Wednesday = Legs
+  3: {
+    name: 'Leg Day — Quads, Hams, Glutes, Calves',
+    sub: 'Squat-focused · 17 sets total',
+    tags: ['Quads','Hamstrings','Glutes','Calves'],
+    rationale: 'Largest muscle group = biggest hormonal & growth response. Squats + RDLs cover everything. Don\'t skip — full-body anabolic boost.',
+    exercises: [
+      { id:'l1', name:'Barbell Back Squat', sets:'4', reps:'6-8', tip:'King of leg exercises. Below parallel. Brace core hard.' },
+      { id:'l2', name:'Romanian Deadlift', sets:'4', reps:'8-10', tip:'Hamstrings + glutes. Hinge at hips, slight knee bend, feel the stretch.' },
+      { id:'l3', name:'Leg Press', sets:'3', reps:'10-12', tip:'Quad-focused. High foot = more glutes/hams. Low foot = quads.' },
+      { id:'l4', name:'Leg Curl (lying or seated)', sets:'3', reps:'10-12', tip:'Direct hamstring isolation. Slow eccentric (3 sec down).' },
+      { id:'l5', name:'Walking Lunges', sets:'3', reps:'10/leg', tip:'Glutes + quads + balance. Step long, sink deep.' },
+      { id:'l6', name:'Standing Calf Raise', sets:'4', reps:'12-15', tip:'Pause 1 sec at top. Full stretch at bottom.' }
+    ]
+  },
+  // Thursday = Shoulder-focused / Upper accessory
+  4: {
+    name: 'Shoulder & Upper Accessory',
+    sub: 'Delt-specialization day · 15 sets',
+    tags: ['Shoulders','Traps','Arms'],
+    rationale: 'Extra shoulder volume = wider, more aesthetic frame. Traps & arms get extra direct work.',
+    exercises: [
+      { id:'s1', name:'Overhead Press (BB or DB)', sets:'4', reps:'6-8', tip:'Heavy press. Standing = extra core engagement.' },
+      { id:'s2', name:'Lateral Raise (DB or Cable)', sets:'4', reps:'12-15', tip:'Highest priority for delt width. 4 sets minimum.' },
+      { id:'s3', name:'Reverse Pec Deck / Rear Delt Fly', sets:'3', reps:'12-15', tip:'Rear delts = balanced shoulders + posture.' },
+      { id:'s4', name:'Barbell Shrugs', sets:'3', reps:'10-12', tip:'Upper traps. 1-second squeeze at top.' },
+      { id:'s5', name:'Incline DB Curl', sets:'3', reps:'10-12', tip:'Bicep stretched = more growth. Lean back on bench.' },
+      { id:'s6', name:'Skull Crushers (EZ-bar)', sets:'3', reps:'10-12', tip:'Long head of triceps. Lower behind head, not to forehead.' }
+    ]
+  },
+  // Friday = Full Body (compound power)
+  5: {
+    name: 'Full Body Power',
+    sub: 'Big compounds, low volume · 12 sets',
+    tags: ['Compound','Power','Full-Body'],
+    rationale: 'Hits all weekly volume gaps. Heavy & low-rep = strength-focused. Recovery is sufficient before weekend volleyball.',
+    exercises: [
+      { id:'f1', name:'Conventional Deadlift', sets:'4', reps:'5', tip:'King lift. Posterior chain + core + grip. Belt optional.' },
+      { id:'f2', name:'Bench Press', sets:'3', reps:'5-6', tip:'Heavy chest day #2. Match or beat Monday\'s top set.' },
+      { id:'f3', name:'Pull-ups (weighted if possible)', sets:'3', reps:'5-8', tip:'Add weight via belt once 8+ bodyweight reps are easy.' },
+      { id:'f4', name:'Front Squat OR Bulgarian Split Squat', sets:'3', reps:'8/leg', tip:'Quad-dominant. Lower load than back squat.' },
+      { id:'f5', name:'Plank + Side Plank', sets:'2', reps:'45s each', tip:'Core stability for all lifts.' }
+    ]
+  },
+  // Saturday = Volleyball
+  6: {
+    name: 'Volleyball Match Day',
+    sub: 'Sport-specific cardio & power · fuel well',
+    tags: ['Volleyball','Sport','Power'],
+    rationale: 'Plyometric + anaerobic + sport-specific. Eat extra carbs pre-game (banana + oats), protein post-game.',
+    exercises: [
+      { id:'v1', name:'Dynamic warm-up (5 min)', sets:'1', reps:'5 min', tip:'Arm circles, leg swings, jumping jacks. Reduces injury risk.' },
+      { id:'v2', name:'Volleyball match / practice', sets:'1', reps:'60-90 min', tip:'High-intensity intervals. Drink water.' },
+      { id:'v3', name:'Cool-down stretch (5 min)', sets:'1', reps:'5 min', tip:'Especially calves, hams, shoulders.' },
+      { id:'v4', name:'Post-game protein shake', sets:'1', reps:'30g', tip:'Within 1 hr. Helps recovery before tomorrow.' }
+    ]
+  }
 };
-const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
+const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+/* === STRUCTURED INDIAN BULK DIET ===
+ * ~2800 kcal · ~115g protein · 3:1 carb-to-fat ratio
+ * Each meal has approx kcal/protein for autosum.
+ */
 const DIET_PLAN = [
-  { time: '5:30 AM', food: 'Soaked chana / moong / kismis / soya' },
-  { time: '6:00 AM', food: 'Banana + creatine (pre-workout)' },
-  { time: 'Post WO', food: 'Protein shake (whey 1 scoop)' },
-  { time: '9:00 AM', food: 'Oats + almonds' },
-  { time: '11:00 AM',food: 'Eggs (2-3 whole)' },
-  { time: '2:00 PM', food: 'Lunch — roti, dal, rice, paneer' },
-  { time: '5:00 PM', food: 'Peanut butter bread' },
-  { time: '8:00 PM', food: 'Dinner — chicken or paneer' },
-  { time: '10:00 PM',food: 'Milk + almonds' }
+  { id:'m1', time:'5:30 AM', name:'Soaked chana + moong + kismis + soya', kcal:280, protein:18 },
+  { id:'m2', time:'6:00 AM', name:'Banana + creatine 5g (pre-workout)', kcal:110, protein:1 },
+  { id:'m3', time:'POST-WO', name:'Whey protein shake (1 scoop) + water', kcal:130, protein:25 },
+  { id:'m4', time:'9:00 AM', name:'Oats (60g) + milk + 10 almonds', kcal:430, protein:14 },
+  { id:'m5', time:'11:00 AM',name:'3 whole eggs (boiled or omelet)', kcal:220, protein:18 },
+  { id:'m6', time:'2:00 PM', name:'Lunch: 3 roti + dal + rice + paneer (100g)', kcal:780, protein:28 },
+  { id:'m7', time:'5:00 PM', name:'2 slices bread + 2 tbsp peanut butter', kcal:330, protein:11 },
+  { id:'m8', time:'8:00 PM', name:'Dinner: chicken (150g) OR paneer + 2 roti', kcal:520, protein:38 },
+  { id:'m9', time:'10:00 PM',name:'Glass of milk + 6 almonds', kcal:200, protein:9 }
 ];
+// Total: ~3000 kcal, ~162g protein (slightly above target — natural buffer)
 
 // ============================================================
 const App = (() => {
@@ -574,10 +745,12 @@ const App = (() => {
     profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4 },
     logs: [],
     workouts: [],
-    todayDraft: { workoutDone: null }
+    exercises: [],
+    meals: [],
+    expandedTip: null,
+    viewingDayDow: new Date().getDay()
   };
 
-  // ===== Bootstrap =====
   function init() {
     setTodayLabel();
     if (!state.apiUrl) {
@@ -586,9 +759,8 @@ const App = (() => {
     }
     document.getElementById('app').style.display = 'block';
     loadCache();
-    renderAll(); // render with cache first for snappy feel
-    refresh();   // then sync from sheet
-    document.getElementById('t_date').value = todayStr();
+    renderAll();
+    refresh();
     registerSW();
   }
 
@@ -601,16 +773,22 @@ const App = (() => {
   function loadCache(){
     try {
       const c = JSON.parse(localStorage.getItem(STORAGE_KEY_CACHE) || 'null');
-      if (c) { state.profile = c.profile || state.profile; state.logs = c.logs || []; state.workouts = c.workouts || []; }
+      if (c) {
+        state.profile = c.profile || state.profile;
+        state.logs = c.logs || [];
+        state.workouts = c.workouts || [];
+        state.exercises = c.exercises || [];
+        state.meals = c.meals || [];
+      }
     } catch(e){}
   }
   function saveCache(){
     localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify({
-      profile: state.profile, logs: state.logs, workouts: state.workouts
+      profile: state.profile, logs: state.logs, workouts: state.workouts,
+      exercises: state.exercises, meals: state.meals
     }));
   }
 
-  // ===== API =====
   function setSync(status){
     const pill = document.getElementById('syncPill');
     const txt = document.getElementById('syncTxt');
@@ -624,7 +802,6 @@ const App = (() => {
     if (!state.apiUrl) throw new Error('No API URL configured');
     setSync('syncing');
     try {
-      // Use text/plain to avoid CORS preflight on Apps Script
       const res = await fetch(state.apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -641,51 +818,61 @@ const App = (() => {
     }
   }
 
-  async function refresh() {
+  async function refresh(showToast) {
     try {
       const all = await api('getAll');
       state.profile = Object.assign(state.profile, all.profile || {});
-      // Coerce numeric profile values
       ['currentWeight','targetWeight','targetCalories','targetProtein','weeklyGainTarget'].forEach(k=>{
         if (state.profile[k] !== undefined) state.profile[k] = Number(state.profile[k]);
       });
-      state.logs     = all.logs || [];
+      state.logs = all.logs || [];
       state.workouts = all.workouts || [];
+      state.exercises = all.exercises || [];
+      state.meals = all.meals || [];
       saveCache();
       renderAll();
+      if (showToast) toast('Synced', 'good');
     } catch(e) {
-      toast('Offline — using cached data', 'bad');
+      if (showToast) toast('Sync failed: ' + e.message, 'bad');
+      else toast('Offline — using cached data', 'bad');
     }
   }
 
-  // ===== Render =====
   function renderAll() {
     renderHome();
+    renderTrack();
     renderPlan();
     renderStats();
     renderProfile();
   }
 
-  function todayLog() {
-    const t = todayStr();
-    return state.logs.find(l => l.date === t) || null;
-  }
-  function todayWorkoutEntry() {
-    const t = todayStr();
-    return state.workouts.find(w => w.date === t) || null;
-  }
+  // ==================== HOME ====================
+  function todayLog() { return state.logs.find(l => l.date === todayStr()) || null; }
+  function todayWorkoutEntry() { return state.workouts.find(w => w.date === todayStr()) || null; }
 
   function renderHome() {
     const p = state.profile;
     const log = todayLog();
-    const cal = Number(log?.calories) || 0;
-    const prot = Number(log?.protein) || 0;
+    const dow = new Date().getDay();
+    const wkPlan = WORKOUT_PROGRAM[dow];
+
+    // Auto-compute calories/protein from checked meals if no override in log
+    const todayMeals = state.meals.filter(m => m.date === todayStr() && m.done === 'YES');
+    const autoCal = todayMeals.reduce((sum,m)=>{
+      const meal = DIET_PLAN.find(d => d.id === m.mealId);
+      return sum + (meal ? meal.kcal : 0);
+    }, 0);
+    const autoProt = todayMeals.reduce((sum,m)=>{
+      const meal = DIET_PLAN.find(d => d.id === m.mealId);
+      return sum + (meal ? meal.protein : 0);
+    }, 0);
+
+    const cal = Number(log?.calories) || autoCal;
+    const prot = Number(log?.protein) || autoProt;
     const w = Number(log?.weight) || p.currentWeight || 51;
 
-    // Hero subtitle
-    const wkPlan = WORKOUT_PLAN[new Date().getDay()];
     document.getElementById('heroSub').textContent =
-      `Today: ${wkPlan.name}. Target ${p.targetCalories} kcal · ${p.targetProtein}g protein.`;
+      `Today: ${wkPlan.name.split(' — ')[0]}. Target ${p.targetCalories} kcal · ${p.targetProtein}g protein.`;
 
     // Calories
     const calPct = Math.min(100, Math.round((cal / p.targetCalories) * 100));
@@ -700,10 +887,10 @@ const App = (() => {
     calBar.classList.remove('warn','bad');
     const calBadge = document.getElementById('calBadge');
     calBadge.classList.remove('good','warn','bad');
-    if (cal === 0)               { calBadge.textContent='NO DATA'; }
-    else if (calPct < 80)        { calBadge.textContent='LOW'; calBadge.classList.add('warn'); calBar.classList.add('warn'); }
-    else if (calPct > 115)       { calBadge.textContent='HIGH'; calBadge.classList.add('bad'); calBar.classList.add('bad'); }
-    else                         { calBadge.textContent='GOOD'; calBadge.classList.add('good'); }
+    if (cal === 0)        { calBadge.textContent='NO DATA'; }
+    else if (calPct < 80) { calBadge.textContent='LOW'; calBadge.classList.add('warn'); calBar.classList.add('warn'); }
+    else if (calPct > 115){ calBadge.textContent='HIGH'; calBadge.classList.add('bad'); calBar.classList.add('bad'); }
+    else                  { calBadge.textContent='GOOD'; calBadge.classList.add('good'); }
 
     // Protein
     const protPct = Math.min(100, Math.round((prot / p.targetProtein) * 100));
@@ -714,146 +901,334 @@ const App = (() => {
     protBar.classList.remove('warn','bad');
     const protBadge = document.getElementById('protBadge');
     protBadge.classList.remove('good','warn','bad');
-    if (prot === 0)              { protBadge.textContent='NO DATA'; }
-    else if (protPct < 80)       { protBadge.textContent='LOW'; protBadge.classList.add('warn'); protBar.classList.add('warn'); }
-    else                         { protBadge.textContent='GOOD'; protBadge.classList.add('good'); }
+    if (prot === 0)         { protBadge.textContent='NO DATA'; }
+    else if (protPct < 80)  { protBadge.textContent='LOW'; protBadge.classList.add('warn'); protBar.classList.add('warn'); }
+    else                    { protBadge.textContent='GOOD'; protBadge.classList.add('good'); }
 
     // Weight
-    document.getElementById('weightNum').textContent = w.toFixed ? w.toFixed(1) : w;
-    const weightPct = Math.max(0, Math.min(100,
-      ((w - 51) / (p.targetWeight - 51)) * 100));
+    document.getElementById('weightNum').textContent = (w.toFixed ? w.toFixed(1) : w);
+    const weightPct = Math.max(0, Math.min(100, ((w - 51) / (p.targetWeight - 51)) * 100));
     document.getElementById('weightProgress').style.width = weightPct + '%';
     const toGo = (p.targetWeight - w).toFixed(1);
     document.getElementById('weightToGo').textContent = toGo > 0 ? `${toGo}kg to go` : 'Goal reached';
     const trend = computeWeightTrend();
     document.getElementById('weightTrend').textContent = trend.label;
 
-    // Workout
+    // Workout summary on home
     document.getElementById('workoutName').textContent = wkPlan.name;
     document.getElementById('workoutTags').innerHTML =
       wkPlan.tags.map(t => `<span class="tag">${t}</span>`).join('');
-    const wEntry = todayWorkoutEntry();
-    const done = wEntry && wEntry.completed === 'YES';
+    const todayExercises = state.exercises.filter(e => e.date === todayStr());
+    const totalEx = wkPlan.exercises.length + todayExercises.filter(e => e.custom === 'YES').length;
+    const doneEx = todayExercises.filter(e => e.done === 'YES').length;
     const wBadge = document.getElementById('workoutBadge');
     wBadge.classList.remove('good','warn','bad');
-    if (done) { wBadge.textContent='DONE'; wBadge.classList.add('good'); }
-    else      { wBadge.textContent='PLANNED'; }
-    document.getElementById('markDoneBtn').textContent = done ? 'Mark as Not Done' : 'Mark Done';
+    if (totalEx > 0 && doneEx === totalEx) { wBadge.textContent = 'COMPLETE'; wBadge.classList.add('good'); }
+    else if (doneEx > 0) { wBadge.textContent = `${doneEx}/${totalEx}`; wBadge.classList.add('warn'); }
+    else { wBadge.textContent = 'PENDING'; }
 
-    // Suggestions
-    renderSuggestions(cal, prot, w, done, trend);
+    renderSuggestions(cal, prot, w, doneEx, totalEx, trend);
   }
 
-  function renderSuggestions(cal, prot, w, workoutDone, trend) {
+  function renderSuggestions(cal, prot, w, doneEx, totalEx, trend) {
     const p = state.profile;
     const sug = [];
     const dow = new Date().getDay();
-
-    // 1. Calories
-    if (cal === 0) {
-      sug.push({ type:'warn', icon:'🍽', text:'No calories logged today.', sub:'OPEN TRACK TAB → LOG MEALS' });
-    } else if (cal < p.targetCalories * 0.8) {
-      const gap = p.targetCalories - cal;
-      sug.push({ type:'warn', icon:'⬆', text:`You're ${gap} kcal short. Add a banana shake or peanut butter toast.`, sub:'CALORIE DEFICIT • MUSCLE GAIN BLOCKED' });
-    } else if (cal > p.targetCalories * 1.15) {
-      sug.push({ type:'bad', icon:'⬇', text:`Over by ${cal - p.targetCalories} kcal. Trim carbs at dinner.`, sub:'EXCESS WILL ADD FAT' });
-    } else {
-      sug.push({ type:'good', icon:'✓', text:'Calorie target on point. Keep it up.', sub:'SURPLUS LOCKED IN' });
-    }
-
-    // 2. Protein
-    if (prot > 0 && prot < p.targetProtein * 0.8) {
-      const gap = p.targetProtein - prot;
-      sug.push({ type:'warn', icon:'🥚', text:`Need ${gap}g more protein. Add eggs, paneer, or a scoop of whey.`, sub:'PROTEIN < 80% OF TARGET' });
-    } else if (prot >= p.targetProtein * 0.95) {
-      sug.push({ type:'good', icon:'💪', text:'Protein hit. Muscle synthesis primed.', sub:'TARGET REACHED' });
-    }
-
-    // 3. Workout
-    const todayPlan = WORKOUT_PLAN[dow];
     const hr = new Date().getHours();
-    if (dow === 0) {
-      sug.push({ type:'good', icon:'😴', text:'Rest day — recovery builds muscle. Sleep 8h, eat full surplus.', sub:'SUNDAY • RECOVERY' });
-    } else if (dow === 6) {
-      sug.push({ type:'good', icon:'🏐', text:'Volleyball today. Eat extra carbs pre-game, protein post.', sub:'SATURDAY • SPORT DAY' });
-    } else if (!workoutDone && hr >= 21) {
-      sug.push({ type:'bad', icon:'⚠', text:`Missed ${todayPlan.name} today. Reschedule to tomorrow or merge with next session.`, sub:'WORKOUT MISSED' });
-    } else if (!workoutDone) {
-      sug.push({ type:'warn', icon:'🏋', text:`${todayPlan.name} is planned. Hit the gym before 8 PM.`, sub:'WORKOUT PENDING' });
-    }
+    const wkPlan = WORKOUT_PROGRAM[dow];
 
-    // 4. Weight trend
+    if (cal === 0) sug.push({ type:'warn', icon:'🍽', text:'No meals checked off today.', sub:'OPEN TRACK TAB → CHECK MEALS' });
+    else if (cal < p.targetCalories * 0.8) sug.push({ type:'warn', icon:'⬆', text:`Need ${p.targetCalories-cal} more kcal. Add a banana shake or extra peanut butter toast.`, sub:'CALORIE DEFICIT • MUSCLE GAIN BLOCKED' });
+    else if (cal > p.targetCalories * 1.15) sug.push({ type:'bad', icon:'⬇', text:`${cal-p.targetCalories} kcal over. Trim carbs at next meal.`, sub:'EXCESS WILL ADD FAT' });
+    else sug.push({ type:'good', icon:'✓', text:'Calorie target on point. Keep stacking days.', sub:'SURPLUS LOCKED IN' });
+
+    if (prot > 0 && prot < p.targetProtein * 0.8) sug.push({ type:'warn', icon:'🥚', text:`${p.targetProtein-prot}g more protein needed. Add eggs, paneer, or whey.`, sub:'PROTEIN < 80% — MUSCLE SYNTHESIS LIMITED' });
+    else if (prot >= p.targetProtein * 0.95) sug.push({ type:'good', icon:'💪', text:'Protein hit. MPS primed for 24h.', sub:'TARGET REACHED' });
+
+    if (dow === 0) sug.push({ type:'good', icon:'😴', text:'Recovery day — muscle is built today, not at the gym.', sub:'SUNDAY • SLEEP 8H' });
+    else if (dow === 6) sug.push({ type:'good', icon:'🏐', text:'Volleyball day. Banana + oats 1h before, protein within 1h after.', sub:'SAT • SPORT FUEL' });
+    else if (totalEx > 0 && doneEx === 0 && hr >= 21) sug.push({ type:'bad', icon:'⚠', text:`${wkPlan.name.split(' — ')[0]} missed. Reschedule tomorrow or merge with next session.`, sub:'WORKOUT MISSED' });
+    else if (totalEx > 0 && doneEx < totalEx && hr >= 18) sug.push({ type:'warn', icon:'🏋', text:`${totalEx-doneEx} exercises left. Lock it in before 9 PM.`, sub:'WORKOUT IN PROGRESS' });
+    else if (totalEx > 0 && doneEx === totalEx) sug.push({ type:'good', icon:'🔥', text:'Workout complete. Eat, hydrate, sleep — gains incoming.', sub:'SESSION DONE' });
+
     if (trend.weeks >= 1) {
       const target = p.weeklyGainTarget;
-      if (trend.perWeek < target * 0.5) {
-        sug.push({ type:'warn', icon:'📈', text:`Weight gain only ${trend.perWeek.toFixed(2)}kg/wk. Add 200 kcal — try extra ghee or peanut butter.`, sub:'GAIN TOO SLOW' });
-      } else if (trend.perWeek > target * 2) {
-        sug.push({ type:'warn', icon:'📉', text:`Gaining ${trend.perWeek.toFixed(2)}kg/wk — too fast. Cut 200 kcal to stay lean.`, sub:'GAIN TOO FAST' });
-      } else if (trend.perWeek > 0) {
-        sug.push({ type:'good', icon:'📊', text:`On track: ${trend.perWeek.toFixed(2)}kg/wk. Stay consistent.`, sub:'GAIN ON TARGET' });
-      }
+      if (trend.perWeek < target * 0.5) sug.push({ type:'warn', icon:'📈', text:`Gain only ${trend.perWeek.toFixed(2)}kg/wk. Add 200 kcal — extra ghee or peanut butter.`, sub:'GAIN TOO SLOW' });
+      else if (trend.perWeek > target * 2) sug.push({ type:'warn', icon:'📉', text:`Gaining ${trend.perWeek.toFixed(2)}kg/wk — too fast. Cut 200 kcal.`, sub:'GAIN TOO FAST' });
+      else if (trend.perWeek > 0) sug.push({ type:'good', icon:'📊', text:`On track: ${trend.perWeek.toFixed(2)}kg/wk. Stay consistent.`, sub:'TREND OPTIMAL' });
     }
 
-    // Always end with a positive nudge if list is short
-    if (sug.length === 0) {
-      sug.push({ type:'good', icon:'🔥', text:'All systems go. Lock in another solid day.', sub:'NO ACTION NEEDED' });
-    }
+    if (sug.length === 0) sug.push({ type:'good', icon:'🔥', text:'All systems go. Make today count.', sub:'NO ACTION NEEDED' });
 
-    const html = sug.slice(0, 5).map(s => `
+    document.getElementById('suggestions').innerHTML = sug.slice(0,5).map(s => `
       <div class="suggestion">
         <div class="sug-icon ${s.type}">${s.icon}</div>
         <div class="sug-text">${s.text}<small>${s.sub}</small></div>
       </div>`).join('');
-    document.getElementById('suggestions').innerHTML = html;
   }
 
   function computeWeightTrend() {
-    const weighIns = state.logs
-      .filter(l => Number(l.weight) > 0)
-      .sort((a,b) => a.date.localeCompare(b.date));
-    if (weighIns.length < 2) return { perWeek: 0, weeks: 0, label: '—' };
-    const first = weighIns[0], last = weighIns[weighIns.length - 1];
-    const days = (new Date(last.date) - new Date(first.date)) / (1000*60*60*24);
+    const w = state.logs.filter(l => Number(l.weight) > 0).sort((a,b) => a.date.localeCompare(b.date));
+    if (w.length < 2) return { perWeek: 0, weeks: 0, label: '—' };
+    const first = w[0], last = w[w.length-1];
+    const days = (new Date(last.date) - new Date(first.date)) / 86400000;
     if (days < 1) return { perWeek: 0, weeks: 0, label: '—' };
     const perWeek = ((Number(last.weight) - Number(first.weight)) / days) * 7;
-    const weeks = days / 7;
-    const label = (perWeek > 0 ? '+' : '') + perWeek.toFixed(2) + 'kg/wk';
-    return { perWeek, weeks, label };
+    return { perWeek, weeks: days/7, label: (perWeek>0?'+':'') + perWeek.toFixed(2) + 'kg/wk' };
   }
 
+  // ==================== TRACK ====================
+  function renderTrack() {
+    const dow = new Date().getDay();
+    const wkPlan = WORKOUT_PROGRAM[dow];
+    const today = todayStr();
+    const todayEx = state.exercises.filter(e => e.date === today);
+    const customEx = todayEx.filter(e => e.custom === 'YES');
+
+    document.getElementById('exerciseTitle').textContent = wkPlan.name;
+    document.getElementById('exerciseSub').textContent = wkPlan.sub;
+
+    // Build full list: planned + custom
+    const allExercises = [
+      ...wkPlan.exercises.map(e => ({...e, custom:false})),
+      ...customEx.map(e => ({ id: e.exerciseId, name: e.exerciseName, sets: e.sets || '-', reps: e.reps || '-', tip:'Custom exercise', custom:true }))
+    ];
+
+    const totalEx = allExercises.length;
+    const doneEx = todayEx.filter(e => e.done === 'YES').length;
+    const pct = totalEx ? Math.round((doneEx/totalEx)*100) : 0;
+
+    document.getElementById('exerciseBadge').textContent = `${doneEx}/${totalEx}`;
+    document.getElementById('exerciseBadge').className = 'badge' + (pct === 100 ? ' good' : pct > 0 ? ' warn' : '');
+    document.getElementById('exercisePct').textContent = pct + '%';
+    document.getElementById('exerciseProgress').style.width = pct + '%';
+
+    document.getElementById('exerciseList').innerHTML = allExercises.map(ex => {
+      const done = todayEx.find(t => t.exerciseId === ex.id && t.done === 'YES');
+      const tipShown = state.expandedTip === ex.id;
+      return `
+        <div class="exercise">
+          <button class="ex-check ${done?'done':''}" onclick="App.toggleExercise('${ex.id}', '${escapeAttr(ex.name)}', '${ex.sets}', '${ex.reps}', ${ex.custom})">
+            ${done?'✓':''}
+          </button>
+          <div class="ex-body">
+            <div class="ex-name ${done?'done':''}">${escapeHTML(ex.name)}</div>
+            <div class="ex-meta">
+              <span class="sets">${ex.sets} × ${ex.reps}</span>
+              ${ex.custom ? '<span style="color:#fbbf24">CUSTOM</span>' : ''}
+            </div>
+            <div class="ex-tip ${tipShown?'show':''}">${escapeHTML(ex.tip || '')}</div>
+          </div>
+          ${ex.tip ? `<button class="ex-info" onclick="App.toggleTip('${ex.id}')">ⓘ</button>` : ''}
+        </div>`;
+    }).join('') || '<div class="empty">No exercises today (rest day).</div>';
+
+    // Meals
+    const todayMeals = state.meals.filter(m => m.date === today);
+    const totalM = DIET_PLAN.length;
+    const doneM = todayMeals.filter(m => m.done === 'YES').length;
+    const mPct = totalM ? Math.round((doneM/totalM)*100) : 0;
+
+    document.getElementById('mealBadge').textContent = `${doneM}/${totalM}`;
+    document.getElementById('mealBadge').className = 'badge' + (mPct === 100 ? ' good' : mPct > 0 ? ' warn' : '');
+    document.getElementById('mealPct').textContent = mPct + '%';
+    document.getElementById('mealProgress').style.width = mPct + '%';
+
+    document.getElementById('mealList').innerHTML = DIET_PLAN.map(meal => {
+      const done = todayMeals.find(m => m.mealId === meal.id && m.done === 'YES');
+      return `
+        <div class="meal">
+          <button class="meal-check ${done?'done':''}" onclick="App.toggleMeal('${meal.id}', '${meal.time}', '${escapeAttr(meal.name)}')">
+            ${done?'✓':''}
+          </button>
+          <div class="meal-time">${meal.time}</div>
+          <div class="meal-food">
+            <div class="${done?'done':''}">${escapeHTML(meal.name)}</div>
+            <div class="meal-macros">${meal.kcal} kcal · ${meal.protein}g protein</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Pre-fill metrics
+    const log = todayLog();
+    if (log) {
+      if (Number(log.weight)) document.getElementById('t_weight').value = log.weight;
+      if (Number(log.calories)) document.getElementById('t_calories').value = log.calories;
+      if (Number(log.protein)) document.getElementById('t_protein').value = log.protein;
+      if (log.sleep) document.getElementById('t_sleep').value = log.sleep;
+      if (log.notes) document.getElementById('t_notes').value = log.notes;
+    }
+  }
+
+  async function toggleExercise(id, name, sets, reps, isCustom) {
+    if (!id) return;
+    const today = todayStr();
+    const existing = state.exercises.find(e => e.date === today && e.exerciseId === id);
+    const newDone = !(existing && existing.done === 'YES');
+    // Optimistic update
+    if (existing) existing.done = newDone ? 'YES' : 'NO';
+    else state.exercises.push({
+      date: today, exerciseId: id, exerciseName: name, sets, reps,
+      done: newDone ? 'YES' : 'NO', custom: isCustom ? 'YES' : 'NO'
+    });
+    if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
+    saveCache();
+    renderTrack();
+    renderHome();
+    try {
+      await api('logExercise', {
+        date: today, exerciseId: id, exerciseName: name, sets, reps,
+        done: newDone, custom: isCustom
+      });
+    } catch(e) {
+      toast('Saved offline — will sync', 'warn');
+    }
+  }
+
+  async function toggleMeal(id, time, name) {
+    const today = todayStr();
+    const existing = state.meals.find(m => m.date === today && m.mealId === id);
+    const newDone = !(existing && existing.done === 'YES');
+    if (existing) existing.done = newDone ? 'YES' : 'NO';
+    else state.meals.push({
+      date: today, mealId: id, mealTime: time, mealName: name,
+      done: newDone ? 'YES' : 'NO'
+    });
+    if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
+    saveCache();
+    renderTrack();
+    renderHome();
+    try {
+      await api('logMeal', { date: today, mealId: id, mealTime: time, mealName: name, done: newDone });
+    } catch(e) {
+      toast('Saved offline — will sync', 'warn');
+    }
+  }
+
+  function toggleTip(id) {
+    state.expandedTip = state.expandedTip === id ? null : id;
+    renderTrack();
+  }
+
+  async function addCustomExercise() {
+    const inp = document.getElementById('customExName');
+    const name = inp.value.trim();
+    if (!name) return;
+    const id = 'custom_' + Date.now();
+    inp.value = '';
+    await toggleExercise(id, name, '3', '10', true);
+    toast('Custom exercise added', 'good');
+  }
+
+  async function saveTrack() {
+    const today = todayStr();
+    const todayMeals = state.meals.filter(m => m.date === today && m.done === 'YES');
+    const autoCal = todayMeals.reduce((s,m) => {
+      const meal = DIET_PLAN.find(d => d.id === m.mealId);
+      return s + (meal ? meal.kcal : 0);
+    }, 0);
+    const autoProt = todayMeals.reduce((s,m) => {
+      const meal = DIET_PLAN.find(d => d.id === m.mealId);
+      return s + (meal ? meal.protein : 0);
+    }, 0);
+
+    const todayEx = state.exercises.filter(e => e.date === today);
+    const wkPlan = WORKOUT_PROGRAM[new Date().getDay()];
+    const totalEx = wkPlan.exercises.length + todayEx.filter(e => e.custom === 'YES').length;
+    const doneEx = todayEx.filter(e => e.done === 'YES').length;
+    const workoutDone = totalEx > 0 && doneEx === totalEx;
+
+    const payload = {
+      date: today,
+      weight: parseFloat(document.getElementById('t_weight').value) || 0,
+      workoutDone,
+      workoutType: wkPlan.name,
+      calories: parseInt(document.getElementById('t_calories').value) || autoCal,
+      protein: parseInt(document.getElementById('t_protein').value) || autoProt,
+      meals: todayMeals.map(m => m.mealName).join(', '),
+      sleep: document.getElementById('t_sleep').value,
+      notes: document.getElementById('t_notes').value
+    };
+
+    try {
+      await api('saveLog', payload);
+      await api('toggleWorkout', {
+        date: today, dayName: DAY_NAMES[new Date().getDay()],
+        plannedWorkout: wkPlan.name, completed: workoutDone
+      });
+      toast('Saved & analyzed', 'good');
+      await refresh();
+    } catch(e) {
+      toast('Save failed: ' + e.message, 'bad');
+    }
+  }
+
+  // ==================== PLAN ====================
   function renderPlan() {
     const today = new Date().getDay();
+    state.viewingDayDow = state.viewingDayDow ?? today;
+
     let html = '';
     [1,2,3,4,5,6,0].forEach(dow => {
-      const w = WORKOUT_PLAN[dow];
+      const w = WORKOUT_PROGRAM[dow];
       const isToday = dow === today;
-      // Find a workout entry from this week for status
+      const isViewing = dow === state.viewingDayDow;
       const status = getDowStatus(dow);
-      let checkClass = '';
-      let checkContent = '○';
+      let checkClass = '', checkContent = '○';
       if (status === 'done')   { checkClass = 'done';   checkContent = '✓'; }
       if (status === 'missed') { checkClass = 'missed'; checkContent = '✗'; }
       html += `
-        <div class="plan-item">
+        <div class="plan-item" style="cursor:pointer; ${isViewing?'background:rgba(212,255,58,0.04);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:8px;':''}" onclick="App.viewDay(${dow})">
           <div class="plan-day ${isToday?'today':''}">${DAY_NAMES[dow]}</div>
           <div class="plan-content">
-            <div class="name">${w.name}</div>
-            <div class="sub">${w.sub}</div>
+            <div class="name">${w.name.split(' — ')[0]}</div>
+            <div class="sub">${w.exercises.length} exercises · ${w.sub.split('·')[1] ? w.sub.split('·')[1].trim() : w.tags.join(', ')}</div>
           </div>
           <div class="plan-check ${checkClass}">${checkContent}</div>
         </div>`;
     });
     document.getElementById('planList').innerHTML = html;
 
+    // Day detail
+    const dow = state.viewingDayDow;
+    const dayPlan = WORKOUT_PROGRAM[dow];
+    document.getElementById('dayDetailDay').textContent = DAY_FULL[dow].toUpperCase();
+    document.getElementById('dayDetail').innerHTML = `
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px;line-height:1.2;">${escapeHTML(dayPlan.name)}</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">${escapeHTML(dayPlan.sub)}</div>
+      <div style="font-size:12px;color:var(--text-2);line-height:1.55;padding:10px 12px;background:var(--surface-2);border-radius:10px;border-left:2px solid var(--accent);margin-bottom:14px;">
+        <strong style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;">WHY:</strong>
+        ${escapeHTML(dayPlan.rationale)}
+      </div>
+      ${dayPlan.exercises.map(ex => `
+        <div class="exercise" style="border-top:1px solid var(--line-soft);">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;">${dayPlan.exercises.indexOf(ex)+1}</div>
+          <div class="ex-body">
+            <div class="ex-name">${escapeHTML(ex.name)}</div>
+            <div class="ex-meta"><span class="sets">${ex.sets} × ${ex.reps}</span></div>
+            <div style="margin-top:6px;font-size:11px;color:var(--text-3);line-height:1.5;">${escapeHTML(ex.tip)}</div>
+          </div>
+        </div>`).join('')}
+    `;
+
+    // Diet
     document.getElementById('dietList').innerHTML = DIET_PLAN.map(d => `
-      <div class="diet-item">
-        <div class="diet-time">${d.time}</div>
-        <div class="diet-food">${d.food}</div>
+      <div class="meal">
+        <div class="meal-time">${d.time}</div>
+        <div class="meal-food">
+          <div>${escapeHTML(d.name)}</div>
+          <div class="meal-macros">${d.kcal} kcal · ${d.protein}g protein</div>
+        </div>
       </div>`).join('');
   }
 
+  function viewDay(dow) {
+    state.viewingDayDow = dow;
+    renderPlan();
+    document.getElementById('dayDetailCard').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
   function getDowStatus(dow) {
-    // Look at most recent workout log for this day-of-week within last 7 days
     const today = new Date();
     for (let i = 0; i < 7; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
@@ -864,7 +1239,6 @@ const App = (() => {
           if (entry.completed === 'YES') return 'done';
           if (i > 0) return 'missed';
         }
-        // For days in the past with no entry, count as missed (if not rest)
         if (i > 0 && dow !== 0) return 'missed';
         break;
       }
@@ -872,18 +1246,17 @@ const App = (() => {
     return '';
   }
 
+  // ==================== STATS ====================
   function renderStats() {
     const last30 = lastNDaysLogs(30);
 
-    // Weight
-    const weights = last30.filter(l => Number(l.weight) > 0)
-      .map(l => ({ date: l.date, val: Number(l.weight) }));
-    drawLineChart('weightChart', weights, { color: 'var(--accent)', minPad: 1 });
+    const weights = last30.filter(l => Number(l.weight) > 0).map(l => ({ date:l.date, val:Number(l.weight) }));
+    drawLineChart('weightChart', weights);
     const wb = document.getElementById('weightStatBadge');
     wb.classList.remove('good','warn','bad');
     if (weights.length >= 2) {
       const diff = weights[weights.length-1].val - weights[0].val;
-      wb.textContent = (diff > 0 ? '+' : '') + diff.toFixed(1) + ' KG';
+      wb.textContent = (diff>0?'+':'') + diff.toFixed(1) + ' KG';
       wb.classList.add(diff >= 0 ? 'good' : 'warn');
       document.getElementById('weightChartStart').textContent = weights[0].date;
       document.getElementById('weightChartEnd').textContent = weights[weights.length-1].date;
@@ -893,9 +1266,7 @@ const App = (() => {
       document.getElementById('weightChartEnd').textContent = '—';
     }
 
-    // Calories
-    const cals = last30.filter(l => Number(l.calories) > 0)
-      .map(l => ({ date: l.date, val: Number(l.calories) }));
+    const cals = last30.filter(l => Number(l.calories) > 0).map(l => ({ date:l.date, val:Number(l.calories) }));
     drawBarChart('calChart', cals, { target: state.profile.targetCalories });
     const calAvg = cals.length ? Math.round(cals.reduce((s,c)=>s+c.val,0)/cals.length) : 0;
     document.getElementById('calAvg').textContent = calAvg ? `avg ${calAvg}` : 'avg —';
@@ -904,13 +1275,11 @@ const App = (() => {
     if (calAvg > 0) {
       const pct = (calAvg / state.profile.targetCalories) * 100;
       if (pct >= 90 && pct <= 110) { cb.textContent = 'ON TARGET'; cb.classList.add('good'); }
-      else if (pct < 90)            { cb.textContent = 'UNDER'; cb.classList.add('warn'); }
-      else                          { cb.textContent = 'OVER'; cb.classList.add('bad'); }
-    } else { cb.textContent = 'NEED DATA'; }
+      else if (pct < 90) { cb.textContent = 'UNDER'; cb.classList.add('warn'); }
+      else { cb.textContent = 'OVER'; cb.classList.add('bad'); }
+    } else cb.textContent = 'NEED DATA';
 
-    // Protein
-    const prots = last30.filter(l => Number(l.protein) > 0)
-      .map(l => ({ date: l.date, val: Number(l.protein) }));
+    const prots = last30.filter(l => Number(l.protein) > 0).map(l => ({ date:l.date, val:Number(l.protein) }));
     drawBarChart('protChart', prots, { target: state.profile.targetProtein });
     const protAvg = prots.length ? Math.round(prots.reduce((s,c)=>s+c.val,0)/prots.length) : 0;
     document.getElementById('protAvg').textContent = protAvg ? `avg ${protAvg}g` : 'avg —';
@@ -919,15 +1288,14 @@ const App = (() => {
     if (protAvg > 0) {
       const pct = (protAvg / state.profile.targetProtein) * 100;
       if (pct >= 90) { pb.textContent = 'GOOD'; pb.classList.add('good'); }
-      else           { pb.textContent = 'LOW'; pb.classList.add('warn'); }
-    } else { pb.textContent = 'NEED DATA'; }
+      else { pb.textContent = 'LOW'; pb.classList.add('warn'); }
+    } else pb.textContent = 'NEED DATA';
 
-    // Consistency — workouts done / planned (excluding rest days) in last 30 days
     let planned = 0, done = 0;
     const today = new Date();
     for (let i = 0; i < 30; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
-      if (d.getDay() === 0) continue; // skip rest day
+      if (d.getDay() === 0) continue;
       planned++;
       const ds = formatDate(d);
       const entry = state.workouts.find(w => w.date === ds);
@@ -937,11 +1305,11 @@ const App = (() => {
     document.getElementById('consistNum').textContent = pct;
     document.getElementById('consistMeta').textContent = `${done} / ${planned} sessions`;
     document.getElementById('consistProgress').querySelector('i').style.width = pct + '%';
-    const conBadge = document.getElementById('consistBadge');
-    conBadge.classList.remove('good','warn','bad');
-    if (pct >= 80)      { conBadge.textContent = 'STRONG'; conBadge.classList.add('good'); }
-    else if (pct >= 50) { conBadge.textContent = 'OK'; conBadge.classList.add('warn'); }
-    else                { conBadge.textContent = 'WEAK'; conBadge.classList.add('bad'); }
+    const cb2 = document.getElementById('consistBadge');
+    cb2.classList.remove('good','warn','bad');
+    if (pct >= 80) { cb2.textContent = 'STRONG'; cb2.classList.add('good'); }
+    else if (pct >= 50) { cb2.textContent = 'OK'; cb2.classList.add('warn'); }
+    else { cb2.textContent = 'WEAK'; cb2.classList.add('bad'); }
   }
 
   function renderProfile() {
@@ -951,15 +1319,14 @@ const App = (() => {
     document.getElementById('p_targetCalories').textContent = p.targetCalories;
     document.getElementById('p_targetProtein').textContent = p.targetProtein;
     document.getElementById('p_weeklyGainTarget').textContent = p.weeklyGainTarget;
-
     document.getElementById('e_targetWeight').value = p.targetWeight;
     document.getElementById('e_targetCalories').value = p.targetCalories;
     document.getElementById('e_targetProtein').value = p.targetProtein;
     document.getElementById('e_weeklyGainTarget').value = p.weeklyGainTarget;
   }
 
-  // ===== Charts =====
-  function drawLineChart(id, points, opts={}) {
+  // ==================== CHARTS ====================
+  function drawLineChart(id, points) {
     const svg = document.getElementById(id);
     svg.innerHTML = '';
     const W = 320, H = 160, P = 12;
@@ -968,26 +1335,23 @@ const App = (() => {
       return;
     }
     if (points.length === 1) {
-      svg.innerHTML = `<circle cx="160" cy="80" r="4" fill="${opts.color||'#d4ff3a'}"/>
+      svg.innerHTML = `<circle cx="160" cy="80" r="4" fill="#d4ff3a"/>
         <text x="160" y="105" fill="#666" font-family="JetBrains Mono" font-size="10" text-anchor="middle">${points[0].val}</text>`;
       return;
     }
     const vals = points.map(p=>p.val);
-    const minV = Math.min(...vals) - (opts.minPad||0);
-    const maxV = Math.max(...vals) + (opts.minPad||0);
+    const minV = Math.min(...vals) - 1;
+    const maxV = Math.max(...vals) + 1;
     const range = maxV - minV || 1;
     const xs = points.map((_,i) => P + (i/(points.length-1))*(W-2*P));
     const ys = points.map(p => H - P - ((p.val - minV)/range)*(H-2*P));
     const path = xs.map((x,i)=>`${i===0?'M':'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
     const area = path + ` L${xs[xs.length-1]},${H-P} L${xs[0]},${H-P} Z`;
-
     svg.innerHTML = `
-      <defs>
-        <linearGradient id="${id}grad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#d4ff3a" stop-opacity=".25"/>
-          <stop offset="100%" stop-color="#d4ff3a" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
+      <defs><linearGradient id="${id}grad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#d4ff3a" stop-opacity=".25"/>
+        <stop offset="100%" stop-color="#d4ff3a" stop-opacity="0"/>
+      </linearGradient></defs>
       <path d="${area}" fill="url(#${id}grad)"/>
       <path d="${path}" stroke="#d4ff3a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       ${xs.map((x,i)=>`<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2.5" fill="#d4ff3a"/>`).join('')}
@@ -1011,8 +1375,7 @@ const App = (() => {
       const y = H - P - h;
       const w = bw*0.7;
       const isHit = target && p.val >= target * 0.9;
-      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2"
-        fill="${isHit?'#d4ff3a':'#3a3a3a'}"/>`;
+      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${isHit?'#d4ff3a':'#3a3a3a'}"/>`;
     }).join('');
     let targetLine = '';
     if (target) {
@@ -1025,11 +1388,10 @@ const App = (() => {
   function lastNDaysLogs(n) {
     const today = new Date();
     const cutoff = new Date(today); cutoff.setDate(today.getDate() - n);
-    return state.logs.filter(l => new Date(l.date) >= cutoff)
-      .sort((a,b) => a.date.localeCompare(b.date));
+    return state.logs.filter(l => new Date(l.date) >= cutoff).sort((a,b) => a.date.localeCompare(b.date));
   }
 
-  // ===== Actions =====
+  // ==================== ACTIONS ====================
   function go(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelector(`.page[data-page="${name}"]`).classList.add('active');
@@ -1037,62 +1399,6 @@ const App = (() => {
     document.querySelector(`.nav-btn[data-nav="${name}"]`).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (navigator.vibrate) navigator.vibrate(8);
-  }
-
-  function setWorkoutDone(val) {
-    state.todayDraft.workoutDone = val;
-    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.toggle-btn[data-val="${val?'yes':'no'}"]`).classList.add('active');
-  }
-
-  async function saveTrack() {
-    const date = document.getElementById('t_date').value || todayStr();
-    const payload = {
-      date,
-      weight: parseFloat(document.getElementById('t_weight').value) || 0,
-      workoutDone: state.todayDraft.workoutDone === true,
-      workoutType: document.getElementById('t_workoutType').value,
-      calories: parseInt(document.getElementById('t_calories').value) || 0,
-      protein: parseInt(document.getElementById('t_protein').value) || 0,
-      meals: document.getElementById('t_meals').value,
-      sleep: document.getElementById('t_sleep').value,
-      notes: document.getElementById('t_notes').value
-    };
-    try {
-      await api('saveLog', payload);
-      // Also log workout completion separately if user marked it
-      if (state.todayDraft.workoutDone !== null) {
-        const dow = new Date(date).getDay();
-        await api('toggleWorkout', {
-          date, dayName: DAY_NAMES[dow],
-          plannedWorkout: WORKOUT_PLAN[dow].name,
-          completed: state.todayDraft.workoutDone
-        });
-      }
-      toast('Saved & analyzed', 'good');
-      await refresh();
-      go('home');
-    } catch(e) {
-      toast('Save failed: ' + e.message, 'bad');
-    }
-  }
-
-  async function toggleTodayWorkout() {
-    const dow = new Date().getDay();
-    const t = todayStr();
-    const entry = todayWorkoutEntry();
-    const newState = !(entry && entry.completed === 'YES');
-    try {
-      await api('toggleWorkout', {
-        date: t, dayName: DAY_NAMES[dow],
-        plannedWorkout: WORKOUT_PLAN[dow].name,
-        completed: newState
-      });
-      toast(newState ? 'Workout logged 💪' : 'Marked not done', newState ? 'good' : 'bad');
-      await refresh();
-    } catch(e) {
-      toast('Failed: ' + e.message, 'bad');
-    }
   }
 
   async function saveProfile() {
@@ -1106,16 +1412,12 @@ const App = (() => {
       await api('updateProfile', payload);
       toast('Targets saved', 'good');
       await refresh();
-    } catch(e) {
-      toast('Failed: ' + e.message, 'bad');
-    }
+    } catch(e) { toast('Failed: ' + e.message, 'bad'); }
   }
 
   function saveApiUrl() {
     const url = document.getElementById('setupUrl').value.trim();
-    if (!url || !url.includes('script.google.com')) {
-      toast('Invalid URL', 'bad'); return;
-    }
+    if (!url || !url.includes('script.google.com')) { toast('Invalid URL', 'bad'); return; }
     localStorage.setItem(STORAGE_KEY_API, url);
     state.apiUrl = url;
     document.getElementById('setupScreen').style.display = 'none';
@@ -1126,33 +1428,28 @@ const App = (() => {
     if (!confirm('Disconnect from Google Sheet?')) return;
     localStorage.removeItem(STORAGE_KEY_API);
     localStorage.removeItem(STORAGE_KEY_CACHE);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
+    }
     location.reload();
-  }
-  function openSheet() {
-    if (!state.apiUrl) return;
-    // Parse the script ID from URL (best effort)
-    toast('Opening Google Sheet…');
-    window.open('https://drive.google.com/drive/recent', '_blank');
   }
 
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
   function installPwa() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt = null;
-    } else {
-      toast('iOS: Share → Add to Home Screen', 'good');
-    }
+    if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+    else toast('iOS: Share → Add to Home Screen', 'good');
   }
 
-  // ===== Helpers =====
+  // ==================== HELPERS ====================
   function todayStr() { return formatDate(new Date()); }
   function formatDate(d) {
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0');
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
   function toast(msg, kind) {
     const el = document.getElementById('toast');
     el.textContent = msg;
@@ -1160,15 +1457,12 @@ const App = (() => {
     clearTimeout(el._t);
     el._t = setTimeout(() => el.className = 'toast', 2200);
   }
-
   function registerSW() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(()=>{});
-    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }
 
-  return { init, go, setWorkoutDone, saveTrack, toggleTodayWorkout,
-    saveProfile, saveApiUrl, resetApiUrl, openSheet, installPwa };
+  return { init, go, refresh, saveTrack, saveProfile, saveApiUrl, resetApiUrl,
+    installPwa, toggleExercise, toggleMeal, toggleTip, addCustomExercise, viewDay };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
