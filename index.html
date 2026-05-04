@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="IRON" />
-<title>IRON — Gym Tracker</title>
+<title>MN — Gym Tracker</title>
 
 <link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="icon-192.png" />
@@ -1704,10 +1704,31 @@ const App = (() => {
   // ==================== HOME ====================
   function todayLog() { return state.logs.find(l => l.date === todayStr()) || null; }
 
-  function getTodayMacros() {
+  /**
+   * Returns map of mealId → latest meal record for today, deduplicated.
+   * If sheet has duplicate rows for the same (date, mealId), the most recent
+   * timestamp wins (so unchecking properly overrides an earlier YES).
+   */
+  function getTodayMealMap() {
     const today = todayStr();
+    const all = state.meals.filter(m => m.date === today);
+    const latest = {};
+    all.forEach(m => {
+      const ts = m.timestamp ? new Date(m.timestamp).getTime() : 0;
+      const existing = latest[m.mealId];
+      if (!existing || ts >= existing._ts) {
+        latest[m.mealId] = Object.assign({}, m, { _ts: ts });
+      }
+    });
+    return latest;
+  }
+
+  function getTodayMacros() {
     const log = todayLog();
-    const checkedMeals = state.meals.filter(m => m.date === today && m.done === 'YES');
+    const mealMap = getTodayMealMap();
+    // Only count meals that are (a) currently YES and (b) part of the active diet plan
+    const checkedMeals = Object.values(mealMap).filter(m => m.done === 'YES');
+
     const autoCal = checkedMeals.reduce((s,m) => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
       return s + (meal ? meal.kcal : 0);
@@ -1716,12 +1737,13 @@ const App = (() => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
       return s + (meal ? meal.protein : 0);
     }, 0);
-    return {
-      cal: Number(log?.calories) || autoCal,
-      prot: Number(log?.protein) || autoProt,
-      autoCal, autoProt,
-      mealCount: checkedMeals.length
-    };
+
+    // Prefer auto-calc when meals are checked; only fall back to manual log when no meals checked.
+    // This way unchecking a meal correctly reduces dashboard total.
+    const cal  = checkedMeals.length > 0 ? autoCal  : (Number(log?.calories) || 0);
+    const prot = checkedMeals.length > 0 ? autoProt : (Number(log?.protein) || 0);
+
+    return { cal, prot, autoCal, autoProt, mealCount: checkedMeals.length };
   }
 
   function renderHome() {
@@ -1920,11 +1942,20 @@ const App = (() => {
     for (let i = 0; i < 60; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const ds = formatDate(d);
-      const log = state.logs.find(l => l.date === ds);
       const ex = state.exercises.filter(e => e.date === ds && e.done === 'YES');
-      const meals = state.meals.filter(m => m.date === ds && m.done === 'YES');
-      // "Day counted" = at least 3 meals checked OR workout completed (or rest day with meals)
-      if (meals.length >= 3 || ex.length >= 3) streak++;
+
+      // Dedupe meals for this day — pick latest record per mealId
+      const dayMeals = state.meals.filter(m => m.date === ds);
+      const latest = {};
+      dayMeals.forEach(m => {
+        const ts = m.timestamp ? new Date(m.timestamp).getTime() : 0;
+        if (!latest[m.mealId] || ts >= latest[m.mealId]._ts) {
+          latest[m.mealId] = Object.assign({}, m, { _ts: ts });
+        }
+      });
+      const checkedMeals = Object.values(latest).filter(m => m.done === 'YES').length;
+
+      if (checkedMeals >= 3 || ex.length >= 3) streak++;
       else break;
     }
     return streak;
@@ -2001,10 +2032,10 @@ const App = (() => {
         </div>`;
     }).join('') || '<div class="empty">No exercises today (rest day).</div>';
 
-    // Meals
-    const todayMeals = state.meals.filter(m => m.date === today);
+    // Meals — use deduped map so untick + duplicates handled correctly
+    const mealMap = getTodayMealMap();
     const totalM = DIET_PLAN.length;
-    const doneM = todayMeals.filter(m => m.done === 'YES').length;
+    const doneM = DIET_PLAN.filter(d => mealMap[d.id]?.done === 'YES').length;
     const mPct = totalM ? Math.round((doneM/totalM)*100) : 0;
 
     document.getElementById('mealBadge').textContent = `${doneM}/${totalM}`;
@@ -2013,7 +2044,7 @@ const App = (() => {
     document.getElementById('mealProgress').style.width = mPct + '%';
 
     document.getElementById('mealList').innerHTML = DIET_PLAN.map(meal => {
-      const done = todayMeals.find(m => m.mealId === meal.id && m.done === 'YES');
+      const done = mealMap[meal.id] && mealMap[meal.id].done === 'YES';
       const lock = getMealLockStatus(meal);
       const isLocked = !lock.unlocked && !done;
       const countdown = isLocked
@@ -2070,11 +2101,13 @@ const App = (() => {
   async function toggleMeal(id, time, name) {
     const today = todayStr();
     const meal = DIET_PLAN.find(d => d.id === id);
-    const existing = state.meals.find(m => m.date === today && m.mealId === id);
-    const isCurrentlyDone = existing && existing.done === 'YES';
+
+    // Use deduped map to determine current state — handles duplicate sheet rows
+    const mealMap = getTodayMealMap();
+    const latest = mealMap[id];
+    const isCurrentlyDone = latest && latest.done === 'YES';
 
     // Guard: only check lock when CHECKING (not unchecking).
-    // Unchecking a previously-ticked meal is always allowed (correction).
     if (!isCurrentlyDone && meal) {
       const lock = getMealLockStatus(meal);
       if (!lock.unlocked) {
@@ -2086,8 +2119,21 @@ const App = (() => {
     }
 
     const newDone = !isCurrentlyDone;
-    if (existing) existing.done = newDone ? 'YES' : 'NO';
-    else state.meals.push({ date: today, mealId: id, mealTime: time, mealName: name, done: newDone ? 'YES' : 'NO' });
+
+    // Find ALL existing rows for this (date, mealId) and update the latest one;
+    // mark older duplicates so they don't interfere (the sheet's logMeal_ does
+    // single-row update keyed on date+mealId, so this stays clean going forward).
+    const existing = state.meals.find(m => m.date === today && m.mealId === id);
+    const nowTs = new Date().toISOString();
+    if (existing) {
+      existing.done = newDone ? 'YES' : 'NO';
+      existing.timestamp = nowTs;
+    } else {
+      state.meals.push({
+        date: today, mealId: id, mealTime: time, mealName: name,
+        done: newDone ? 'YES' : 'NO', timestamp: nowTs
+      });
+    }
     if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
     saveCache();
     renderTrack();
@@ -2138,7 +2184,8 @@ const App = (() => {
     const totalEx = wkPlan.exercises.length + customCount;
     const doneEx = todayEx.filter(e => e.done === 'YES').length;
     const workoutDone = totalEx > 0 && doneEx === totalEx;
-    const todayMealsList = state.meals.filter(mm => mm.date === today && mm.done === 'YES');
+    const mealMap2 = getTodayMealMap();
+    const todayMealsList = Object.values(mealMap2).filter(mm => mm.done === 'YES');
 
     const payload = {
       date: today,
