@@ -1,5 +1,5 @@
-// IRON Gym Tracker - Service Worker (v5)
-const CACHE = 'iron-v5';
+// IRON Gym Tracker - Service Worker (v6)
+const CACHE = 'iron-v6';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
