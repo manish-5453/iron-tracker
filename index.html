@@ -312,6 +312,59 @@ textarea{resize:vertical;min-height:80px;}
   letter-spacing:1px;text-align:center;margin-top:8px;}
 
 ::-webkit-scrollbar{display:none;}
+
+/* === Plan selection cards === */
+.plan-card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;
+  padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;position:relative;}
+.plan-card:active{transform:scale(.98);}
+.plan-card.active{border-color:var(--accent);background:rgba(212,255,58,0.04);
+  box-shadow:0 0 0 1px var(--accent), 0 6px 20px rgba(212,255,58,0.1);}
+.plan-card.active::after{content:"ACTIVE";position:absolute;top:12px;right:12px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:#000;background:var(--accent);
+  padding:3px 8px;border-radius:999px;letter-spacing:1px;font-weight:700;}
+.plan-card .plan-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.plan-card .plan-name{font-size:17px;font-weight:700;line-height:1.2;}
+.plan-card .plan-short{font-size:12px;color:var(--text-3);margin-top:2px;}
+.plan-card .plan-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;
+  padding:10px 0;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);}
+.plan-card .plan-stat{text-align:center;}
+.plan-card .plan-stat-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);
+  letter-spacing:1px;line-height:1;}
+.plan-card .plan-stat-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-3);
+  letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.plan-card .plan-desc{font-size:12px;color:var(--text-2);line-height:1.5;margin-top:10px;}
+.plan-card .plan-best{font-size:11px;color:var(--text-3);line-height:1.5;margin-top:8px;
+  padding:8px 10px;background:var(--surface-3);border-radius:8px;border-left:2px solid var(--accent);}
+.plan-card .plan-best strong{color:var(--accent);font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:1.5px;}
+.plan-card .plan-toggle{display:none;font-size:11px;color:var(--accent);margin-top:8px;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;cursor:pointer;}
+.plan-card.expanded .plan-toggle{display:inline-block;}
+.plan-card .plan-extra{display:none;margin-top:10px;}
+.plan-card.expanded .plan-extra{display:block;}
+.plan-card .plan-pros, .plan-card .plan-cons{font-size:11px;color:var(--text-2);
+  line-height:1.6;margin-top:8px;}
+.plan-card .plan-pros li::before{content:"✓ ";color:var(--good);}
+.plan-card .plan-cons li::before{content:"× ";color:var(--bad);}
+.plan-card ul{list-style:none;padding:0;margin:4px 0;}
+
+/* Plan picker toolbar */
+.plan-toolbar{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.plan-chip{flex-shrink:0;padding:8px 14px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;font-size:12px;color:var(--text-2);cursor:pointer;transition:all .15s;
+  white-space:nowrap;}
+.plan-chip.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+
+.plan-recommendation{padding:14px 16px;background:linear-gradient(135deg, rgba(212,255,58,0.08), rgba(212,255,58,0.02));
+  border:1px solid rgba(212,255,58,0.3);border-radius:14px;margin-bottom:14px;}
+.plan-recommendation .rec-label{font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;
+  display:flex;align-items:center;gap:6px;}
+.plan-recommendation .rec-text{font-size:13px;line-height:1.55;color:var(--text);}
+.plan-recommendation .rec-actions{display:flex;gap:8px;margin-top:10px;}
+.plan-recommendation .rec-btn{flex:1;padding:10px;background:var(--accent);color:#000;
+  border-radius:10px;font-weight:700;font-size:12px;letter-spacing:.5px;}
+.plan-recommendation .rec-btn.dismiss{background:var(--surface-3);color:var(--text-2);font-weight:500;}
 </style>
 </head>
 <body>
@@ -336,6 +389,17 @@ textarea{resize:vertical;min-height:80px;}
   <button class="btn btn-primary" onclick="App.saveApiUrl()">Connect & Launch</button>
   <p style="margin-top:14px;font-size:11px;color:var(--text-3);text-align:center;">
     Your data stays in your Google Sheet.
+  </p>
+</div>
+
+<div id="planPickerScreen" class="setup" style="display:none; min-height:100vh; padding-bottom:40px; justify-content:flex-start; padding-top:30px;">
+  <h2>CHOOSE YOUR <span style="color:var(--accent)">PLAN</span></h2>
+  <p style="margin-bottom:6px;">Pick a workout plan that fits your level and schedule.</p>
+  <p style="margin-bottom:18px;font-size:12px;color:var(--text-3);">Coach will suggest switching if your progress needs it.</p>
+  <div id="planPickerList"></div>
+  <button class="btn btn-primary" id="planConfirmBtn" onclick="App.confirmPlan()" style="margin-top:8px;" disabled>Select a plan</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--text-3);text-align:center;">
+    You can switch plans anytime from the Plan tab.
   </p>
 </div>
 
@@ -504,17 +568,40 @@ textarea{resize:vertical;min-height:80px;}
   <section class="page" data-page="plan">
     <div class="hero">
       <h1>YOUR <span class="accent">PLAN.</span></h1>
-      <p>Science-based hypertrophy + structured nutrition.</p>
+      <p>Pick a plan. Coach adjusts as you progress.</p>
+    </div>
+
+    <!-- AI Plan Recommendation (shown only when relevant) -->
+    <div id="planRecommendation" style="display:none;"></div>
+
+    <!-- Active plan summary + switch -->
+    <div class="card">
+      <div class="card-title">
+        <span>Active Plan</span>
+        <span class="badge good" id="activePlanBadge">SELECTED</span>
+      </div>
+      <div id="activePlanSummary"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="App.openPlanSwitcher()">Switch Plan</button>
+      </div>
+    </div>
+
+    <!-- Plan switcher (hidden by default, opens on tap) -->
+    <div class="card" id="planSwitcherCard" style="display:none;">
+      <div class="card-title">
+        <span>All Plans</span>
+        <span class="badge">5 OPTIONS</span>
+      </div>
+      <div id="planSwitcherList"></div>
     </div>
 
     <div class="card">
       <div class="card-title">
         <span>Weekly Workout Split</span>
-        <span class="badge">PPL + SPORT</span>
+        <span class="badge" id="splitBadge">PPL</span>
       </div>
-      <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 12px;">
-        Push / Pull / Legs split. Each muscle hit ~2x/week (optimal MPS frequency, Schoenfeld 2016).
-        Tap a day to see exercises, video demos & form tips.
+      <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 12px;" id="splitDescription">
+        Tap a day to see exercises, photos & form tips.
       </p>
       <div id="planList"></div>
     </div>
@@ -610,6 +697,14 @@ textarea{resize:vertical;min-height:80px;}
     <div class="hero">
       <h1>YOUR <span class="accent">GOAL.</span></h1>
       <p>Targets & settings.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Active Plan</div>
+      <div class="profile-row" style="cursor:pointer" onclick="App.go('plan')">
+        <span class="label">Workout Plan</span>
+        <span class="value" style="font-size:14px;color:var(--accent);max-width:60%;text-align:right;line-height:1.3;" id="p_activePlan">—</span>
+      </div>
     </div>
 
     <div class="card">
@@ -919,35 +1014,435 @@ const VOLLEYBALL_EXERCISES = [
     video: yt('post workout protein timing'), demo: 'generic' }
 ];
 
-const WORKOUT_PROGRAM = {
-  0: { name:'Active Recovery', sub:'Walk · foam roll · stretch', tags:['Recovery'],
-       rationale:'Recovery is when muscle is built. Sleep 8h, eat full surplus, light movement.',
-       exercises: RECOVERY_EXERCISES },
-  1: { name:'Push Day — Chest, Shoulders, Triceps', sub:'4 chest + 4 shoulders + 5 tri sets · 16 total',
-       tags:['Chest','Shoulders','Triceps'],
-       rationale:'Compounds first when CNS fresh. Bench drives chest mass, OHP builds delts. Volume hits all 3 push muscles in 60 min.',
-       exercises: PUSH_EXERCISES },
-  2: { name:'Pull Day — Back, Biceps, Rear Delts', sub:'Vertical + horizontal pulls · 16 sets',
-       tags:['Back','Biceps','Rear Delts'],
-       rationale:'Back needs both vertical pulls (lats = width) and horizontal (mid-back = thickness). Biceps after, fresh from supporting compound work.',
-       exercises: PULL_EXERCISES },
-  3: { name:'Leg Day — Quads, Hams, Glutes, Calves', sub:'Squat-focused · 17 total sets',
-       tags:['Quads','Hamstrings','Glutes','Calves'],
-       rationale:'Legs = largest muscle group = biggest hormonal & growth response system-wide. Don\'t skip — full-body anabolic boost.',
-       exercises: LEG_EXERCISES },
-  4: { name:'Shoulder Specialization', sub:'Delt-focused · 15 total sets',
-       tags:['Shoulders','Traps','Arms'],
-       rationale:'Extra delt volume = wider, more aesthetic frame. Side delts respond best to high frequency + volume.',
-       exercises: SHOULDER_EXERCISES },
-  5: { name:'Full Body Power', sub:'Heavy compounds, low volume · 12 sets',
-       tags:['Compound','Power','Strength'],
-       rationale:'Hits weekly volume gaps. Heavy & low-rep emphasizes strength. Ample recovery before weekend volleyball.',
-       exercises: FULLBODY_EXERCISES },
-  6: { name:'Volleyball Match Day', sub:'Sport-specific cardio + power',
-       tags:['Volleyball','Sport','Power'],
-       rationale:'Plyometric + anaerobic. Carb-load before, protein within 1h post-game.',
-       exercises: VOLLEYBALL_EXERCISES }
+/* === 5 WORKOUT PLANS — user selects one, AI coach can suggest switching ===
+ * Each plan has: id, name, level, daysPerWeek, description, bestFor, schedule {0..6}
+ * schedule maps day-of-week (Sun=0) → workout day object
+ */
+
+// Build short upper, lower, full-body day templates
+const UPPER_BODY_DAY = {
+  name:'Upper Body — Chest, Back, Shoulders, Arms',
+  sub:'Compounds + isolation · 18 sets',
+  tags:['Chest','Back','Shoulders','Arms'],
+  rationale:'Hits all upper body push & pull in one session. Used in 4-day Upper/Lower split for ~2x weekly frequency per muscle.',
+  exercises: [
+    { id:'ub1', name:'Barbell Bench Press', sets:4, reps:'6-8', rest:'2-3 min',
+      muscles:[{name:'Chest',sets:4},{name:'Triceps',sets:1},{name:'Front Delts',sets:1}],
+      tip:'Keep shoulder blades retracted. Bar to lower chest. Slight arch.', demo:'bench' },
+    { id:'ub2', name:'Pull-ups (or Lat Pulldown)', sets:4, reps:'6-10', rest:'2 min',
+      muscles:[{name:'Lats',sets:4},{name:'Biceps',sets:1.5}],
+      tip:'Drive elbows down, not back. Use band assist if needed.', demo:'pullup' },
+    { id:'ub3', name:'Seated DB Shoulder Press', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Front Delts',sets:3},{name:'Triceps',sets:1}],
+      tip:'Stop just before lockout to keep tension on delts.', demo:'press' },
+    { id:'ub4', name:'Cable / DB Row', sets:3, reps:'10-12', rest:'90s',
+      muscles:[{name:'Mid Back',sets:3},{name:'Biceps',sets:1}],
+      tip:'Squeeze shoulder blades at end. Constant tension.', demo:'row' },
+    { id:'ub5', name:'Lateral Raise', sets:3, reps:'12-15', rest:'60s',
+      muscles:[{name:'Side Delts',sets:3}],
+      tip:'Light weight, slow tempo. Lead with elbows.', demo:'raise' },
+    { id:'ub6', name:'EZ-bar Curl', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Biceps',sets:3}],
+      tip:'Don\'t swing. Slight forward elbow drift OK at top.', demo:'curl' },
+    { id:'ub7', name:'Tricep Pushdown', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Triceps',sets:3}],
+      tip:'Elbows pinned to sides. Spread rope at bottom.', demo:'pushdown' }
+  ]
 };
+
+const LOWER_BODY_DAY = {
+  name:'Lower Body — Quads, Hams, Glutes, Calves, Core',
+  sub:'Squat + RDL focus · 17 sets',
+  tags:['Quads','Hamstrings','Glutes','Calves'],
+  rationale:'Hits entire lower body 2x/week in Upper/Lower split. Squats + RDLs cover everything.',
+  exercises: [
+    { id:'lb1', name:'Barbell Back Squat', sets:4, reps:'6-8', rest:'3 min',
+      muscles:[{name:'Quads',sets:4},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:1}],
+      tip:'Below parallel. Brace abs. Knees track over toes.', demo:'squat' },
+    { id:'lb2', name:'Romanian Deadlift', sets:4, reps:'8-10', rest:'2 min',
+      muscles:[{name:'Hamstrings',sets:4},{name:'Glutes',sets:3}],
+      tip:'Hinge hips, slight knee bend. Feel deep ham stretch.', demo:'deadlift' },
+    { id:'lb3', name:'Leg Press', sets:3, reps:'10-12', rest:'2 min',
+      muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:1}],
+      tip:'Foot placement: low = quads, high = glutes/hams.', demo:'legpress' },
+    { id:'lb4', name:'Lying Leg Curl', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Hamstrings',sets:3}],
+      tip:'3-sec eccentric (slow lowering) for max growth.', demo:'legcurl' },
+    { id:'lb5', name:'Walking Lunges', sets:3, reps:'10/leg', rest:'90s',
+      muscles:[{name:'Quads',sets:1.5},{name:'Glutes',sets:2}],
+      tip:'Long step = glutes, short step = quads. Drive through heel.', demo:'lunge' },
+    { id:'lb6', name:'Standing Calf Raise', sets:4, reps:'12-15', rest:'45s',
+      muscles:[{name:'Calves',sets:4}],
+      tip:'1-sec pause at top. Full stretch at bottom.', demo:'calf' },
+    { id:'lb7', name:'Plank + Side Plank', sets:2, reps:'45s each', rest:'30s',
+      muscles:[{name:'Core',sets:2}],
+      tip:'Squeeze glutes, brace abs, no sagging hips.', demo:'plank' }
+  ]
+};
+
+const FULLBODY_DAY_A = {
+  name:'Full Body A — Push focus',
+  sub:'Squat + Bench + Row · 12 sets',
+  tags:['Full Body','Push'],
+  rationale:'Hits every muscle 3x/week with rotating focus. Best for beginners — maximum CNS adaptation.',
+  exercises: [
+    { id:'fa1', name:'Barbell Squat', sets:3, reps:'6-8', rest:'2 min',
+      muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:2}],
+      tip:'Heaviest compound. Below parallel.', demo:'squat' },
+    { id:'fa2', name:'Bench Press', sets:3, reps:'6-8', rest:'2 min',
+      muscles:[{name:'Chest',sets:3},{name:'Triceps',sets:1}],
+      tip:'Pause briefly at chest. Drive feet hard.', demo:'bench' },
+    { id:'fa3', name:'Bent-Over Row', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Mid Back',sets:3},{name:'Lats',sets:1.5}],
+      tip:'Pull to lower chest. Torso 45°.', demo:'row' },
+    { id:'fa4', name:'Overhead Press', sets:2, reps:'8-10', rest:'90s',
+      muscles:[{name:'Front Delts',sets:2},{name:'Triceps',sets:0.5}],
+      tip:'Standing for core engagement.', demo:'press' },
+    { id:'fa5', name:'Lateral Raise', sets:2, reps:'12-15', rest:'45s',
+      muscles:[{name:'Side Delts',sets:2}],
+      tip:'Light weight, slow.', demo:'raise' },
+    { id:'fa6', name:'EZ-bar Curl', sets:2, reps:'10-12', rest:'60s',
+      muscles:[{name:'Biceps',sets:2}],
+      tip:'Strict form. No swing.', demo:'curl' }
+  ]
+};
+
+const FULLBODY_DAY_B = {
+  name:'Full Body B — Pull focus',
+  sub:'Deadlift + Pull-ups + Press · 12 sets',
+  tags:['Full Body','Pull'],
+  rationale:'Pull-dominant workout in 3-day full body rotation. Deadlift = posterior chain king.',
+  exercises: [
+    { id:'fb1', name:'Conventional Deadlift', sets:3, reps:'5', rest:'3 min',
+      muscles:[{name:'Hamstrings',sets:2},{name:'Glutes',sets:2.5},{name:'Lower Back',sets:2.5}],
+      tip:'Bar over mid-foot. Brace lats hard.', demo:'deadlift' },
+    { id:'fb2', name:'Incline DB Press', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Upper Chest',sets:3},{name:'Front Delts',sets:1}],
+      tip:'30° incline for upper chest.', demo:'press' },
+    { id:'fb3', name:'Pull-ups / Lat Pulldown', sets:3, reps:'6-10', rest:'90s',
+      muscles:[{name:'Lats',sets:3},{name:'Biceps',sets:1}],
+      tip:'Drive elbows down for lat width.', demo:'pullup' },
+    { id:'fb4', name:'Walking Lunges', sets:2, reps:'10/leg', rest:'90s',
+      muscles:[{name:'Quads',sets:1},{name:'Glutes',sets:1.5}],
+      tip:'Sink deep. Drive through heel.', demo:'lunge' },
+    { id:'fb5', name:'Face Pulls', sets:2, reps:'12-15', rest:'45s',
+      muscles:[{name:'Rear Delts',sets:2}],
+      tip:'External rotation at end.', demo:'facepull' },
+    { id:'fb6', name:'Hammer Curl', sets:2, reps:'10-12', rest:'60s',
+      muscles:[{name:'Biceps',sets:2}],
+      tip:'Neutral grip = thicker arms.', demo:'curl' }
+  ]
+};
+
+const FULLBODY_DAY_C = {
+  name:'Full Body C — Leg focus',
+  sub:'Front squat + RDL + accessories · 12 sets',
+  tags:['Full Body','Legs'],
+  rationale:'Leg-emphasis day in full body rotation. Builds posterior + anterior chain.',
+  exercises: [
+    { id:'fc1', name:'Front Squat (or Goblet)', sets:3, reps:'6-8', rest:'2 min',
+      muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:1.5}],
+      tip:'More quad-dominant than back squat.', demo:'squat' },
+    { id:'fc2', name:'Romanian Deadlift', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Hamstrings',sets:3},{name:'Glutes',sets:2}],
+      tip:'Push hips back. Slight knee bend.', demo:'deadlift' },
+    { id:'fc3', name:'DB Bench Press', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Chest',sets:3},{name:'Triceps',sets:1}],
+      tip:'Lower than barbell range.', demo:'bench' },
+    { id:'fc4', name:'Cable Row', sets:2, reps:'10-12', rest:'60s',
+      muscles:[{name:'Mid Back',sets:2}],
+      tip:'Constant tension. Squeeze.', demo:'row' },
+    { id:'fc5', name:'Lateral Raise', sets:2, reps:'12-15', rest:'45s',
+      muscles:[{name:'Side Delts',sets:2}],
+      tip:'Lead with elbows.', demo:'raise' },
+    { id:'fc6', name:'Calf Raise', sets:2, reps:'12-15', rest:'45s',
+      muscles:[{name:'Calves',sets:2}],
+      tip:'Pause at top.', demo:'calf' }
+  ]
+};
+
+// Bro split — one muscle per day (more recovery, less frequency)
+const BRO_CHEST = {
+  name:'Chest Day', sub:'Pure chest focus · 18 sets', tags:['Chest'],
+  rationale:'Higher per-muscle volume in one session. Best for those preferring 1x/week frequency with full recovery.',
+  exercises: [
+    { id:'bc1', name:'Barbell Bench Press', sets:4, reps:'6-8', rest:'2-3 min',
+      muscles:[{name:'Chest',sets:4},{name:'Triceps',sets:1}], tip:'Pause at chest.', demo:'bench' },
+    { id:'bc2', name:'Incline DB Press', sets:4, reps:'8-10', rest:'90s',
+      muscles:[{name:'Upper Chest',sets:4}], tip:'30° incline only.', demo:'press' },
+    { id:'bc3', name:'Decline Press', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Lower Chest',sets:3}], tip:'Lower chest emphasis.', demo:'bench' },
+    { id:'bc4', name:'Cable Fly', sets:3, reps:'12-15', rest:'60s',
+      muscles:[{name:'Chest',sets:3}], tip:'Stretch deeply, squeeze hard.', demo:'raise' },
+    { id:'bc5', name:'DB Pullover', sets:2, reps:'10-12', rest:'60s',
+      muscles:[{name:'Chest',sets:1},{name:'Lats',sets:1}], tip:'Stretch chest fully.', demo:'press' },
+    { id:'bc6', name:'Push-up burnout', sets:2, reps:'AMRAP', rest:'45s',
+      muscles:[{name:'Chest',sets:2}], tip:'Go to failure.', demo:'plank' }
+  ]
+};
+
+const BRO_BACK = {
+  name:'Back Day', sub:'Width + thickness · 18 sets', tags:['Back','Biceps'],
+  rationale:'High back volume in single session. Mix vertical & horizontal pulls.',
+  exercises: [
+    { id:'bb1', name:'Deadlift', sets:4, reps:'5-6', rest:'3 min',
+      muscles:[{name:'Lower Back',sets:3},{name:'Lats',sets:2},{name:'Mid Back',sets:2}], tip:'Bar over mid-foot.', demo:'deadlift' },
+    { id:'bb2', name:'Pull-ups (weighted)', sets:4, reps:'6-10', rest:'2 min',
+      muscles:[{name:'Lats',sets:4},{name:'Biceps',sets:1.5}], tip:'Drive elbows down.', demo:'pullup' },
+    { id:'bb3', name:'Barbell Row', sets:3, reps:'8-10', rest:'90s',
+      muscles:[{name:'Mid Back',sets:3}], tip:'Pull to lower chest.', demo:'row' },
+    { id:'bb4', name:'Seated Cable Row', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Mid Back',sets:3}], tip:'Squeeze blades together.', demo:'row' },
+    { id:'bb5', name:'Lat Pulldown', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Lats',sets:3}], tip:'Wide grip for width.', demo:'pullup' },
+    { id:'bb6', name:'Face Pull', sets:3, reps:'12-15', rest:'45s',
+      muscles:[{name:'Rear Delts',sets:3}], tip:'External rotation.', demo:'facepull' }
+  ]
+};
+
+const BRO_LEGS = {
+  name:'Leg Day', sub:'Quad + ham + glute · 20 sets', tags:['Legs'],
+  rationale:'Single leg day with maximum volume. Brutal but effective.',
+  exercises: [
+    { id:'bl1', name:'Barbell Squat', sets:4, reps:'6-8', rest:'3 min',
+      muscles:[{name:'Quads',sets:4},{name:'Glutes',sets:2}], tip:'Below parallel.', demo:'squat' },
+    { id:'bl2', name:'Romanian Deadlift', sets:4, reps:'8-10', rest:'2 min',
+      muscles:[{name:'Hamstrings',sets:4},{name:'Glutes',sets:2}], tip:'Hinge hips back.', demo:'deadlift' },
+    { id:'bl3', name:'Leg Press', sets:3, reps:'10-12', rest:'90s',
+      muscles:[{name:'Quads',sets:3}], tip:'Don\'t lock knees.', demo:'legpress' },
+    { id:'bl4', name:'Leg Curl', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Hamstrings',sets:3}], tip:'Slow eccentric.', demo:'legcurl' },
+    { id:'bl5', name:'Leg Extension', sets:3, reps:'12-15', rest:'60s',
+      muscles:[{name:'Quads',sets:3}], tip:'Pause at top.', demo:'legcurl' },
+    { id:'bl6', name:'Walking Lunges', sets:3, reps:'10/leg', rest:'90s',
+      muscles:[{name:'Glutes',sets:2},{name:'Quads',sets:1}], tip:'Drive through heel.', demo:'lunge' }
+  ]
+};
+
+const BRO_SHOULDERS = {
+  name:'Shoulder Day', sub:'All 3 delts + traps · 16 sets', tags:['Shoulders','Traps'],
+  rationale:'Full shoulder development in one session — front, side, rear delts + traps.',
+  exercises: [
+    { id:'bs1', name:'Overhead Press', sets:4, reps:'6-8', rest:'2 min',
+      muscles:[{name:'Front Delts',sets:4}], tip:'Standing for core engagement.', demo:'press' },
+    { id:'bs2', name:'Cable Lateral Raise', sets:4, reps:'12-15', rest:'45s',
+      muscles:[{name:'Side Delts',sets:4}], tip:'Cable = constant tension.', demo:'raise' },
+    { id:'bs3', name:'Reverse Pec Deck', sets:3, reps:'12-15', rest:'45s',
+      muscles:[{name:'Rear Delts',sets:3}], tip:'Push through walls with elbows.', demo:'raise' },
+    { id:'bs4', name:'Front Raise', sets:3, reps:'10-12', rest:'45s',
+      muscles:[{name:'Front Delts',sets:3}], tip:'Don\'t swing.', demo:'raise' },
+    { id:'bs5', name:'Barbell Shrugs', sets:2, reps:'10-12', rest:'60s',
+      muscles:[{name:'Traps',sets:2}], tip:'Squeeze 1 sec at top.', demo:'shrug' }
+  ]
+};
+
+const BRO_ARMS = {
+  name:'Arm Day', sub:'Biceps + Triceps blast · 16 sets', tags:['Biceps','Triceps'],
+  rationale:'Direct arm volume = max growth. Alternate bicep/tricep for fatigue management.',
+  exercises: [
+    { id:'ba1', name:'Barbell Curl', sets:4, reps:'8-10', rest:'60s',
+      muscles:[{name:'Biceps',sets:4}], tip:'Strict form.', demo:'curl' },
+    { id:'ba2', name:'Skull Crusher', sets:4, reps:'10-12', rest:'60s',
+      muscles:[{name:'Triceps',sets:4}], tip:'Lower behind head.', demo:'pushdown' },
+    { id:'ba3', name:'Incline DB Curl', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Biceps (long head)',sets:3}], tip:'Stretched position.', demo:'curl' },
+    { id:'ba4', name:'Overhead Tricep Ext', sets:3, reps:'10-12', rest:'60s',
+      muscles:[{name:'Triceps (long head)',sets:3}], tip:'Long head needs overhead.', demo:'pushdown' },
+    { id:'ba5', name:'Hammer Curl', sets:2, reps:'12-15', rest:'45s',
+      muscles:[{name:'Biceps',sets:2}], tip:'Brachialis builder.', demo:'curl' }
+  ]
+};
+
+const REST_DAY = {
+  name:'Rest Day', sub:'Sleep · eat · recover', tags:['Rest'],
+  rationale:'Muscle is built during rest. Sleep 8h, hit calorie surplus, light walking only.',
+  exercises: [
+    { id:'rest1', name:'Light walk (optional)', sets:1, reps:'15 min', rest:'-',
+      muscles:[], tip:'Boosts blood flow without stress.', demo:'walk' },
+    { id:'rest2', name:'Stretch (optional)', sets:1, reps:'10 min', rest:'-',
+      muscles:[], tip:'Hams, hips, chest. 30s holds.', demo:'stretch' }
+  ]
+};
+
+const VOLLEYBALL_DAY = {
+  name:'Volleyball Match Day',
+  sub:'Sport-specific cardio + power',
+  tags:['Volleyball','Sport','Power'],
+  rationale:'Plyometric + anaerobic. Carb-load before, protein within 1h post-game.',
+  exercises: VOLLEYBALL_EXERCISES
+};
+
+const RECOVERY_DAY = {
+  name:'Active Recovery', sub:'Walk · foam roll · stretch', tags:['Recovery'],
+  rationale:'Recovery is when muscle is built. Sleep 8h, eat full surplus, light movement.',
+  exercises: RECOVERY_EXERCISES
+};
+
+const SHOULDER_DAY = {
+  name:'Shoulder Specialization', sub:'Delt-focused · 15 total sets',
+  tags:['Shoulders','Traps','Arms'],
+  rationale:'Extra delt volume = wider, more aesthetic frame. Side delts respond best to high frequency + volume.',
+  exercises: SHOULDER_EXERCISES
+};
+
+const FULLBODY_POWER_DAY = {
+  name:'Full Body Power', sub:'Heavy compounds, low volume · 12 sets',
+  tags:['Compound','Power','Strength'],
+  rationale:'Hits weekly volume gaps. Heavy & low-rep emphasizes strength. Ample recovery before weekend volleyball.',
+  exercises: FULLBODY_EXERCISES
+};
+
+const PUSH_DAY = {
+  name:'Push Day — Chest, Shoulders, Triceps', sub:'4 chest + 4 shoulders + 5 tri sets · 16 total',
+  tags:['Chest','Shoulders','Triceps'],
+  rationale:'Compounds first when CNS fresh. Bench drives chest mass, OHP builds delts. Volume hits all 3 push muscles in 60 min.',
+  exercises: PUSH_EXERCISES
+};
+
+const PULL_DAY = {
+  name:'Pull Day — Back, Biceps, Rear Delts', sub:'Vertical + horizontal pulls · 16 sets',
+  tags:['Back','Biceps','Rear Delts'],
+  rationale:'Back needs both vertical pulls (lats = width) and horizontal (mid-back = thickness). Biceps after, fresh from supporting compound work.',
+  exercises: PULL_EXERCISES
+};
+
+const LEG_DAY = {
+  name:'Leg Day — Quads, Hams, Glutes, Calves', sub:'Squat-focused · 17 total sets',
+  tags:['Quads','Hamstrings','Glutes','Calves'],
+  rationale:'Legs = largest muscle group = biggest hormonal & growth response system-wide. Don\'t skip — full-body anabolic boost.',
+  exercises: LEG_EXERCISES
+};
+
+/* === 5 SELECTABLE PLANS === */
+const WORKOUT_PLANS = {
+  ppl_6day: {
+    id: 'ppl_6day',
+    name: 'PPL Hypertrophy',
+    short: 'Push/Pull/Legs + Sport',
+    level: 'Intermediate',
+    daysPerWeek: 6,
+    duration: '60-75 min',
+    weeklySetsPerMuscle: '14-18',
+    description: 'Push/Pull/Legs split with shoulder specialization and full-body power day. Each muscle hit ~2x/week — the proven optimum for natural hypertrophy.',
+    bestFor: 'Serious mass-gain. Available 6 days/week. Already lifting 1+ months.',
+    pros: ['~2x weekly frequency per muscle', 'High weekly volume', 'Specialization day for delts'],
+    cons: ['6 days commitment', 'Demanding recovery', 'Not for beginners'],
+    schedule: {
+      0: RECOVERY_DAY,           // Sun — recovery
+      1: PUSH_DAY,               // Mon — Push
+      2: PULL_DAY,               // Tue — Pull
+      3: LEG_DAY,                // Wed — Legs
+      4: SHOULDER_DAY,           // Thu — Shoulder spec
+      5: FULLBODY_POWER_DAY,     // Fri — Full body power
+      6: VOLLEYBALL_DAY          // Sat — Volleyball
+    }
+  },
+  upper_lower_4day: {
+    id: 'upper_lower_4day',
+    name: 'Upper / Lower 4-Day',
+    short: '4 days, balanced',
+    level: 'Beginner-Intermediate',
+    daysPerWeek: 4,
+    duration: '50-65 min',
+    weeklySetsPerMuscle: '10-14',
+    description: 'Classic 4-day Upper/Lower split. Each muscle worked 2x/week with full recovery in between. Excellent strength + size combination.',
+    bestFor: 'Beginners or busy schedules. Best gains-per-time-spent ratio.',
+    pros: ['Only 4 days', 'Simple to follow', 'Optimal frequency for beginners'],
+    cons: ['Lower total volume than PPL', 'Long workouts (~60 min)'],
+    schedule: {
+      0: REST_DAY,
+      1: UPPER_BODY_DAY,      // Mon — Upper
+      2: LOWER_BODY_DAY,      // Tue — Lower
+      3: REST_DAY,
+      4: UPPER_BODY_DAY,      // Thu — Upper
+      5: LOWER_BODY_DAY,      // Fri — Lower
+      6: VOLLEYBALL_DAY
+    }
+  },
+  bro_split_5day: {
+    id: 'bro_split_5day',
+    name: 'Classic Bro Split',
+    short: 'One muscle per day',
+    level: 'Intermediate',
+    daysPerWeek: 5,
+    duration: '45-60 min',
+    weeklySetsPerMuscle: '16-20 (1x freq)',
+    description: 'Traditional bodybuilder split. Each muscle gets full attention one day per week with ample recovery. Old-school, still effective.',
+    bestFor: 'Lifters who prefer high-volume single-muscle sessions and 7-day recovery.',
+    pros: ['Maximum focus per session', 'Long muscle recovery', 'Mentally simpler'],
+    cons: ['Only 1x/week frequency = slower gains than PPL', 'Suboptimal for natural lifters'],
+    schedule: {
+      0: REST_DAY,
+      1: BRO_CHEST,        // Mon
+      2: BRO_BACK,         // Tue
+      3: BRO_LEGS,         // Wed
+      4: BRO_SHOULDERS,    // Thu
+      5: BRO_ARMS,         // Fri
+      6: VOLLEYBALL_DAY
+    }
+  },
+  full_body_3day: {
+    id: 'full_body_3day',
+    name: 'Full Body 3x/week',
+    short: '3 days, beginner-friendly',
+    level: 'Beginner',
+    daysPerWeek: 3,
+    duration: '45-55 min',
+    weeklySetsPerMuscle: '9-12 (3x freq)',
+    description: 'Three full-body workouts per week. Each muscle hit 3x — best frequency for beginners. Minimum gym time for maximum gains.',
+    bestFor: 'Absolute beginners, very busy schedules, or those returning from a break.',
+    pros: ['Only 3 days', '3x weekly frequency = fast learning', 'Easy recovery'],
+    cons: ['Lower per-session volume', 'Not optimal for advanced lifters'],
+    schedule: {
+      0: REST_DAY,
+      1: FULLBODY_DAY_A,   // Mon
+      2: REST_DAY,
+      3: FULLBODY_DAY_B,   // Wed
+      4: REST_DAY,
+      5: FULLBODY_DAY_C,   // Fri
+      6: VOLLEYBALL_DAY
+    }
+  },
+  push_pull_4day: {
+    id: 'push_pull_4day',
+    name: 'Push/Pull 4-Day',
+    short: 'Push, Pull, Off, repeat',
+    level: 'Intermediate-Advanced',
+    daysPerWeek: 4,
+    duration: '60-75 min',
+    weeklySetsPerMuscle: '12-16',
+    description: 'High-frequency Push/Pull rotation: hit chest, shoulders, triceps & legs (push) twice, back + biceps (pull) twice per week.',
+    bestFor: 'Advanced lifters who recovered well from PPL and want even more frequency on push muscles.',
+    pros: ['Push muscles hit 2x/week', 'Flexible day arrangement'],
+    cons: ['Push volume can be excessive', 'Requires good recovery'],
+    schedule: {
+      0: REST_DAY,
+      1: PUSH_DAY,         // Mon — Push
+      2: PULL_DAY,         // Tue — Pull
+      3: REST_DAY,
+      4: PUSH_DAY,         // Thu — Push (with legs included as a "leg-hybrid" version)
+      5: PULL_DAY,         // Fri — Pull
+      6: VOLLEYBALL_DAY
+    }
+  }
+};
+
+// Default plan if none selected yet
+const DEFAULT_PLAN_ID = 'ppl_6day';
+
+// Backward compat — keep WORKOUT_PROGRAM as alias to current schedule
+function getActivePlan() {
+  const planId = state.profile.activePlanId || DEFAULT_PLAN_ID;
+  return WORKOUT_PLANS[planId] || WORKOUT_PLANS[DEFAULT_PLAN_ID];
+}
+
+function getWorkoutForToday() {
+  return getActivePlan().schedule[new Date().getDay()];
+}
+
+function getWorkoutForDow(dow) {
+  return getActivePlan().schedule[dow];
+}
 
 const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -968,11 +1463,14 @@ const DIET_PLAN = [
 const App = (() => {
   let state = {
     apiUrl: localStorage.getItem(STORAGE_KEY_API) || '',
-    profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4 },
+    profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4, activePlanId:'' },
     logs: [], workouts: [], exercises: [], meals: [],
     expandedDemo: null,
     viewingDayDow: new Date().getDay(),
-    lastSyncTs: null
+    lastSyncTs: null,
+    pickedPlanId: null,
+    expandedPlanCardId: null,
+    dismissedRecommendation: null
   };
 
   function init() {
@@ -981,12 +1479,25 @@ const App = (() => {
       document.getElementById('setupScreen').style.display = 'flex';
       return;
     }
-    document.getElementById('app').style.display = 'block';
     loadCache();
+    // If no plan selected yet → show picker
+    if (!state.profile.activePlanId) {
+      document.getElementById('planPickerScreen').style.display = 'flex';
+      renderPlanPicker();
+      // Still try to refresh in background — profile may have plan from sheet
+      refresh().then(() => {
+        if (state.profile.activePlanId) {
+          document.getElementById('planPickerScreen').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+          renderAll();
+        }
+      });
+      return;
+    }
+    document.getElementById('app').style.display = 'block';
     renderAll();
     refresh();
     registerSW();
-    // Auto-refresh every 60s for fresh data
     setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 60000);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') refresh();
@@ -1131,7 +1642,7 @@ const App = (() => {
     const p = state.profile;
     const log = todayLog();
     const dow = new Date().getDay();
-    const wkPlan = WORKOUT_PROGRAM[dow];
+    const wkPlan = getWorkoutForDow(dow);
     const m = getTodayMacros();
     const w = Number(log?.weight) || p.currentWeight || 51;
 
@@ -1201,7 +1712,7 @@ const App = (() => {
     const sug = [];
     const dow = new Date().getDay();
     const hr = new Date().getHours();
-    const wkPlan = WORKOUT_PROGRAM[dow];
+    const wkPlan = getWorkoutForDow(dow);
     const { cal, prot, w, doneEx, totalEx, trend, mealCount } = context;
 
     // PRIORITY 1 — Time-sensitive
@@ -1336,7 +1847,7 @@ const App = (() => {
   // ==================== TRACK ====================
   function renderTrack() {
     const dow = new Date().getDay();
-    const wkPlan = WORKOUT_PROGRAM[dow];
+    const wkPlan = getWorkoutForDow(dow);
     const today = todayStr();
     const todayEx = state.exercises.filter(e => e.date === today);
     const customEx = todayEx.filter(e => e.custom === 'YES');
@@ -1495,7 +2006,7 @@ const App = (() => {
     const today = todayStr();
     const m = getTodayMacros();
     const todayEx = state.exercises.filter(e => e.date === today);
-    const wkPlan = WORKOUT_PROGRAM[new Date().getDay()];
+    const wkPlan = getWorkoutForToday();
     const customCount = todayEx.filter(e => e.custom === 'YES').length;
     const totalEx = wkPlan.exercises.length + customCount;
     const doneEx = todayEx.filter(e => e.done === 'YES').length;
@@ -1533,9 +2044,17 @@ const App = (() => {
     const today = new Date().getDay();
     if (state.viewingDayDow === undefined || state.viewingDayDow === null) state.viewingDayDow = today;
 
+    // Active plan summary
+    renderActivePlanSummary();
+    renderPlanRecommendation();
+
+    const activePlan = getActivePlan();
+    document.getElementById('splitBadge').textContent = activePlan.short.toUpperCase();
+    document.getElementById('splitDescription').textContent = activePlan.description;
+
     let html = '';
     [1,2,3,4,5,6,0].forEach(dow => {
-      const w = WORKOUT_PROGRAM[dow];
+      const w = getWorkoutForDow(dow);
       const isToday = dow === today;
       const isViewing = dow === state.viewingDayDow;
       const status = getDowStatus(dow);
@@ -1546,7 +2065,7 @@ const App = (() => {
         <div class="plan-item" style="cursor:pointer; ${isViewing?'background:rgba(212,255,58,0.04);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:8px;':''}" onclick="App.viewDay(${dow})">
           <div class="plan-day ${isToday?'today':''}">${DAY_NAMES[dow]}</div>
           <div class="plan-content">
-            <div class="name">${w.name.split(' — ')[0]}</div>
+            <div class="name">${escapeHTML(w.name.split(' — ')[0])}</div>
             <div class="sub">${w.exercises.length} exercises · ${w.tags.join(', ')}</div>
           </div>
           <div class="plan-check ${checkClass}">${checkContent}</div>
@@ -1555,7 +2074,7 @@ const App = (() => {
     document.getElementById('planList').innerHTML = html;
 
     const dow = state.viewingDayDow;
-    const dayPlan = WORKOUT_PROGRAM[dow];
+    const dayPlan = getWorkoutForDow(dow);
     document.getElementById('dayDetailDay').textContent = DAY_FULL[dow].toUpperCase();
     document.getElementById('dayDetail').innerHTML = `
       <div style="font-size:18px;font-weight:700;margin-bottom:4px;line-height:1.2;">${escapeHTML(dayPlan.name)}</div>
@@ -1605,6 +2124,292 @@ const App = (() => {
     state.viewingDayDow = dow;
     renderPlan();
     document.getElementById('dayDetailCard').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // ==================== PLAN MANAGEMENT ====================
+  function renderActivePlanSummary() {
+    const plan = getActivePlan();
+    document.getElementById('activePlanSummary').innerHTML = `
+      <div style="font-size:20px;font-weight:700;line-height:1.2;margin-bottom:4px;">${escapeHTML(plan.name)}</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">${escapeHTML(plan.short)} · ${plan.level}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);">
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);line-height:1;">${plan.daysPerWeek}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);letter-spacing:1px;margin-top:2px;">DAYS/WK</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);line-height:1;padding-top:3px;">${plan.duration.split('-')[0]}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);letter-spacing:1px;margin-top:2px;">MIN/SESSION</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);line-height:1;padding-top:3px;">${plan.weeklySetsPerMuscle.split(' ')[0]}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);letter-spacing:1px;margin-top:2px;">SETS/MUSCLE</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-2);line-height:1.5;margin-top:10px;">${escapeHTML(plan.description)}</div>
+    `;
+  }
+
+  function buildPlanCard(plan, opts={}) {
+    const active = state.profile.activePlanId === plan.id;
+    const picked = state.pickedPlanId === plan.id;
+    const expanded = state.expandedPlanCardId === plan.id;
+    const klass = (active || picked) ? 'active' : '';
+    const onClick = opts.onClick || `App.pickPlan('${plan.id}')`;
+    return `
+      <div class="plan-card ${klass} ${expanded?'expanded':''}" onclick="${onClick}">
+        <div class="plan-head">
+          <div>
+            <div class="plan-name">${escapeHTML(plan.name)}</div>
+            <div class="plan-short">${escapeHTML(plan.short)} · ${plan.level}</div>
+          </div>
+        </div>
+        <div class="plan-stats">
+          <div class="plan-stat">
+            <div class="plan-stat-num">${plan.daysPerWeek}</div>
+            <div class="plan-stat-lbl">DAYS/WK</div>
+          </div>
+          <div class="plan-stat">
+            <div class="plan-stat-num" style="font-size:18px;padding-top:3px;">${plan.duration.split('-')[0]}</div>
+            <div class="plan-stat-lbl">MIN</div>
+          </div>
+          <div class="plan-stat">
+            <div class="plan-stat-num" style="font-size:18px;padding-top:3px;">${plan.weeklySetsPerMuscle.split(' ')[0]}</div>
+            <div class="plan-stat-lbl">SETS/MUSCLE</div>
+          </div>
+        </div>
+        <div class="plan-desc">${escapeHTML(plan.description)}</div>
+        <div class="plan-best"><strong>BEST FOR:</strong> ${escapeHTML(plan.bestFor)}</div>
+        <div class="plan-extra">
+          <div class="plan-pros"><strong style="color:var(--good);font-size:10px;letter-spacing:1px;font-family:'JetBrains Mono',monospace;">PROS</strong><ul>${plan.pros.map(p=>`<li>${escapeHTML(p)}</li>`).join('')}</ul></div>
+          <div class="plan-cons"><strong style="color:var(--bad);font-size:10px;letter-spacing:1px;font-family:'JetBrains Mono',monospace;">TRADEOFFS</strong><ul>${plan.cons.map(p=>`<li>${escapeHTML(p)}</li>`).join('')}</ul></div>
+        </div>
+        <div class="plan-toggle" onclick="event.stopPropagation();App.togglePlanCard('${plan.id}')">${expanded?'HIDE DETAILS ↑':'MORE DETAILS ↓'}</div>
+      </div>`;
+  }
+
+  function renderPlanPicker() {
+    const list = Object.values(WORKOUT_PLANS);
+    document.getElementById('planPickerList').innerHTML = list.map(p => buildPlanCard(p)).join('');
+    const btn = document.getElementById('planConfirmBtn');
+    if (state.pickedPlanId) {
+      btn.disabled = false;
+      btn.textContent = 'Start with ' + WORKOUT_PLANS[state.pickedPlanId].name;
+    } else {
+      btn.disabled = true;
+      btn.textContent = 'Select a plan';
+    }
+  }
+
+  function pickPlan(id) {
+    state.pickedPlanId = id;
+    if (navigator.vibrate) navigator.vibrate(8);
+    // Re-render whichever screen is visible
+    if (document.getElementById('planPickerScreen').style.display !== 'none') renderPlanPicker();
+    else renderPlanSwitcher();
+  }
+
+  function togglePlanCard(id) {
+    state.expandedPlanCardId = state.expandedPlanCardId === id ? null : id;
+    if (document.getElementById('planPickerScreen').style.display !== 'none') renderPlanPicker();
+    else renderPlanSwitcher();
+  }
+
+  async function confirmPlan() {
+    if (!state.pickedPlanId) return;
+    state.profile.activePlanId = state.pickedPlanId;
+    saveCache();
+    // Hide picker, show app
+    document.getElementById('planPickerScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderAll();
+    showUpdateBanner('PLAN ACTIVATED');
+    toast('Plan saved. Let\'s build!', 'good');
+    // Persist to sheet
+    try { await api('updateProfile', { activePlanId: state.pickedPlanId }); }
+    catch(e){}
+    state.pickedPlanId = null;
+    registerSW();
+  }
+
+  function openPlanSwitcher() {
+    const card = document.getElementById('planSwitcherCard');
+    if (card.style.display === 'none' || !card.style.display) {
+      card.style.display = 'block';
+      state.pickedPlanId = state.profile.activePlanId;
+      renderPlanSwitcher();
+      card.scrollIntoView({behavior:'smooth', block:'start'});
+    } else {
+      card.style.display = 'none';
+    }
+  }
+
+  function renderPlanSwitcher() {
+    const list = Object.values(WORKOUT_PLANS);
+    const html = list.map(p => buildPlanCard(p, { onClick: `App.pickPlan('${p.id}')` })).join('');
+    const apply = state.pickedPlanId && state.pickedPlanId !== state.profile.activePlanId
+      ? `<button class="btn btn-primary" onclick="App.applyPlanSwitch()" style="margin-top:8px;">Switch to ${escapeHTML(WORKOUT_PLANS[state.pickedPlanId].name)}</button>`
+      : '';
+    document.getElementById('planSwitcherList').innerHTML = html + apply;
+  }
+
+  async function applyPlanSwitch() {
+    if (!state.pickedPlanId || state.pickedPlanId === state.profile.activePlanId) return;
+    const newName = WORKOUT_PLANS[state.pickedPlanId].name;
+    if (!confirm(`Switch to ${newName}?\n\nYour history stays. Tomorrow's workout follows the new plan.`)) return;
+    state.profile.activePlanId = state.pickedPlanId;
+    saveCache();
+    document.getElementById('planSwitcherCard').style.display = 'none';
+    state.pickedPlanId = null;
+    state.dismissedRecommendation = null;
+    showUpdateBanner('PLAN SWITCHED');
+    toast(`Now on: ${newName}`, 'good');
+    renderAll();
+    try { await api('updateProfile', { activePlanId: state.profile.activePlanId }); }
+    catch(e){}
+  }
+
+  // ==================== AI PLAN RECOMMENDATION ====================
+  /**
+   * Analyze user's data over last few weeks. Recommend a plan switch if:
+   * - Workouts consistently missed > 30% → suggest fewer-day plan
+   * - Weight gain too slow > 2 weeks → suggest higher-volume plan
+   * - Weight gain too fast → suggest lower-volume plan
+   * - 90%+ consistency on lower plan for 4+ weeks → suggest stepping up
+   * - Plateau detected → suggest different stimulus
+   */
+  function analyzePlanFit() {
+    const profile = state.profile;
+    const currentPlanId = profile.activePlanId || DEFAULT_PLAN_ID;
+    const last30 = lastNDaysLogs(30);
+    const last14 = lastNDaysLogs(14);
+    if (last14.length < 7) return null; // need at least 1 week of data
+    const trend = computeWeightTrend();
+
+    // Workout missed rate over last 14 days
+    let plannedDays = 0, missedDays = 0;
+    const today = new Date();
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      const ds = formatDate(d);
+      const wkPlan = WORKOUT_PLANS[currentPlanId].schedule[d.getDay()];
+      if (!wkPlan || wkPlan.tags.includes('Rest') || wkPlan.tags.includes('Recovery')) continue;
+      plannedDays++;
+      const entry = state.workouts.find(w => w.date === ds);
+      if (!entry || entry.completed !== 'YES') missedDays++;
+    }
+    const missRate = plannedDays ? missedDays / plannedDays : 0;
+
+    // High miss rate → suggest simpler plan
+    if (missRate > 0.4 && WORKOUT_PLANS[currentPlanId].daysPerWeek >= 5) {
+      const target = WORKOUT_PLANS[currentPlanId].daysPerWeek === 6 ? 'upper_lower_4day' : 'full_body_3day';
+      return {
+        type: 'reduce',
+        text: `You've missed ${Math.round(missRate*100)}% of workouts in the last 2 weeks. Your current ${WORKOUT_PLANS[currentPlanId].name} plan needs ${WORKOUT_PLANS[currentPlanId].daysPerWeek} days/week — that's the issue, not you.`,
+        recommendation: target,
+        reason: `Switch to ${WORKOUT_PLANS[target].name}. Fewer days = better consistency = more gains.`,
+        priority: 1
+      };
+    }
+
+    // Low miss rate + slow weight gain → suggest more volume
+    if (missRate < 0.2 && trend.weeks >= 2 && trend.perWeek > 0 && trend.perWeek < profile.weeklyGainTarget * 0.5
+        && WORKOUT_PLANS[currentPlanId].daysPerWeek <= 4) {
+      return {
+        type: 'increase',
+        text: `Excellent consistency, but weight gain is only ${trend.perWeek.toFixed(2)}kg/wk vs ${profile.weeklyGainTarget} target. You're ready for more volume — your body has adapted.`,
+        recommendation: 'ppl_6day',
+        reason: `Step up to PPL Hypertrophy (6 days). Each muscle hit ~2x/week for faster growth.`,
+        priority: 2
+      };
+    }
+
+    // Plateau detection (weight stuck for 14 days, training going fine)
+    const weights14 = last14.filter(l => Number(l.weight) > 0);
+    if (weights14.length >= 5 && missRate < 0.3) {
+      const first = Number(weights14[0].weight);
+      const last = Number(weights14[weights14.length-1].weight);
+      if (Math.abs(last - first) < 0.3) {
+        // Plateau — suggest plan variety to introduce new stimulus
+        const alternatives = Object.keys(WORKOUT_PLANS).filter(k => k !== currentPlanId);
+        const alt = currentPlanId === 'ppl_6day' ? 'push_pull_4day' :
+                    currentPlanId === 'upper_lower_4day' ? 'ppl_6day' :
+                    currentPlanId === 'bro_split_5day' ? 'ppl_6day' :
+                    currentPlanId === 'full_body_3day' ? 'upper_lower_4day' :
+                    'ppl_6day';
+        return {
+          type: 'plateau',
+          text: `Weight plateau detected (no movement in 2 weeks despite consistent training). Your body has adapted — time for a new stimulus.`,
+          recommendation: alt,
+          reason: `Try ${WORKOUT_PLANS[alt].name}. Different volume distribution will break the plateau.`,
+          priority: 2
+        };
+      }
+    }
+
+    // Weight gain too fast on high-volume plan
+    if (trend.weeks >= 2 && trend.perWeek > profile.weeklyGainTarget * 2.5
+        && WORKOUT_PLANS[currentPlanId].daysPerWeek >= 5) {
+      return {
+        type: 'tooFast',
+        text: `Gaining ${trend.perWeek.toFixed(2)}kg/wk — too fast, mostly fat. High-volume plan + surplus = excess.`,
+        recommendation: 'upper_lower_4day',
+        reason: `Switch to Upper/Lower 4-day. Slightly less volume + cut 200 kcal = lean gains.`,
+        priority: 2
+      };
+    }
+
+    // Time-on-plan ladder: 8+ weeks of solid consistency on beginner plan
+    if (currentPlanId === 'full_body_3day' && state.logs.length >= 30 && missRate < 0.15) {
+      return {
+        type: 'progression',
+        text: `30+ days of solid full-body training with ${Math.round((1-missRate)*100)}% consistency. You're no longer a beginner — time to progress.`,
+        recommendation: 'upper_lower_4day',
+        reason: `Step up to Upper/Lower 4-day. More volume per session, still 4-day commitment.`,
+        priority: 3
+      };
+    }
+
+    return null;
+  }
+
+  function renderPlanRecommendation() {
+    const rec = analyzePlanFit();
+    const el = document.getElementById('planRecommendation');
+    if (!rec || state.dismissedRecommendation === rec.recommendation) {
+      el.style.display = 'none';
+      el.innerHTML = '';
+      return;
+    }
+    const icons = { reduce:'📉', increase:'📈', plateau:'🚫', tooFast:'⚠', progression:'🔥' };
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="plan-recommendation">
+        <div class="rec-label">${icons[rec.type]||'🎯'} COACH SUGGESTS A PLAN UPDATE</div>
+        <div class="rec-text">${escapeHTML(rec.text)}</div>
+        <div class="rec-text" style="margin-top:6px;color:var(--text-2);font-size:12px;"><strong style="color:var(--accent);">→</strong> ${escapeHTML(rec.reason)}</div>
+        <div class="rec-actions">
+          <button class="rec-btn" onclick="App.acceptRecommendation('${rec.recommendation}')">Switch Plan</button>
+          <button class="rec-btn dismiss" onclick="App.dismissRecommendation('${rec.recommendation}')">Not now</button>
+        </div>
+      </div>`;
+  }
+
+  async function acceptRecommendation(planId) {
+    state.profile.activePlanId = planId;
+    state.dismissedRecommendation = null;
+    saveCache();
+    showUpdateBanner('PLAN UPDATED');
+    toast(`Now on: ${WORKOUT_PLANS[planId].name}`, 'good');
+    renderAll();
+    try { await api('updateProfile', { activePlanId: planId }); }
+    catch(e){}
+  }
+
+  function dismissRecommendation(planId) {
+    state.dismissedRecommendation = planId;
+    renderPlanRecommendation();
+    toast('Dismissed. Coach will check again next week.', 'warn');
   }
 
   function getDowStatus(dow) {
@@ -1772,9 +2577,9 @@ const App = (() => {
 
     const muscleVolume = {};
     last7.forEach(logEntry => {
-      // Find the matching exercise definition across all programs
-      for (const dow in WORKOUT_PROGRAM) {
-        const found = WORKOUT_PROGRAM[dow].exercises.find(x => x.id === logEntry.exerciseId);
+      const activePlan = getActivePlan();
+      for (const dow in activePlan.schedule) {
+        const found = activePlan.schedule[dow].exercises.find(x => x.id === logEntry.exerciseId);
         if (found && found.muscles) {
           found.muscles.forEach(m => {
             muscleVolume[m.name] = (muscleVolume[m.name] || 0) + m.sets;
@@ -1813,6 +2618,8 @@ const App = (() => {
     document.getElementById('p_targetCalories').textContent = p.targetCalories;
     document.getElementById('p_targetProtein').textContent = p.targetProtein;
     document.getElementById('p_weeklyGainTarget').textContent = p.weeklyGainTarget;
+    const planName = (WORKOUT_PLANS[p.activePlanId] || WORKOUT_PLANS[DEFAULT_PLAN_ID]).name;
+    document.getElementById('p_activePlan').textContent = planName + ' →';
     document.getElementById('e_targetWeight').value = p.targetWeight;
     document.getElementById('e_targetCalories').value = p.targetCalories;
     document.getElementById('e_targetProtein').value = p.targetProtein;
@@ -1961,7 +2768,9 @@ const App = (() => {
   }
 
   return { init, go, refresh, saveTrack, saveProfile, saveApiUrl, resetApiUrl,
-    installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay };
+    installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay,
+    pickPlan, togglePlanCard, confirmPlan, openPlanSwitcher, applyPlanSwitch,
+    acceptRecommendation, dismissRecommendation };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
