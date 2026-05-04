@@ -143,28 +143,49 @@ textarea{resize:vertical;min-height:80px;}
 .workout-header .pct{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);letter-spacing:1px;}
 .workout-sub{font-size:12px;color:var(--text-3);margin-bottom:12px;}
 
-.exercise{display:flex;gap:12px;align-items:center;padding:14px 0;
+.exercise{display:flex;gap:12px;align-items:flex-start;padding:14px 0;
   border-top:1px solid var(--line-soft);}
 .exercise:first-of-type{border-top:0;padding-top:4px;}
 .ex-check{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);
   background:var(--surface-2);display:flex;align-items:center;justify-content:center;
-  color:transparent;font-size:14px;font-weight:700;flex-shrink:0;
+  color:transparent;font-size:14px;font-weight:700;flex-shrink:0; margin-top:2px;
   transition:all .15s; cursor:pointer;}
 .ex-check.done{background:var(--accent);color:#000;border-color:var(--accent);}
 .ex-body{flex:1;min-width:0;}
 .ex-name{font-size:14px;font-weight:600;line-height:1.2;}
 .ex-name.done{text-decoration:line-through;color:var(--text-3);}
 .ex-meta{display:flex;gap:10px;margin-top:4px;font-family:'JetBrains Mono',monospace;
-  font-size:10px;color:var(--text-3);letter-spacing:.5px;}
+  font-size:10px;color:var(--text-3);letter-spacing:.5px;flex-wrap:wrap;}
 .ex-meta span.sets{color:var(--accent);}
-.ex-info{flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;
-  color:var(--text-3);font-size:14px;border-radius:6px;}
-.ex-info:active{background:var(--surface-3);color:var(--text);}
 
-.ex-tip{margin-top:6px;padding:10px 12px;background:var(--surface-2);border-radius:10px;
-  font-size:11px;color:var(--text-2);line-height:1.5;border-left:2px solid var(--accent);
-  display:none;}
-.ex-tip.show{display:block;}
+.ex-actions{display:flex;gap:6px;margin-top:8px;}
+.ex-action{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;
+  padding:5px 10px;border-radius:8px;background:var(--surface-3);color:var(--text-2);
+  display:inline-flex;align-items:center;gap:5px;text-decoration:none;
+  transition:all .15s;}
+.ex-action:active{background:var(--accent);color:#000;}
+.ex-action svg{width:11px;height:11px;}
+
+/* Demo image container */
+.ex-demo{margin-top:10px;background:var(--surface-2);border-radius:10px;padding:12px;
+  display:none;border:1px solid var(--line-soft);}
+.ex-demo.show{display:block;}
+.ex-demo .demo-img-wrap{position:relative;border-radius:8px;overflow:hidden;
+  background:var(--surface-3);aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;}
+.ex-demo .demo-img{width:100%;height:100%;object-fit:cover;display:block;
+  transition:opacity .3s;}
+.ex-demo .demo-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.ex-demo .demo-fallback svg{width:80%;height:80%;}
+.ex-demo .demo-img-link{position:absolute;bottom:6px;right:6px;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);
+  letter-spacing:1px;padding:4px 8px;border-radius:6px;text-decoration:none;
+  display:flex;align-items:center;gap:4px;}
+.ex-demo .demo-img-link svg{width:10px;height:10px;}
+.ex-demo .demo-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;
+  color:var(--accent);text-transform:uppercase;margin-bottom:6px;text-align:center;}
+.ex-demo .demo-tip{font-size:11px;color:var(--text-2);line-height:1.5;margin-top:8px;
+  padding-top:8px;border-top:1px solid var(--line-soft);}
 
 /* Add custom exercise */
 .add-row{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft);}
@@ -183,7 +204,7 @@ textarea{resize:vertical;min-height:80px;}
 .meal-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);
   letter-spacing:1px;width:64px;flex-shrink:0;}
 .meal-food{flex:1;font-size:13px;line-height:1.4;}
-.meal-food.done{text-decoration:line-through;color:var(--text-3);}
+.meal-food.done .meal-name{text-decoration:line-through;color:var(--text-3);}
 .meal-macros{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
   letter-spacing:.5px;margin-top:2px;}
 
@@ -203,11 +224,24 @@ textarea{resize:vertical;min-height:80px;}
 .plan-check.done{background:var(--accent);color:#000;border-color:var(--accent);}
 .plan-check.missed{background:rgba(248,113,113,.12);color:var(--bad);border-color:rgba(248,113,113,.3);}
 
-/* Stats charts */
+/* Stats */
 .chart-wrap{margin-top:8px;}
 .chart{width:100%;height:160px;display:block;}
 .chart-legend{display:flex;justify-content:space-between;margin-top:8px;
   font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:1px;}
+
+/* Volume bars */
+.vol-bar{display:flex;align-items:center;gap:10px;padding:8px 0;
+  border-top:1px solid var(--line-soft);}
+.vol-bar:first-of-type{border-top:0;padding-top:0;}
+.vol-bar .vol-name{font-size:12px;width:90px;flex-shrink:0;color:var(--text-2);}
+.vol-bar .vol-track{flex:1;height:6px;background:var(--surface-3);border-radius:999px;overflow:hidden;}
+.vol-bar .vol-fill{height:100%;border-radius:999px;background:var(--accent);transition:width .6s;}
+.vol-bar .vol-fill.low{background:var(--warn);}
+.vol-bar .vol-fill.opt{background:var(--good);}
+.vol-bar .vol-fill.high{background:var(--bad);}
+.vol-bar .vol-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);
+  width:50px;text-align:right;letter-spacing:.5px;}
 
 /* Bottom nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:30;
@@ -229,10 +263,25 @@ textarea{resize:vertical;min-height:80px;}
   background:var(--surface-3);color:var(--text);padding:12px 18px;border-radius:999px;
   font-size:13px;font-weight:500;border:1px solid var(--line);
   box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:50;
-  opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;max-width:90%;text-align:center;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+  opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;max-width:90%;text-align:center;
+  display:flex;align-items:center;gap:8px;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);pointer-events:auto;}
 .toast.good{color:var(--accent);}
 .toast.bad{color:var(--bad);}
+.toast.warn{color:var(--warn);}
+.toast .toast-dot{width:6px;height:6px;border-radius:50%;background:currentColor;
+  box-shadow:0 0 8px currentColor;}
+
+/* Update banner — appears when data freshly synced */
+.update-banner{position:fixed;top:calc(60px + var(--safe-top));left:50%;
+  transform:translateX(-50%) translateY(-60px);
+  background:var(--accent);color:#000;padding:8px 16px;border-radius:999px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;font-weight:700;
+  box-shadow:0 6px 20px var(--accent-glow);z-index:25;
+  opacity:0;transition:transform .35s, opacity .35s;display:flex;align-items:center;gap:6px;}
+.update-banner.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.update-banner .check{width:14px;height:14px;border-radius:50%;background:#000;color:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;}
 
 .empty{text-align:center;padding:30px 16px;color:var(--text-3);font-size:13px;}
 
@@ -258,6 +307,9 @@ textarea{resize:vertical;min-height:80px;}
 .sync-pill.offline .dot{background:var(--bad);}
 .sync-pill.syncing .dot{background:var(--warn);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.3;}}
+
+.last-sync{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
+  letter-spacing:1px;text-align:center;margin-top:8px;}
 
 ::-webkit-scrollbar{display:none;}
 </style>
@@ -296,6 +348,8 @@ textarea{resize:vertical;min-height:80px;}
     </div>
     <div class="day" id="todayLabel">—</div>
   </div>
+
+  <div id="updateBanner" class="update-banner"><span class="check">✓</span><span id="updateBannerTxt">DATA UPDATED</span></div>
 
   <!-- HOME -->
   <section class="page active" data-page="home">
@@ -362,18 +416,26 @@ textarea{resize:vertical;min-height:80px;}
 
     <div class="card">
       <div class="card-title">
-        <span>Coach Insights</span>
+        <span>AI Coach Insights</span>
         <span class="badge good">LIVE</span>
       </div>
       <div id="suggestions"></div>
     </div>
+
+    <div class="last-sync" id="lastSyncLabel">—</div>
   </section>
 
   <!-- TRACK -->
   <section class="page" data-page="track">
     <div class="hero">
       <h1>TRACK <span class="accent">TODAY.</span></h1>
-      <p id="trackSub">Tap each exercise & meal as you do them.</p>
+      <p id="trackSub">Tap each exercise & meal. Auto-syncs.</p>
+    </div>
+
+    <!-- Quick suggestions on Track page -->
+    <div class="card" id="trackSuggestionsCard" style="display:none;">
+      <div class="card-title"><span>Right Now</span><span class="badge warn">FOCUS</span></div>
+      <div id="trackSuggestions"></div>
     </div>
 
     <!-- Workout Checklist -->
@@ -451,9 +513,8 @@ textarea{resize:vertical;min-height:80px;}
         <span class="badge">PPL + SPORT</span>
       </div>
       <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 12px;">
-        Push / Pull / Legs is the gold-standard hypertrophy split. Each muscle group hit ~2x/week
-        for optimal MPS (muscle protein synthesis). Compound lifts first when fresh, isolation after.
-        Volleyball = active recovery + power.
+        Push / Pull / Legs split. Each muscle hit ~2x/week (optimal MPS frequency, Schoenfeld 2016).
+        Tap a day to see exercises, video demos & form tips.
       </p>
       <div id="planList"></div>
     </div>
@@ -472,8 +533,8 @@ textarea{resize:vertical;min-height:80px;}
         <span class="badge">~2800 KCAL</span>
       </div>
       <p style="font-size:12px;color:var(--text-2);line-height:1.55;margin:0 0 12px;">
-        Lean bulk: caloric surplus of ~300 kcal over maintenance. Protein 2.0g/kg bodyweight
-        for muscle synthesis. Carbs around training, fats spread across the day.
+        Lean bulk: ~300 kcal surplus. 2.0g protein per kg body weight.
+        Carbs around training, fats spread across the day.
       </p>
       <div id="dietList"></div>
     </div>
@@ -481,11 +542,11 @@ textarea{resize:vertical;min-height:80px;}
     <div class="card">
       <div class="card-title">Why This Works</div>
       <p style="font-size:12px;color:var(--text-2);line-height:1.6;margin:0;">
-        <strong style="color:var(--text)">Progressive overload:</strong> Add weight or reps every 1–2 weeks. <br>
-        <strong style="color:var(--text)">RIR (Reps in Reserve):</strong> Stop sets with 1–2 reps left in the tank, not failure. <br>
-        <strong style="color:var(--text)">Volume:</strong> 10–20 sets per muscle per week is the proven hypertrophy zone. <br>
+        <strong style="color:var(--text)">Progressive overload:</strong> Add weight or 1 rep every 1–2 weeks. <br>
+        <strong style="color:var(--text)">RIR (Reps in Reserve):</strong> Stop sets with 1–2 reps left, not failure. <br>
+        <strong style="color:var(--text)">Volume:</strong> 10–20 hard sets per muscle per week is the proven hypertrophy zone. <br>
         <strong style="color:var(--text)">Rest:</strong> 90–180s for compounds, 60–90s for isolation. <br>
-        <strong style="color:var(--text)">Sleep + surplus:</strong> Muscle is built outside the gym. 8h sleep + 300 kcal surplus.
+        <strong style="color:var(--text)">Recovery:</strong> 8h sleep + 300 kcal surplus. Muscle is built outside the gym.
       </p>
     </div>
   </section>
@@ -494,7 +555,28 @@ textarea{resize:vertical;min-height:80px;}
   <section class="page" data-page="stats">
     <div class="hero">
       <h1>YOUR <span class="accent">DATA.</span></h1>
-      <p>Last 30 days of progress.</p>
+      <p>Last 30 days of progress + AI insights.</p>
+    </div>
+
+    <!-- Smart Stats Insights -->
+    <div class="card" id="statsInsightsCard">
+      <div class="card-title">
+        <span>AI Analysis</span>
+        <span class="badge" id="aiAnalysisBadge">LIVE</span>
+      </div>
+      <div id="statsInsights"></div>
+    </div>
+
+    <!-- Weekly Volume per Muscle -->
+    <div class="card">
+      <div class="card-title">
+        <span>Weekly Volume by Muscle</span>
+        <span class="badge">SETS / WK</span>
+      </div>
+      <p style="font-size:11px;color:var(--text-3);margin:0 0 10px;line-height:1.5;">
+        Optimal hypertrophy zone: 10–20 sets per muscle per week.
+      </p>
+      <div id="volumeBars"></div>
     </div>
 
     <div class="card">
@@ -603,128 +685,273 @@ textarea{resize:vertical;min-height:80px;}
 </div>
 
 <script>
-// ============================================================
-// IRON — Science-Based Hypertrophy Plan + Checklists
-// ============================================================
 const STORAGE_KEY_API = 'iron_api_url';
 const STORAGE_KEY_CACHE = 'iron_cache';
 
-/* === SCIENCE-BASED WORKOUT PLAN ===
- * Push / Pull / Legs split (proven optimal for hypertrophy).
- * Each exercise: sets × reps, with RIR (reps in reserve) targets.
- * Compounds first (heavy, lower reps for strength + size),
- * isolations after (higher reps, focus on muscle pump & MMC).
- * Volume per muscle per week falls in 12-20 sets (Schoenfeld meta-analysis).
+/* === EXERCISE DATABASE — with muscle volume tags + YouTube demos + SVG illustrations ===
+ * Each exercise has muscles[] array for accurate volume tracking,
+ * a `video` field with a YouTube search URL pointing to certified-coach demos
+ * (Jeff Nippard / Athlean-X / Renaissance Periodization style),
+ * and a `demo` SVG icon-illustration of the movement.
  */
+/* Stock exercise images — Wikimedia Commons (CC-licensed, free, stable URLs).
+ * If image fails (network/blocked), SVG fallback shows. Tap = Google Images search for that exercise.
+ */
+const EX_IMG = (name) => 'https://www.google.com/search?q=' + encodeURIComponent(name + ' exercise form') + '&tbm=isch';
+
+// Wikimedia Commons exercise images — CC-licensed, hosted on Wikipedia infrastructure (very reliable)
+const EX_PIC = {
+  bench:    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Bench-press-1.png/640px-Bench-press-1.png',
+  squat:    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Squats.png/640px-Squats.png',
+  deadlift: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Deadlift_top.jpg/640px-Deadlift_top.jpg',
+  pullup:   'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Pull-up.png/640px-Pull-up.png',
+  row:      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Bent-over-barbell-row-1.png/640px-Bent-over-barbell-row-1.png',
+  press:    'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Overhead-press-1.png/640px-Overhead-press-1.png',
+  curl:     'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Biceps-curl-1.png/640px-Biceps-curl-1.png',
+  pushdown: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Triceps-pushdown-1.png/640px-Triceps-pushdown-1.png',
+  raise:    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Lateral-raise-1.png/640px-Lateral-raise-1.png',
+  legpress: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Leg-press-1.png/640px-Leg-press-1.png',
+  legcurl:  'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Leg-curl-1.png/640px-Leg-curl-1.png',
+  facepull: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cable-face-pull-1.png/640px-Cable-face-pull-1.png',
+  lunge:    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Dumbbell-lunge-1.png/640px-Dumbbell-lunge-1.png',
+  shrug:    'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Barbell-shrug-1.png/640px-Barbell-shrug-1.png',
+  calf:     'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Standing-calf-raise-1.png/640px-Standing-calf-raise-1.png',
+  plank:    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Plank-1.png/640px-Plank-1.png',
+  walk:     'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Walking_for_exercise.jpg/640px-Walking_for_exercise.jpg',
+  stretch:  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Hamstring-stretch.png/640px-Hamstring-stretch.png',
+  generic:  ''
+};
+
+// SVG fallbacks (used only if image fails to load)
+const EX_DEMOS = {
+  bench: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><rect x="40" y="40" width="120" height="8" rx="2" fill="#333"/><circle cx="35" cy="44" r="10" fill="#444"/><circle cx="165" cy="44" r="10" fill="#444"/><rect x="80" y="48" width="40" height="20" rx="3" fill="#666"/><circle cx="100" cy="32" r="8" fill="#d4ff3a"/><line x1="60" y1="32" x2="140" y2="32" stroke="#d4ff3a" stroke-width="3" stroke-linecap="round"/><circle cx="62" cy="32" r="6" fill="#888"/><circle cx="138" cy="32" r="6" fill="#888"/></svg>',
+  squat: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="20" x2="150" y2="20" stroke="#d4ff3a" stroke-width="3" stroke-linecap="round"/><circle cx="55" cy="20" r="7" fill="#888"/><circle cx="145" cy="20" r="7" fill="#888"/><circle cx="100" cy="30" r="9" fill="#666"/><line x1="100" y1="38" x2="100" y2="55" stroke="#666" stroke-width="6" stroke-linecap="round"/><line x1="100" y1="55" x2="85" y2="68" stroke="#666" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="55" x2="115" y2="68" stroke="#666" stroke-width="5" stroke-linecap="round"/></svg>',
+  deadlift: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><line x1="40" y1="65" x2="160" y2="65" stroke="#d4ff3a" stroke-width="3" stroke-linecap="round"/><circle cx="45" cy="65" r="8" fill="#888"/><circle cx="155" cy="65" r="8" fill="#888"/><circle cx="100" cy="22" r="9" fill="#666"/><path d="M100 30 Q95 45 88 60" stroke="#666" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M100 30 Q105 45 112 60" stroke="#666" stroke-width="5" stroke-linecap="round" fill="none"/><line x1="88" y1="60" x2="88" y2="65" stroke="#666" stroke-width="5"/><line x1="112" y1="60" x2="112" y2="65" stroke="#666" stroke-width="5"/></svg>',
+  pullup: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="10" x2="150" y2="10" stroke="#444" stroke-width="4"/><line x1="85" y1="10" x2="85" y2="22" stroke="#666" stroke-width="3"/><line x1="115" y1="10" x2="115" y2="22" stroke="#666" stroke-width="3"/><circle cx="100" cy="30" r="8" fill="#666"/><line x1="100" y1="38" x2="100" y2="60" stroke="#666" stroke-width="6"/><line x1="85" y1="22" x2="100" y2="38" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><line x1="115" y1="22" x2="100" y2="38" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="60" x2="92" y2="72" stroke="#666" stroke-width="5"/><line x1="100" y1="60" x2="108" y2="72" stroke="#666" stroke-width="5"/></svg>',
+  row: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><line x1="40" y1="55" x2="120" y2="55" stroke="#d4ff3a" stroke-width="3" stroke-linecap="round"/><circle cx="45" cy="55" r="6" fill="#888"/><circle cx="115" cy="55" r="6" fill="#888"/><circle cx="140" cy="22" r="8" fill="#666"/><line x1="140" y1="30" x2="135" y2="55" stroke="#666" stroke-width="5"/><line x1="135" y1="55" x2="120" y2="55" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><line x1="135" y1="55" x2="125" y2="70" stroke="#666" stroke-width="5"/><line x1="135" y1="55" x2="148" y2="70" stroke="#666" stroke-width="5"/></svg>',
+  press: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="15" x2="150" y2="15" stroke="#d4ff3a" stroke-width="3" stroke-linecap="round"/><circle cx="55" cy="15" r="7" fill="#888"/><circle cx="145" cy="15" r="7" fill="#888"/><circle cx="100" cy="32" r="9" fill="#666"/><line x1="100" y1="22" x2="100" y2="15" stroke="#d4ff3a" stroke-width="4"/><line x1="100" y1="40" x2="100" y2="60" stroke="#666" stroke-width="6"/><line x1="100" y1="60" x2="88" y2="72" stroke="#666" stroke-width="5"/><line x1="100" y1="60" x2="112" y2="72" stroke="#666" stroke-width="5"/></svg>',
+  curl: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="20" r="8" fill="#666"/><line x1="100" y1="28" x2="100" y2="55" stroke="#666" stroke-width="6"/><line x1="100" y1="38" x2="80" y2="42" stroke="#666" stroke-width="5" stroke-linecap="round"/><line x1="80" y1="42" x2="78" y2="28" stroke="#d4ff3a" stroke-width="5" stroke-linecap="round"/><circle cx="78" cy="22" r="7" fill="#888"/><line x1="100" y1="38" x2="120" y2="42" stroke="#666" stroke-width="5" stroke-linecap="round"/><line x1="120" y1="42" x2="122" y2="28" stroke="#d4ff3a" stroke-width="5" stroke-linecap="round"/><circle cx="122" cy="22" r="7" fill="#888"/><line x1="100" y1="55" x2="92" y2="70" stroke="#666" stroke-width="5"/><line x1="100" y1="55" x2="108" y2="70" stroke="#666" stroke-width="5"/></svg>',
+  pushdown: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><line x1="100" y1="5" x2="100" y2="35" stroke="#444" stroke-width="2"/><line x1="80" y1="35" x2="120" y2="35" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="48" r="9" fill="#666"/><line x1="92" y1="42" x2="86" y2="35" stroke="#666" stroke-width="5"/><line x1="108" y1="42" x2="114" y2="35" stroke="#666" stroke-width="5"/><line x1="100" y1="56" x2="100" y2="72" stroke="#666" stroke-width="6"/></svg>',
+  raise: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="22" r="8" fill="#666"/><line x1="100" y1="30" x2="100" y2="55" stroke="#666" stroke-width="6"/><line x1="100" y1="35" x2="65" y2="35" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="35" r="7" fill="#888"/><line x1="100" y1="35" x2="135" y2="35" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><circle cx="140" cy="35" r="7" fill="#888"/><line x1="100" y1="55" x2="92" y2="72" stroke="#666" stroke-width="5"/><line x1="100" y1="55" x2="108" y2="72" stroke="#666" stroke-width="5"/></svg>',
+  legpress: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="50" width="60" height="20" rx="3" fill="#444"/><rect x="120" y="20" width="60" height="40" rx="3" fill="#666"/><line x1="80" y1="40" x2="120" y2="40" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="50" r="6" fill="#888"/></svg>',
+  legcurl: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><rect x="40" y="30" width="80" height="20" rx="3" fill="#444"/><circle cx="80" cy="30" r="8" fill="#666"/><path d="M125 50 Q150 50 150 30" stroke="#d4ff3a" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="150" cy="22" r="6" fill="#888"/></svg>',
+  facepull: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="6" fill="#888"/><line x1="46" y1="40" x2="80" y2="40" stroke="#d4ff3a" stroke-width="3" stroke-linecap="round" stroke-dasharray="3,3"/><circle cx="100" cy="22" r="8" fill="#666"/><line x1="100" y1="30" x2="100" y2="55" stroke="#666" stroke-width="6"/><line x1="100" y1="35" x2="85" y2="42" stroke="#666" stroke-width="5"/><line x1="85" y1="42" x2="80" y2="38" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="35" x2="115" y2="42" stroke="#666" stroke-width="5"/><line x1="100" y1="55" x2="92" y2="70" stroke="#666" stroke-width="5"/><line x1="100" y1="55" x2="108" y2="70" stroke="#666" stroke-width="5"/></svg>',
+  lunge: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="18" r="8" fill="#666"/><line x1="100" y1="26" x2="100" y2="48" stroke="#666" stroke-width="6"/><line x1="100" y1="48" x2="80" y2="65" stroke="#d4ff3a" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="48" x2="125" y2="55" stroke="#666" stroke-width="5"/><line x1="125" y1="55" x2="125" y2="68" stroke="#666" stroke-width="5"/></svg>',
+  shrug: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="22" r="8" fill="#666"/><line x1="100" y1="30" x2="100" y2="55" stroke="#666" stroke-width="6"/><line x1="92" y1="32" x2="80" y2="35" stroke="#666" stroke-width="5"/><line x1="80" y1="35" x2="80" y2="55" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="60" r="6" fill="#888"/><line x1="108" y1="32" x2="120" y2="35" stroke="#666" stroke-width="5"/><line x1="120" y1="35" x2="120" y2="55" stroke="#d4ff3a" stroke-width="4" stroke-linecap="round"/><circle cx="120" cy="60" r="6" fill="#888"/></svg>',
+  calf: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="15" r="7" fill="#666"/><line x1="100" y1="22" x2="100" y2="55" stroke="#666" stroke-width="6"/><line x1="100" y1="55" x2="92" y2="65" stroke="#d4ff3a" stroke-width="5"/><line x1="100" y1="55" x2="108" y2="65" stroke="#d4ff3a" stroke-width="5"/><line x1="85" y1="65" x2="115" y2="65" stroke="#444" stroke-width="3"/><circle cx="92" cy="65" r="3" fill="#d4ff3a"/><circle cx="108" cy="65" r="3" fill="#d4ff3a"/></svg>',
+  plank: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="8" fill="#666"/><line x1="58" y1="40" x2="140" y2="42" stroke="#d4ff3a" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="48" x2="55" y2="62" stroke="#666" stroke-width="5"/><line x1="135" y1="50" x2="135" y2="62" stroke="#666" stroke-width="5"/><line x1="40" y1="62" x2="155" y2="62" stroke="#444" stroke-width="2"/></svg>',
+  walk: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="18" r="8" fill="#666"/><line x1="100" y1="26" x2="100" y2="50" stroke="#666" stroke-width="6"/><line x1="100" y1="50" x2="85" y2="68" stroke="#d4ff3a" stroke-width="5"/><line x1="100" y1="50" x2="115" y2="68" stroke="#d4ff3a" stroke-width="5"/><line x1="100" y1="35" x2="85" y2="40" stroke="#666" stroke-width="4"/><line x1="100" y1="35" x2="118" y2="42" stroke="#666" stroke-width="4"/></svg>',
+  stretch: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="22" r="8" fill="#666"/><line x1="100" y1="30" x2="100" y2="50" stroke="#666" stroke-width="6"/><line x1="100" y1="35" x2="135" y2="20" stroke="#d4ff3a" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="35" x2="65" y2="20" stroke="#d4ff3a" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="50" x2="80" y2="65" stroke="#666" stroke-width="5"/><line x1="100" y1="50" x2="120" y2="65" stroke="#666" stroke-width="5"/></svg>',
+  generic: '<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="22" r="8" fill="#666"/><line x1="100" y1="30" x2="100" y2="55" stroke="#666" stroke-width="6"/><line x1="100" y1="38" x2="75" y2="42" stroke="#666" stroke-width="5"/><line x1="100" y1="38" x2="125" y2="42" stroke="#666" stroke-width="5"/><line x1="100" y1="55" x2="92" y2="70" stroke="#666" stroke-width="5"/><line x1="100" y1="55" x2="108" y2="70" stroke="#666" stroke-width="5"/><circle cx="75" cy="42" r="5" fill="#d4ff3a"/><circle cx="125" cy="42" r="5" fill="#d4ff3a"/></svg>'
+};
+
+const yt = (q) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q + ' proper form jeff nippard');
+
+/* PUSH DAY */
+const PUSH_EXERCISES = [
+  { id:'p1', name:'Barbell Bench Press', sets:4, reps:'6-8', rest:'2-3 min',
+    muscles:[{name:'Chest', sets:4},{name:'Triceps',sets:1},{name:'Front Delts',sets:1}],
+    tip:'Keep shoulder blades retracted, slight arch, bar to lower chest. Pause 1 sec at chest. Drive feet hard.',
+    video: yt('barbell bench press tutorial'), demo: 'bench' },
+  { id:'p2', name:'Incline DB Press (30°)', sets:3, reps:'8-10', rest:'90s',
+    muscles:[{name:'Upper Chest', sets:3},{name:'Front Delts',sets:1},{name:'Triceps',sets:0.5}],
+    tip:'30° incline maximally targets upper chest (clavicular head). Higher angle becomes shoulder-dominant.',
+    video: yt('incline dumbbell press 30 degrees'), demo: 'press' },
+  { id:'p3', name:'Seated DB Shoulder Press', sets:3, reps:'8-10', rest:'90s',
+    muscles:[{name:'Front Delts', sets:3},{name:'Triceps',sets:1}],
+    tip:'Stop just before lockout to keep tension on delts. Don\'t flare elbows out — slight angle protects shoulders.',
+    video: yt('seated dumbbell shoulder press'), demo: 'press' },
+  { id:'p4', name:'Cable / DB Lateral Raise', sets:3, reps:'12-15', rest:'60s',
+    muscles:[{name:'Side Delts', sets:3}],
+    tip:'Lead with elbows, slight forward lean, slow eccentric. Light weight is fine — feel the burn in side delt.',
+    video: yt('lateral raise side delt'), demo: 'raise' },
+  { id:'p5', name:'Cable Tricep Pushdown (rope)', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Triceps', sets:3}],
+    tip:'Elbows pinned to sides. Spread the rope at the bottom for full lateral head contraction.',
+    video: yt('rope tricep pushdown'), demo: 'pushdown' },
+  { id:'p6', name:'Overhead Tricep Extension (DB or rope)', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Triceps', sets:3}],
+    tip:'Long head of triceps only stretches in overhead position — crucial for arm size.',
+    video: yt('overhead tricep extension'), demo: 'pushdown' }
+];
+
+/* PULL DAY */
+const PULL_EXERCISES = [
+  { id:'pl1', name:'Pull-ups (or Lat Pulldown)', sets:4, reps:'6-10', rest:'2 min',
+    muscles:[{name:'Lats', sets:4},{name:'Biceps',sets:1.5},{name:'Mid Back',sets:1}],
+    tip:'Vertical pull = lat width. Drive elbows down to the floor (not back). If can\'t do pull-ups, use band assist.',
+    video: yt('pull up tutorial proper form'), demo: 'pullup' },
+  { id:'pl2', name:'Barbell Row (or Pendlay Row)', sets:4, reps:'6-8', rest:'2 min',
+    muscles:[{name:'Mid Back', sets:4},{name:'Lats',sets:2},{name:'Biceps',sets:1},{name:'Rear Delts',sets:1}],
+    tip:'Horizontal pull = back thickness. Pull to lower chest/upper abs. Keep torso 45° to hide cheating.',
+    video: yt('barbell row proper form'), demo: 'row' },
+  { id:'pl3', name:'Seated Cable Row', sets:3, reps:'10-12', rest:'90s',
+    muscles:[{name:'Mid Back', sets:3},{name:'Lats',sets:1.5},{name:'Biceps',sets:1}],
+    tip:'Squeeze shoulder blades together at end-range. Don\'t lean back too much — keep tension constant.',
+    video: yt('seated cable row'), demo: 'row' },
+  { id:'pl4', name:'Face Pulls (cable, rope)', sets:3, reps:'12-15', rest:'45s',
+    muscles:[{name:'Rear Delts', sets:3},{name:'Mid Back',sets:1}],
+    tip:'Pull rope to face/forehead, external rotation at end. Best shoulder-health exercise — saves you long-term.',
+    video: yt('face pulls rear delt'), demo: 'facepull' },
+  { id:'pl5', name:'Barbell or EZ-Bar Curl', sets:3, reps:'8-10', rest:'60s',
+    muscles:[{name:'Biceps', sets:3}],
+    tip:'Don\'t swing the body. Slight elbow drift forward at top is OK to keep tension.',
+    video: yt('barbell curl proper form'), demo: 'curl' },
+  { id:'pl6', name:'Incline DB Curl (lying back)', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Biceps (long head)', sets:3}],
+    tip:'Stretched-position curl = max long head growth. Sit on 45° incline bench, let arms hang straight.',
+    video: yt('incline dumbbell curl long head'), demo: 'curl' }
+];
+
+/* LEG DAY */
+const LEG_EXERCISES = [
+  { id:'l1', name:'Barbell Back Squat', sets:4, reps:'6-8', rest:'3 min',
+    muscles:[{name:'Quads', sets:4},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:1}],
+    tip:'King of leg exercises. Below parallel for full quad/glute development. Brace abs hard. Knees track over toes.',
+    video: yt('barbell back squat tutorial'), demo: 'squat' },
+  { id:'l2', name:'Romanian Deadlift (RDL)', sets:4, reps:'8-10', rest:'2 min',
+    muscles:[{name:'Hamstrings', sets:4},{name:'Glutes',sets:3}],
+    tip:'Hinge at hips, slight knee bend, push hips back. Lower until you feel deep hamstring stretch — that\'s your range.',
+    video: yt('romanian deadlift form'), demo: 'deadlift' },
+  { id:'l3', name:'Leg Press (Hack Squat alt.)', sets:3, reps:'10-12', rest:'2 min',
+    muscles:[{name:'Quads', sets:3},{name:'Glutes',sets:1}],
+    tip:'Foot placement: low = quad-focus, high = glute/ham-focus. Don\'t lock knees at top.',
+    video: yt('leg press proper form'), demo: 'legpress' },
+  { id:'l4', name:'Lying or Seated Leg Curl', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Hamstrings', sets:3}],
+    tip:'Direct hamstring isolation. 3-second eccentric (slow lowering) for max growth.',
+    video: yt('lying leg curl'), demo: 'legcurl' },
+  { id:'l5', name:'Walking Lunges (DB)', sets:3, reps:'10/leg', rest:'90s',
+    muscles:[{name:'Quads', sets:1.5},{name:'Glutes',sets:2},{name:'Hamstrings',sets:1}],
+    tip:'Long step targets glutes more, short step targets quads. Sink deep, drive through front heel.',
+    video: yt('walking lunges dumbbell'), demo: 'lunge' },
+  { id:'l6', name:'Standing Calf Raise', sets:4, reps:'12-15', rest:'45s',
+    muscles:[{name:'Calves', sets:4}],
+    tip:'1-sec pause at top, full stretch at bottom. Calves recover fast — train them hard.',
+    video: yt('standing calf raise'), demo: 'calf' }
+];
+
+/* SHOULDER DAY */
+const SHOULDER_EXERCISES = [
+  { id:'s1', name:'Standing Overhead Press (BB or DB)', sets:4, reps:'6-8', rest:'2 min',
+    muscles:[{name:'Front Delts', sets:4},{name:'Side Delts',sets:1},{name:'Triceps',sets:1.5}],
+    tip:'Standing = core engagement. Bar travels straight up over crown of head, glutes squeezed.',
+    video: yt('standing overhead press barbell'), demo: 'press' },
+  { id:'s2', name:'Cable Lateral Raise', sets:4, reps:'12-15', rest:'45s',
+    muscles:[{name:'Side Delts', sets:4}],
+    tip:'Cable keeps tension throughout entire range — superior to dumbbells. Cross-body version is best.',
+    video: yt('cable lateral raise side delt'), demo: 'raise' },
+  { id:'s3', name:'Reverse Pec Deck / Rear Delt Fly', sets:3, reps:'12-15', rest:'45s',
+    muscles:[{name:'Rear Delts', sets:3}],
+    tip:'Imagine pushing through walls with elbows. Don\'t let traps take over — keep them down.',
+    video: yt('reverse pec deck rear delt'), demo: 'raise' },
+  { id:'s4', name:'Barbell or DB Shrugs', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Traps', sets:3}],
+    tip:'Straight up, 1-sec squeeze at top. No rolling — that\'s a myth and adds zero growth.',
+    video: yt('barbell shrugs proper form'), demo: 'shrug' },
+  { id:'s5', name:'Incline DB Curl', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Biceps (long head)', sets:3}],
+    tip:'Bench at 45°, arms hang straight. Stretches biceps fully — top 1-2 exercises for arm size.',
+    video: yt('incline dumbbell curl'), demo: 'curl' },
+  { id:'s6', name:'Skull Crushers (EZ-bar)', sets:3, reps:'10-12', rest:'60s',
+    muscles:[{name:'Triceps (long head)', sets:3}],
+    tip:'Lower behind head (not to forehead) for max long-head stretch. Keep elbows in.',
+    video: yt('skull crushers ez bar'), demo: 'pushdown' }
+];
+
+/* FULL BODY POWER DAY */
+const FULLBODY_EXERCISES = [
+  { id:'f1', name:'Conventional Deadlift', sets:4, reps:'5', rest:'3 min',
+    muscles:[{name:'Hamstrings', sets:2.5},{name:'Glutes',sets:3},{name:'Mid Back',sets:2},{name:'Lats',sets:1.5},{name:'Lower Back',sets:3}],
+    tip:'King lift. Bar over mid-foot, brace lats and core, push the floor away. Belt OK for top sets.',
+    video: yt('conventional deadlift tutorial'), demo: 'deadlift' },
+  { id:'f2', name:'Bench Press (heavy)', sets:3, reps:'5-6', rest:'2-3 min',
+    muscles:[{name:'Chest', sets:3},{name:'Triceps',sets:1},{name:'Front Delts',sets:1}],
+    tip:'Heavy chest day #2. Try to hit same or 1 rep more than Monday — that\'s progressive overload.',
+    video: yt('bench press heavy strength'), demo: 'bench' },
+  { id:'f3', name:'Weighted Pull-ups (or Lat Pulldown heavy)', sets:3, reps:'5-8', rest:'2 min',
+    muscles:[{name:'Lats', sets:3},{name:'Biceps',sets:1.5},{name:'Mid Back',sets:1}],
+    tip:'Once you can do 8+ bodyweight pullups, add weight via dip belt. 5kg jumps work great.',
+    video: yt('weighted pull ups'), demo: 'pullup' },
+  { id:'f4', name:'Bulgarian Split Squat', sets:3, reps:'8/leg', rest:'90s',
+    muscles:[{name:'Quads', sets:2},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:0.5}],
+    tip:'Brutal but effective. Front knee should track straight, back leg passive. Builds single-leg strength.',
+    video: yt('bulgarian split squat'), demo: 'lunge' },
+  { id:'f5', name:'Plank + Side Plank', sets:2, reps:'45s each', rest:'30s',
+    muscles:[{name:'Core', sets:2}],
+    tip:'Core stability transfers to every lift. Squeeze glutes, brace abs, no sagging hips.',
+    video: yt('plank proper form'), demo: 'plank' }
+];
+
+/* RECOVERY DAY */
+const RECOVERY_EXERCISES = [
+  { id:'r1', name:'10-min Easy Walk', sets:1, reps:'10 min', rest:'-',
+    muscles:[],
+    tip:'Active recovery = blood flow without stress. Reduces DOMS, helps next workout.',
+    video: yt('active recovery walk'), demo: 'walk' },
+  { id:'r2', name:'Foam Rolling (full body)', sets:1, reps:'8 min', rest:'-',
+    muscles:[],
+    tip:'Hit quads, IT band, lats, mid-back. Slow rolls, pause on tight spots.',
+    video: yt('foam rolling full body recovery'), demo: 'stretch' },
+  { id:'r3', name:'Static Stretching (hams, hips, chest)', sets:1, reps:'30s × 2', rest:'-',
+    muscles:[],
+    tip:'Hold each stretch 30 sec, breathe deeply. Best done at end of day.',
+    video: yt('full body static stretch'), demo: 'stretch' }
+];
+
+/* VOLLEYBALL DAY */
+const VOLLEYBALL_EXERCISES = [
+  { id:'v1', name:'Dynamic Warm-up', sets:1, reps:'5 min', rest:'-',
+    muscles:[],
+    tip:'Arm circles, leg swings, jumping jacks, hip openers. Cuts injury risk by ~40% vs static.',
+    video: yt('dynamic warm up volleyball'), demo: 'stretch' },
+  { id:'v2', name:'Volleyball Match / Practice', sets:1, reps:'60-90 min', rest:'-',
+    muscles:[{name:'Calves', sets:1},{name:'Quads',sets:0.5},{name:'Glutes',sets:0.5}],
+    tip:'High-intensity intervals. Drink water every set. Eat banana + oats 1h before.',
+    video: yt('volleyball training drills'), demo: 'walk' },
+  { id:'v3', name:'Cool-down Stretch', sets:1, reps:'5 min', rest:'-',
+    muscles:[],
+    tip:'Especially calves, hamstrings, shoulders. Reduces next-day stiffness.',
+    video: yt('cool down stretch volleyball'), demo: 'stretch' },
+  { id:'v4', name:'Post-game Protein Shake', sets:1, reps:'30g', rest:'-',
+    muscles:[],
+    tip:'Within 1 hr of finishing. Helps overnight recovery and tomorrow\'s session.',
+    video: yt('post workout protein timing'), demo: 'generic' }
+];
+
 const WORKOUT_PROGRAM = {
-  // Sunday = 0
-  0: {
-    name: 'Active Recovery',
-    sub: 'Light walk · stretch · mobility',
-    tags: ['Recovery'],
-    rationale: 'Recovery is when muscle is built. Sleep 8h, eat full surplus.',
-    exercises: [
-      { id:'rec1', name:'10-min light walk', sets:'1', reps:'10 min', tip:'Boosts circulation, aids recovery' },
-      { id:'rec2', name:'Foam rolling — full body', sets:'1', reps:'8 min', tip:'Reduces DOMS, improves mobility' },
-      { id:'rec3', name:'Static stretches (hams, hips, chest)', sets:'1', reps:'30s × 2', tip:'Hold each stretch 30 sec' }
-    ]
-  },
-  // Monday = Push (Chest + Shoulders + Triceps)
-  1: {
-    name: 'Push Day — Chest, Shoulders, Triceps',
-    sub: 'Heavy compounds → isolations · 16 sets total',
-    tags: ['Chest','Shoulders','Triceps'],
-    rationale: 'Push compounds first when CNS is fresh. Bench drives chest & front delts. Shoulder press hits delts. Isolations finish triceps & rear delts.',
-    exercises: [
-      { id:'p1', name:'Barbell Bench Press', sets:'4', reps:'6-8', tip:'Compound. Drives chest mass. RIR 1-2. Pause briefly at chest.' },
-      { id:'p2', name:'Incline Dumbbell Press', sets:'3', reps:'8-10', tip:'Targets upper chest (clavicular head). 30° incline is optimal.' },
-      { id:'p3', name:'Seated Shoulder Press (DB)', sets:'3', reps:'8-10', tip:'Front + lateral delts. Stop just before lockout to keep tension.' },
-      { id:'p4', name:'Lateral Raises (DB)', sets:'3', reps:'12-15', tip:'Side delts = wider shoulders. Light weight, slow tempo.' },
-      { id:'p5', name:'Cable Tricep Pushdown', sets:'3', reps:'10-12', tip:'Lateral & medial heads. Elbows pinned to sides.' },
-      { id:'p6', name:'Overhead Tricep Extension', sets:'3', reps:'10-12', tip:'Long head of triceps — only stretches in this position.' }
-    ]
-  },
-  // Tuesday = Pull (Back + Biceps)
-  2: {
-    name: 'Pull Day — Back, Biceps, Rear Delts',
-    sub: 'Vertical + horizontal pulls · 16 sets total',
-    tags: ['Back','Biceps','Rear Delts'],
-    rationale: 'Back needs both vertical pulls (lats) & horizontal pulls (mid-back). Biceps trained after to maximize pulling force on compounds.',
-    exercises: [
-      { id:'pl1', name:'Pull-ups / Lat Pulldown', sets:'4', reps:'6-10', tip:'Vertical pull = lat width. Use band assist if needed for pull-ups.' },
-      { id:'pl2', name:'Barbell Row (or Pendlay)', sets:'4', reps:'6-8', tip:'Horizontal pull = mid-back thickness. Pull to lower chest.' },
-      { id:'pl3', name:'Seated Cable Row', sets:'3', reps:'10-12', tip:'Squeeze shoulder blades at end. Constant tension.' },
-      { id:'pl4', name:'Face Pulls', sets:'3', reps:'12-15', tip:'Rear delts + rotator cuff — saves shoulder health long term.' },
-      { id:'pl5', name:'Barbell / EZ-bar Curl', sets:'3', reps:'8-10', tip:'Bicep mass builder. Don\'t swing the body.' },
-      { id:'pl6', name:'Hammer Curl (DB)', sets:'3', reps:'10-12', tip:'Hits brachialis = thicker arms. Neutral grip.' }
-    ]
-  },
-  // Wednesday = Legs
-  3: {
-    name: 'Leg Day — Quads, Hams, Glutes, Calves',
-    sub: 'Squat-focused · 17 sets total',
-    tags: ['Quads','Hamstrings','Glutes','Calves'],
-    rationale: 'Largest muscle group = biggest hormonal & growth response. Squats + RDLs cover everything. Don\'t skip — full-body anabolic boost.',
-    exercises: [
-      { id:'l1', name:'Barbell Back Squat', sets:'4', reps:'6-8', tip:'King of leg exercises. Below parallel. Brace core hard.' },
-      { id:'l2', name:'Romanian Deadlift', sets:'4', reps:'8-10', tip:'Hamstrings + glutes. Hinge at hips, slight knee bend, feel the stretch.' },
-      { id:'l3', name:'Leg Press', sets:'3', reps:'10-12', tip:'Quad-focused. High foot = more glutes/hams. Low foot = quads.' },
-      { id:'l4', name:'Leg Curl (lying or seated)', sets:'3', reps:'10-12', tip:'Direct hamstring isolation. Slow eccentric (3 sec down).' },
-      { id:'l5', name:'Walking Lunges', sets:'3', reps:'10/leg', tip:'Glutes + quads + balance. Step long, sink deep.' },
-      { id:'l6', name:'Standing Calf Raise', sets:'4', reps:'12-15', tip:'Pause 1 sec at top. Full stretch at bottom.' }
-    ]
-  },
-  // Thursday = Shoulder-focused / Upper accessory
-  4: {
-    name: 'Shoulder & Upper Accessory',
-    sub: 'Delt-specialization day · 15 sets',
-    tags: ['Shoulders','Traps','Arms'],
-    rationale: 'Extra shoulder volume = wider, more aesthetic frame. Traps & arms get extra direct work.',
-    exercises: [
-      { id:'s1', name:'Overhead Press (BB or DB)', sets:'4', reps:'6-8', tip:'Heavy press. Standing = extra core engagement.' },
-      { id:'s2', name:'Lateral Raise (DB or Cable)', sets:'4', reps:'12-15', tip:'Highest priority for delt width. 4 sets minimum.' },
-      { id:'s3', name:'Reverse Pec Deck / Rear Delt Fly', sets:'3', reps:'12-15', tip:'Rear delts = balanced shoulders + posture.' },
-      { id:'s4', name:'Barbell Shrugs', sets:'3', reps:'10-12', tip:'Upper traps. 1-second squeeze at top.' },
-      { id:'s5', name:'Incline DB Curl', sets:'3', reps:'10-12', tip:'Bicep stretched = more growth. Lean back on bench.' },
-      { id:'s6', name:'Skull Crushers (EZ-bar)', sets:'3', reps:'10-12', tip:'Long head of triceps. Lower behind head, not to forehead.' }
-    ]
-  },
-  // Friday = Full Body (compound power)
-  5: {
-    name: 'Full Body Power',
-    sub: 'Big compounds, low volume · 12 sets',
-    tags: ['Compound','Power','Full-Body'],
-    rationale: 'Hits all weekly volume gaps. Heavy & low-rep = strength-focused. Recovery is sufficient before weekend volleyball.',
-    exercises: [
-      { id:'f1', name:'Conventional Deadlift', sets:'4', reps:'5', tip:'King lift. Posterior chain + core + grip. Belt optional.' },
-      { id:'f2', name:'Bench Press', sets:'3', reps:'5-6', tip:'Heavy chest day #2. Match or beat Monday\'s top set.' },
-      { id:'f3', name:'Pull-ups (weighted if possible)', sets:'3', reps:'5-8', tip:'Add weight via belt once 8+ bodyweight reps are easy.' },
-      { id:'f4', name:'Front Squat OR Bulgarian Split Squat', sets:'3', reps:'8/leg', tip:'Quad-dominant. Lower load than back squat.' },
-      { id:'f5', name:'Plank + Side Plank', sets:'2', reps:'45s each', tip:'Core stability for all lifts.' }
-    ]
-  },
-  // Saturday = Volleyball
-  6: {
-    name: 'Volleyball Match Day',
-    sub: 'Sport-specific cardio & power · fuel well',
-    tags: ['Volleyball','Sport','Power'],
-    rationale: 'Plyometric + anaerobic + sport-specific. Eat extra carbs pre-game (banana + oats), protein post-game.',
-    exercises: [
-      { id:'v1', name:'Dynamic warm-up (5 min)', sets:'1', reps:'5 min', tip:'Arm circles, leg swings, jumping jacks. Reduces injury risk.' },
-      { id:'v2', name:'Volleyball match / practice', sets:'1', reps:'60-90 min', tip:'High-intensity intervals. Drink water.' },
-      { id:'v3', name:'Cool-down stretch (5 min)', sets:'1', reps:'5 min', tip:'Especially calves, hams, shoulders.' },
-      { id:'v4', name:'Post-game protein shake', sets:'1', reps:'30g', tip:'Within 1 hr. Helps recovery before tomorrow.' }
-    ]
-  }
+  0: { name:'Active Recovery', sub:'Walk · foam roll · stretch', tags:['Recovery'],
+       rationale:'Recovery is when muscle is built. Sleep 8h, eat full surplus, light movement.',
+       exercises: RECOVERY_EXERCISES },
+  1: { name:'Push Day — Chest, Shoulders, Triceps', sub:'4 chest + 4 shoulders + 5 tri sets · 16 total',
+       tags:['Chest','Shoulders','Triceps'],
+       rationale:'Compounds first when CNS fresh. Bench drives chest mass, OHP builds delts. Volume hits all 3 push muscles in 60 min.',
+       exercises: PUSH_EXERCISES },
+  2: { name:'Pull Day — Back, Biceps, Rear Delts', sub:'Vertical + horizontal pulls · 16 sets',
+       tags:['Back','Biceps','Rear Delts'],
+       rationale:'Back needs both vertical pulls (lats = width) and horizontal (mid-back = thickness). Biceps after, fresh from supporting compound work.',
+       exercises: PULL_EXERCISES },
+  3: { name:'Leg Day — Quads, Hams, Glutes, Calves', sub:'Squat-focused · 17 total sets',
+       tags:['Quads','Hamstrings','Glutes','Calves'],
+       rationale:'Legs = largest muscle group = biggest hormonal & growth response system-wide. Don\'t skip — full-body anabolic boost.',
+       exercises: LEG_EXERCISES },
+  4: { name:'Shoulder Specialization', sub:'Delt-focused · 15 total sets',
+       tags:['Shoulders','Traps','Arms'],
+       rationale:'Extra delt volume = wider, more aesthetic frame. Side delts respond best to high frequency + volume.',
+       exercises: SHOULDER_EXERCISES },
+  5: { name:'Full Body Power', sub:'Heavy compounds, low volume · 12 sets',
+       tags:['Compound','Power','Strength'],
+       rationale:'Hits weekly volume gaps. Heavy & low-rep emphasizes strength. Ample recovery before weekend volleyball.',
+       exercises: FULLBODY_EXERCISES },
+  6: { name:'Volleyball Match Day', sub:'Sport-specific cardio + power',
+       tags:['Volleyball','Sport','Power'],
+       rationale:'Plyometric + anaerobic. Carb-load before, protein within 1h post-game.',
+       exercises: VOLLEYBALL_EXERCISES }
 };
 
 const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-/* === STRUCTURED INDIAN BULK DIET ===
- * ~2800 kcal · ~115g protein · 3:1 carb-to-fat ratio
- * Each meal has approx kcal/protein for autosum.
- */
 const DIET_PLAN = [
   { id:'m1', time:'5:30 AM', name:'Soaked chana + moong + kismis + soya', kcal:280, protein:18 },
   { id:'m2', time:'6:00 AM', name:'Banana + creatine 5g (pre-workout)', kcal:110, protein:1 },
@@ -736,19 +963,16 @@ const DIET_PLAN = [
   { id:'m8', time:'8:00 PM', name:'Dinner: chicken (150g) OR paneer + 2 roti', kcal:520, protein:38 },
   { id:'m9', time:'10:00 PM',name:'Glass of milk + 6 almonds', kcal:200, protein:9 }
 ];
-// Total: ~3000 kcal, ~162g protein (slightly above target — natural buffer)
 
 // ============================================================
 const App = (() => {
   let state = {
     apiUrl: localStorage.getItem(STORAGE_KEY_API) || '',
     profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4 },
-    logs: [],
-    workouts: [],
-    exercises: [],
-    meals: [],
-    expandedTip: null,
-    viewingDayDow: new Date().getDay()
+    logs: [], workouts: [], exercises: [], meals: [],
+    expandedDemo: null,
+    viewingDayDow: new Date().getDay(),
+    lastSyncTs: null
   };
 
   function init() {
@@ -762,6 +986,11 @@ const App = (() => {
     renderAll();
     refresh();
     registerSW();
+    // Auto-refresh every 60s for fresh data
+    setInterval(() => { if (document.visibilityState === 'visible') refresh(); }, 60000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refresh();
+    });
   }
 
   function setTodayLabel(){
@@ -775,17 +1004,16 @@ const App = (() => {
       const c = JSON.parse(localStorage.getItem(STORAGE_KEY_CACHE) || 'null');
       if (c) {
         state.profile = c.profile || state.profile;
-        state.logs = c.logs || [];
-        state.workouts = c.workouts || [];
-        state.exercises = c.exercises || [];
-        state.meals = c.meals || [];
+        state.logs = c.logs || []; state.workouts = c.workouts || [];
+        state.exercises = c.exercises || []; state.meals = c.meals || [];
+        state.lastSyncTs = c.lastSyncTs || null;
       }
     } catch(e){}
   }
   function saveCache(){
     localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify({
       profile: state.profile, logs: state.logs, workouts: state.workouts,
-      exercises: state.exercises, meals: state.meals
+      exercises: state.exercises, meals: state.meals, lastSyncTs: state.lastSyncTs
     }));
   }
 
@@ -796,6 +1024,14 @@ const App = (() => {
     if (status === 'syncing'){ pill.classList.add('syncing'); txt.textContent = 'SYNCING'; }
     else if (status === 'offline'){ pill.classList.add('offline'); txt.textContent = 'OFFLINE'; }
     else { txt.textContent = 'SYNCED'; }
+  }
+
+  function showUpdateBanner(msg){
+    const b = document.getElementById('updateBanner');
+    document.getElementById('updateBannerTxt').textContent = msg || 'DATA UPDATED';
+    b.classList.add('show');
+    clearTimeout(b._t);
+    b._t = setTimeout(() => b.classList.remove('show'), 1800);
   }
 
   async function api(action, payload = {}) {
@@ -818,9 +1054,10 @@ const App = (() => {
     }
   }
 
-  async function refresh(showToast) {
+  async function refresh(showFeedback) {
     try {
       const all = await api('getAll');
+      const oldHash = JSON.stringify({l:state.logs.length, e:state.exercises.length, m:state.meals.length});
       state.profile = Object.assign(state.profile, all.profile || {});
       ['currentWeight','targetWeight','targetCalories','targetProtein','weeklyGainTarget'].forEach(k=>{
         if (state.profile[k] !== undefined) state.profile[k] = Number(state.profile[k]);
@@ -829,12 +1066,18 @@ const App = (() => {
       state.workouts = all.workouts || [];
       state.exercises = all.exercises || [];
       state.meals = all.meals || [];
+      state.lastSyncTs = Date.now();
+      const newHash = JSON.stringify({l:state.logs.length, e:state.exercises.length, m:state.meals.length});
       saveCache();
       renderAll();
-      if (showToast) toast('Synced', 'good');
+      if (showFeedback) {
+        showUpdateBanner('SYNCED');
+        toast('Data refreshed', 'good');
+      } else if (oldHash !== newHash) {
+        showUpdateBanner('NEW DATA');
+      }
     } catch(e) {
-      if (showToast) toast('Sync failed: ' + e.message, 'bad');
-      else toast('Offline — using cached data', 'bad');
+      if (showFeedback) toast('Sync failed: ' + e.message, 'bad');
     }
   }
 
@@ -844,42 +1087,63 @@ const App = (() => {
     renderPlan();
     renderStats();
     renderProfile();
+    renderLastSync();
   }
+
+  function renderLastSync(){
+    const el = document.getElementById('lastSyncLabel');
+    if (!el) return;
+    if (!state.lastSyncTs) { el.textContent = ''; return; }
+    const sec = Math.floor((Date.now() - state.lastSyncTs) / 1000);
+    let txt;
+    if (sec < 5) txt = 'Synced just now';
+    else if (sec < 60) txt = `Synced ${sec}s ago`;
+    else if (sec < 3600) txt = `Synced ${Math.floor(sec/60)}m ago`;
+    else txt = 'Synced ' + new Date(state.lastSyncTs).toLocaleTimeString();
+    el.textContent = txt;
+  }
+  setInterval(renderLastSync, 15000);
 
   // ==================== HOME ====================
   function todayLog() { return state.logs.find(l => l.date === todayStr()) || null; }
-  function todayWorkoutEntry() { return state.workouts.find(w => w.date === todayStr()) || null; }
+
+  function getTodayMacros() {
+    const today = todayStr();
+    const log = todayLog();
+    const checkedMeals = state.meals.filter(m => m.date === today && m.done === 'YES');
+    const autoCal = checkedMeals.reduce((s,m) => {
+      const meal = DIET_PLAN.find(d => d.id === m.mealId);
+      return s + (meal ? meal.kcal : 0);
+    }, 0);
+    const autoProt = checkedMeals.reduce((s,m) => {
+      const meal = DIET_PLAN.find(d => d.id === m.mealId);
+      return s + (meal ? meal.protein : 0);
+    }, 0);
+    return {
+      cal: Number(log?.calories) || autoCal,
+      prot: Number(log?.protein) || autoProt,
+      autoCal, autoProt,
+      mealCount: checkedMeals.length
+    };
+  }
 
   function renderHome() {
     const p = state.profile;
     const log = todayLog();
     const dow = new Date().getDay();
     const wkPlan = WORKOUT_PROGRAM[dow];
-
-    // Auto-compute calories/protein from checked meals if no override in log
-    const todayMeals = state.meals.filter(m => m.date === todayStr() && m.done === 'YES');
-    const autoCal = todayMeals.reduce((sum,m)=>{
-      const meal = DIET_PLAN.find(d => d.id === m.mealId);
-      return sum + (meal ? meal.kcal : 0);
-    }, 0);
-    const autoProt = todayMeals.reduce((sum,m)=>{
-      const meal = DIET_PLAN.find(d => d.id === m.mealId);
-      return sum + (meal ? meal.protein : 0);
-    }, 0);
-
-    const cal = Number(log?.calories) || autoCal;
-    const prot = Number(log?.protein) || autoProt;
+    const m = getTodayMacros();
     const w = Number(log?.weight) || p.currentWeight || 51;
 
     document.getElementById('heroSub').textContent =
       `Today: ${wkPlan.name.split(' — ')[0]}. Target ${p.targetCalories} kcal · ${p.targetProtein}g protein.`;
 
     // Calories
-    const calPct = Math.min(100, Math.round((cal / p.targetCalories) * 100));
-    document.getElementById('calNum').textContent = cal;
+    const calPct = Math.min(100, Math.round((m.cal / p.targetCalories) * 100));
+    document.getElementById('calNum').textContent = m.cal;
     document.getElementById('calTarget').textContent = `/ ${p.targetCalories}`;
     document.getElementById('calPct').textContent = calPct + '%';
-    const calRem = p.targetCalories - cal;
+    const calRem = p.targetCalories - m.cal;
     document.getElementById('calRemaining').textContent =
       calRem > 0 ? `${calRem} kcal remaining` : `+${Math.abs(calRem)} over target`;
     const calBar = document.getElementById('calProgress');
@@ -887,84 +1151,160 @@ const App = (() => {
     calBar.classList.remove('warn','bad');
     const calBadge = document.getElementById('calBadge');
     calBadge.classList.remove('good','warn','bad');
-    if (cal === 0)        { calBadge.textContent='NO DATA'; }
+    if (m.cal === 0) calBadge.textContent='NO DATA';
     else if (calPct < 80) { calBadge.textContent='LOW'; calBadge.classList.add('warn'); calBar.classList.add('warn'); }
-    else if (calPct > 115){ calBadge.textContent='HIGH'; calBadge.classList.add('bad'); calBar.classList.add('bad'); }
-    else                  { calBadge.textContent='GOOD'; calBadge.classList.add('good'); }
+    else if (calPct > 115) { calBadge.textContent='HIGH'; calBadge.classList.add('bad'); calBar.classList.add('bad'); }
+    else { calBadge.textContent='GOOD'; calBadge.classList.add('good'); }
 
     // Protein
-    const protPct = Math.min(100, Math.round((prot / p.targetProtein) * 100));
-    document.getElementById('protNum').textContent = prot;
+    const protPct = Math.min(100, Math.round((m.prot / p.targetProtein) * 100));
+    document.getElementById('protNum').textContent = m.prot;
     document.getElementById('protTarget').textContent = `/ ${p.targetProtein}g`;
     const protBar = document.getElementById('protProgress');
     protBar.querySelector('i').style.width = protPct + '%';
     protBar.classList.remove('warn','bad');
     const protBadge = document.getElementById('protBadge');
     protBadge.classList.remove('good','warn','bad');
-    if (prot === 0)         { protBadge.textContent='NO DATA'; }
-    else if (protPct < 80)  { protBadge.textContent='LOW'; protBadge.classList.add('warn'); protBar.classList.add('warn'); }
-    else                    { protBadge.textContent='GOOD'; protBadge.classList.add('good'); }
+    if (m.prot === 0) protBadge.textContent='NO DATA';
+    else if (protPct < 80) { protBadge.textContent='LOW'; protBadge.classList.add('warn'); protBar.classList.add('warn'); }
+    else { protBadge.textContent='GOOD'; protBadge.classList.add('good'); }
 
     // Weight
     document.getElementById('weightNum').textContent = (w.toFixed ? w.toFixed(1) : w);
-    const weightPct = Math.max(0, Math.min(100, ((w - 51) / (p.targetWeight - 51)) * 100));
+    const weightPct = Math.max(0, Math.min(100, ((w - 51) / Math.max(0.1, p.targetWeight - 51)) * 100));
     document.getElementById('weightProgress').style.width = weightPct + '%';
     const toGo = (p.targetWeight - w).toFixed(1);
     document.getElementById('weightToGo').textContent = toGo > 0 ? `${toGo}kg to go` : 'Goal reached';
     const trend = computeWeightTrend();
     document.getElementById('weightTrend').textContent = trend.label;
 
-    // Workout summary on home
+    // Workout summary
     document.getElementById('workoutName').textContent = wkPlan.name;
     document.getElementById('workoutTags').innerHTML =
       wkPlan.tags.map(t => `<span class="tag">${t}</span>`).join('');
-    const todayExercises = state.exercises.filter(e => e.date === todayStr());
-    const totalEx = wkPlan.exercises.length + todayExercises.filter(e => e.custom === 'YES').length;
-    const doneEx = todayExercises.filter(e => e.done === 'YES').length;
+    const todayEx = state.exercises.filter(e => e.date === todayStr());
+    const customEx = todayEx.filter(e => e.custom === 'YES');
+    const totalEx = wkPlan.exercises.length + customEx.length;
+    const doneEx = todayEx.filter(e => e.done === 'YES').length;
     const wBadge = document.getElementById('workoutBadge');
     wBadge.classList.remove('good','warn','bad');
-    if (totalEx > 0 && doneEx === totalEx) { wBadge.textContent = 'COMPLETE'; wBadge.classList.add('good'); }
+    if (totalEx > 0 && doneEx === totalEx) { wBadge.textContent = 'COMPLETE ✓'; wBadge.classList.add('good'); }
     else if (doneEx > 0) { wBadge.textContent = `${doneEx}/${totalEx}`; wBadge.classList.add('warn'); }
     else { wBadge.textContent = 'PENDING'; }
 
-    renderSuggestions(cal, prot, w, doneEx, totalEx, trend);
+    renderSuggestions(m.cal, m.prot, w, doneEx, totalEx, trend, m.mealCount);
   }
 
-  function renderSuggestions(cal, prot, w, doneEx, totalEx, trend) {
+  // ==================== AI SUGGESTIONS ENGINE ====================
+  function buildSuggestions(context) {
     const p = state.profile;
     const sug = [];
     const dow = new Date().getDay();
     const hr = new Date().getHours();
     const wkPlan = WORKOUT_PROGRAM[dow];
+    const { cal, prot, w, doneEx, totalEx, trend, mealCount } = context;
 
-    if (cal === 0) sug.push({ type:'warn', icon:'🍽', text:'No meals checked off today.', sub:'OPEN TRACK TAB → CHECK MEALS' });
-    else if (cal < p.targetCalories * 0.8) sug.push({ type:'warn', icon:'⬆', text:`Need ${p.targetCalories-cal} more kcal. Add a banana shake or extra peanut butter toast.`, sub:'CALORIE DEFICIT • MUSCLE GAIN BLOCKED' });
-    else if (cal > p.targetCalories * 1.15) sug.push({ type:'bad', icon:'⬇', text:`${cal-p.targetCalories} kcal over. Trim carbs at next meal.`, sub:'EXCESS WILL ADD FAT' });
-    else sug.push({ type:'good', icon:'✓', text:'Calorie target on point. Keep stacking days.', sub:'SURPLUS LOCKED IN' });
-
-    if (prot > 0 && prot < p.targetProtein * 0.8) sug.push({ type:'warn', icon:'🥚', text:`${p.targetProtein-prot}g more protein needed. Add eggs, paneer, or whey.`, sub:'PROTEIN < 80% — MUSCLE SYNTHESIS LIMITED' });
-    else if (prot >= p.targetProtein * 0.95) sug.push({ type:'good', icon:'💪', text:'Protein hit. MPS primed for 24h.', sub:'TARGET REACHED' });
-
-    if (dow === 0) sug.push({ type:'good', icon:'😴', text:'Recovery day — muscle is built today, not at the gym.', sub:'SUNDAY • SLEEP 8H' });
-    else if (dow === 6) sug.push({ type:'good', icon:'🏐', text:'Volleyball day. Banana + oats 1h before, protein within 1h after.', sub:'SAT • SPORT FUEL' });
-    else if (totalEx > 0 && doneEx === 0 && hr >= 21) sug.push({ type:'bad', icon:'⚠', text:`${wkPlan.name.split(' — ')[0]} missed. Reschedule tomorrow or merge with next session.`, sub:'WORKOUT MISSED' });
-    else if (totalEx > 0 && doneEx < totalEx && hr >= 18) sug.push({ type:'warn', icon:'🏋', text:`${totalEx-doneEx} exercises left. Lock it in before 9 PM.`, sub:'WORKOUT IN PROGRESS' });
-    else if (totalEx > 0 && doneEx === totalEx) sug.push({ type:'good', icon:'🔥', text:'Workout complete. Eat, hydrate, sleep — gains incoming.', sub:'SESSION DONE' });
-
-    if (trend.weeks >= 1) {
-      const target = p.weeklyGainTarget;
-      if (trend.perWeek < target * 0.5) sug.push({ type:'warn', icon:'📈', text:`Gain only ${trend.perWeek.toFixed(2)}kg/wk. Add 200 kcal — extra ghee or peanut butter.`, sub:'GAIN TOO SLOW' });
-      else if (trend.perWeek > target * 2) sug.push({ type:'warn', icon:'📉', text:`Gaining ${trend.perWeek.toFixed(2)}kg/wk — too fast. Cut 200 kcal.`, sub:'GAIN TOO FAST' });
-      else if (trend.perWeek > 0) sug.push({ type:'good', icon:'📊', text:`On track: ${trend.perWeek.toFixed(2)}kg/wk. Stay consistent.`, sub:'TREND OPTIMAL' });
+    // PRIORITY 1 — Time-sensitive
+    if (dow !== 0 && totalEx > 0 && doneEx === 0 && hr >= 21) {
+      sug.push({ type:'bad', icon:'⚠', text:`${wkPlan.name.split(' — ')[0]} not started — too late tonight. Reschedule to tomorrow.`, sub:'WORKOUT MISSED · 9 PM PASSED', priority:1 });
+    } else if (dow !== 0 && totalEx > 0 && doneEx < totalEx && hr >= 18) {
+      const left = totalEx - doneEx;
+      sug.push({ type:'warn', icon:'🏋', text:`${left} ${left===1?'exercise':'exercises'} left. Get to gym before 9 PM to lock it in.`, sub:'EVENING REMINDER', priority:1 });
     }
 
-    if (sug.length === 0) sug.push({ type:'good', icon:'🔥', text:'All systems go. Make today count.', sub:'NO ACTION NEEDED' });
+    // PRIORITY 2 — Macros
+    if (cal === 0 && hr >= 10) {
+      sug.push({ type:'warn', icon:'🍽', text:'No meals checked off yet today.', sub:'OPEN TRACK TAB → CHECK MEALS', priority:2 });
+    } else if (cal > 0 && cal < p.targetCalories * 0.8 && hr >= 19) {
+      const gap = p.targetCalories - cal;
+      sug.push({ type:'warn', icon:'⬆', text:`${gap} kcal short with day almost over. Late-night oats + peanut butter shake will save your surplus.`, sub:'CALORIE DEFICIT · MUSCLE GAIN BLOCKED', priority:2 });
+    } else if (cal > p.targetCalories * 1.15) {
+      sug.push({ type:'bad', icon:'⬇', text:`${cal - p.targetCalories} kcal over target. Cut carbs at next meal to stay lean.`, sub:'EXCESS WILL ADD FAT', priority:2 });
+    } else if (cal >= p.targetCalories * 0.9 && cal <= p.targetCalories * 1.1) {
+      sug.push({ type:'good', icon:'✓', text:'Calorie target on point. Surplus locked in — gains incoming.', sub:'NUTRITION ON TRACK', priority:5 });
+    }
 
-    document.getElementById('suggestions').innerHTML = sug.slice(0,5).map(s => `
+    if (prot > 0 && prot < p.targetProtein * 0.7 && hr >= 18) {
+      const gap = p.targetProtein - prot;
+      sug.push({ type:'warn', icon:'🥚', text:`${gap}g more protein needed. Add eggs (18g/3eggs), paneer (18g/100g), or whey shake (25g).`, sub:'PROTEIN < 70% · MPS LIMITED', priority:2 });
+    } else if (prot >= p.targetProtein * 0.95) {
+      sug.push({ type:'good', icon:'💪', text:'Protein target hit. MPS primed — muscle synthesis active for 24h.', sub:'PROTEIN COMPLETE', priority:6 });
+    }
+
+    // PRIORITY 3 — Workout-specific
+    if (dow === 0) {
+      sug.push({ type:'good', icon:'😴', text:'Recovery day — muscle is built today, not in the gym. Sleep 8h, hit full surplus.', sub:'SUNDAY · CRITICAL DAY', priority:3 });
+    } else if (dow === 6) {
+      sug.push({ type:'good', icon:'🏐', text:'Volleyball day. Banana + oats 1h before, whey shake within 1h after game.', sub:'SAT · SPORT FUEL TIMING', priority:3 });
+    } else if (dow === 3 && hr < 17 && doneEx === 0) {
+      sug.push({ type:'good', icon:'🦵', text:'Leg day = biggest hormonal response. Eat extra carbs pre-workout (oats + banana).', sub:'WEDNESDAY · QUAD STIMULUS', priority:3 });
+    } else if (totalEx > 0 && doneEx === totalEx) {
+      sug.push({ type:'good', icon:'🔥', text:'Workout complete. Eat protein within 1 hour, hydrate, hit 8h sleep.', sub:'SESSION DONE · RECOVERY MODE', priority:4 });
+    }
+
+    // PRIORITY 4 — Weight trend (long-term)
+    if (trend.weeks >= 1) {
+      const target = p.weeklyGainTarget;
+      if (trend.perWeek < 0) {
+        sug.push({ type:'bad', icon:'⚠', text:`Losing weight (${trend.perWeek.toFixed(2)}kg/wk). Add 300 kcal — extra ghee, peanut butter, or shake.`, sub:'GOING WRONG WAY · INCREASE EAT', priority:2 });
+      } else if (trend.perWeek < target * 0.5) {
+        sug.push({ type:'warn', icon:'📈', text:`Gain only ${trend.perWeek.toFixed(2)}kg/wk vs ${target} target. Add 200 kcal/day for 1 week, then re-check.`, sub:'GAIN TOO SLOW', priority:3 });
+      } else if (trend.perWeek > target * 2) {
+        sug.push({ type:'warn', icon:'📉', text:`Gaining ${trend.perWeek.toFixed(2)}kg/wk — too fast, mostly fat. Cut 200 kcal.`, sub:'GAIN TOO FAST · SLOW DOWN', priority:3 });
+      } else if (trend.perWeek >= target * 0.7) {
+        sug.push({ type:'good', icon:'📊', text:`On track: ${trend.perWeek.toFixed(2)}kg/wk. Stay consistent for ${Math.ceil((p.targetWeight - w)/trend.perWeek)} more weeks.`, sub:'TREND OPTIMAL', priority:5 });
+      }
+    } else if (state.logs.length === 0 && hr >= 18) {
+      sug.push({ type:'warn', icon:'⚖', text:'Log your weight on Track tab — needed to detect trends.', sub:'NO WEIGHT DATA YET', priority:3 });
+    }
+
+    // PRIORITY 5 — Recovery analysis
+    const last3DaysExercises = state.exercises.filter(e => {
+      const d = new Date(e.date);
+      const days = (Date.now() - d) / 86400000;
+      return days <= 3 && e.done === 'YES';
+    });
+    if (last3DaysExercises.length >= 30 && dow !== 0) {
+      sug.push({ type:'warn', icon:'🛌', text:'High volume in last 3 days. Consider lighter session today or extra rest.', sub:'RECOVERY DEBT DETECTED', priority:3 });
+    }
+
+    // PRIORITY 6 — Streak
+    const streak = computeStreak();
+    if (streak >= 7) {
+      sug.push({ type:'good', icon:'🔥', text:`${streak}-day streak! Consistency beats intensity. Don't break it now.`, sub:'STREAK MILESTONE', priority:7 });
+    }
+
+    if (sug.length === 0) {
+      sug.push({ type:'good', icon:'✓', text:'All systems green. Make today count.', sub:'NO ACTION NEEDED', priority:9 });
+    }
+
+    return sug.sort((a,b) => a.priority - b.priority);
+  }
+
+  function renderSuggestions(cal, prot, w, doneEx, totalEx, trend, mealCount) {
+    const ctx = { cal, prot, w, doneEx, totalEx, trend, mealCount };
+    const all = buildSuggestions(ctx);
+
+    // Home — top 5 suggestions
+    document.getElementById('suggestions').innerHTML = all.slice(0,5).map(s => `
       <div class="suggestion">
         <div class="sug-icon ${s.type}">${s.icon}</div>
         <div class="sug-text">${s.text}<small>${s.sub}</small></div>
       </div>`).join('');
+
+    // Track — only urgent (priority <= 3) shown there
+    const urgent = all.filter(s => s.priority <= 3 && s.type !== 'good').slice(0,3);
+    const trackCard = document.getElementById('trackSuggestionsCard');
+    if (urgent.length > 0) {
+      trackCard.style.display = 'block';
+      document.getElementById('trackSuggestions').innerHTML = urgent.map(s => `
+        <div class="suggestion">
+          <div class="sug-icon ${s.type}">${s.icon}</div>
+          <div class="sug-text">${s.text}<small>${s.sub}</small></div>
+        </div>`).join('');
+    } else {
+      trackCard.style.display = 'none';
+    }
   }
 
   function computeWeightTrend() {
@@ -975,6 +1315,22 @@ const App = (() => {
     if (days < 1) return { perWeek: 0, weeks: 0, label: '—' };
     const perWeek = ((Number(last.weight) - Number(first.weight)) / days) * 7;
     return { perWeek, weeks: days/7, label: (perWeek>0?'+':'') + perWeek.toFixed(2) + 'kg/wk' };
+  }
+
+  function computeStreak() {
+    const today = new Date();
+    let streak = 0;
+    for (let i = 0; i < 60; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      const ds = formatDate(d);
+      const log = state.logs.find(l => l.date === ds);
+      const ex = state.exercises.filter(e => e.date === ds && e.done === 'YES');
+      const meals = state.meals.filter(m => m.date === ds && m.done === 'YES');
+      // "Day counted" = at least 3 meals checked OR workout completed (or rest day with meals)
+      if (meals.length >= 3 || ex.length >= 3) streak++;
+      else break;
+    }
+    return streak;
   }
 
   // ==================== TRACK ====================
@@ -988,10 +1344,14 @@ const App = (() => {
     document.getElementById('exerciseTitle').textContent = wkPlan.name;
     document.getElementById('exerciseSub').textContent = wkPlan.sub;
 
-    // Build full list: planned + custom
     const allExercises = [
       ...wkPlan.exercises.map(e => ({...e, custom:false})),
-      ...customEx.map(e => ({ id: e.exerciseId, name: e.exerciseName, sets: e.sets || '-', reps: e.reps || '-', tip:'Custom exercise', custom:true }))
+      ...customEx.map(e => ({
+        id: e.exerciseId, name: e.exerciseName,
+        sets: e.sets || '-', reps: e.reps || '-',
+        tip:'Custom exercise', demo:'generic', video: yt(e.exerciseName),
+        muscles:[], custom:true
+      }))
     ];
 
     const totalEx = allExercises.length;
@@ -1005,7 +1365,7 @@ const App = (() => {
 
     document.getElementById('exerciseList').innerHTML = allExercises.map(ex => {
       const done = todayEx.find(t => t.exerciseId === ex.id && t.done === 'YES');
-      const tipShown = state.expandedTip === ex.id;
+      const demoShown = state.expandedDemo === ex.id;
       return `
         <div class="exercise">
           <button class="ex-check ${done?'done':''}" onclick="App.toggleExercise('${ex.id}', '${escapeAttr(ex.name)}', '${ex.sets}', '${ex.reps}', ${ex.custom})">
@@ -1015,11 +1375,32 @@ const App = (() => {
             <div class="ex-name ${done?'done':''}">${escapeHTML(ex.name)}</div>
             <div class="ex-meta">
               <span class="sets">${ex.sets} × ${ex.reps}</span>
+              ${ex.rest ? `<span>REST ${ex.rest}</span>` : ''}
               ${ex.custom ? '<span style="color:#fbbf24">CUSTOM</span>' : ''}
             </div>
-            <div class="ex-tip ${tipShown?'show':''}">${escapeHTML(ex.tip || '')}</div>
+            <div class="ex-actions">
+              <button class="ex-action" onclick="App.toggleDemo('${ex.id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z"/></svg>
+                ${demoShown?'HIDE':'DEMO'}
+              </button>
+              ${ex.video ? `<a class="ex-action" href="${ex.video}" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="3"/><path d="M10 10l5 3-5 3v-6z" fill="currentColor"/></svg>
+                VIDEO
+              </a>` : ''}
+            </div>
+            <div class="ex-demo ${demoShown?'show':''}">
+              <div class="demo-label">FORM REFERENCE</div>
+              <div class="demo-img-wrap">
+                ${EX_PIC[ex.demo] ? `<img class="demo-img" src="${EX_PIC[ex.demo]}" alt="${escapeAttr(ex.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />` : ''}
+                <div class="demo-fallback" style="${EX_PIC[ex.demo]?'display:none':''}">${EX_DEMOS[ex.demo] || EX_DEMOS.generic}</div>
+                <a class="demo-img-link" href="${EX_IMG(ex.name)}" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                  MORE
+                </a>
+              </div>
+              <div class="demo-tip">${escapeHTML(ex.tip || '')}</div>
+            </div>
           </div>
-          ${ex.tip ? `<button class="ex-info" onclick="App.toggleTip('${ex.id}')">ⓘ</button>` : ''}
         </div>`;
     }).join('') || '<div class="empty">No exercises today (rest day).</div>';
 
@@ -1042,21 +1423,20 @@ const App = (() => {
             ${done?'✓':''}
           </button>
           <div class="meal-time">${meal.time}</div>
-          <div class="meal-food">
-            <div class="${done?'done':''}">${escapeHTML(meal.name)}</div>
+          <div class="meal-food ${done?'done':''}">
+            <div class="meal-name">${escapeHTML(meal.name)}</div>
             <div class="meal-macros">${meal.kcal} kcal · ${meal.protein}g protein</div>
           </div>
         </div>`;
     }).join('');
 
-    // Pre-fill metrics
     const log = todayLog();
     if (log) {
-      if (Number(log.weight)) document.getElementById('t_weight').value = log.weight;
-      if (Number(log.calories)) document.getElementById('t_calories').value = log.calories;
-      if (Number(log.protein)) document.getElementById('t_protein').value = log.protein;
-      if (log.sleep) document.getElementById('t_sleep').value = log.sleep;
-      if (log.notes) document.getElementById('t_notes').value = log.notes;
+      if (Number(log.weight) && !document.getElementById('t_weight').value) document.getElementById('t_weight').value = log.weight;
+      if (Number(log.calories) && !document.getElementById('t_calories').value) document.getElementById('t_calories').value = log.calories;
+      if (Number(log.protein) && !document.getElementById('t_protein').value) document.getElementById('t_protein').value = log.protein;
+      if (log.sleep && !document.getElementById('t_sleep').value) document.getElementById('t_sleep').value = log.sleep;
+      if (log.notes && !document.getElementById('t_notes').value) document.getElementById('t_notes').value = log.notes;
     }
   }
 
@@ -1065,7 +1445,6 @@ const App = (() => {
     const today = todayStr();
     const existing = state.exercises.find(e => e.date === today && e.exerciseId === id);
     const newDone = !(existing && existing.done === 'YES');
-    // Optimistic update
     if (existing) existing.done = newDone ? 'YES' : 'NO';
     else state.exercises.push({
       date: today, exerciseId: id, exerciseName: name, sets, reps,
@@ -1076,13 +1455,9 @@ const App = (() => {
     renderTrack();
     renderHome();
     try {
-      await api('logExercise', {
-        date: today, exerciseId: id, exerciseName: name, sets, reps,
-        done: newDone, custom: isCustom
-      });
-    } catch(e) {
-      toast('Saved offline — will sync', 'warn');
-    }
+      await api('logExercise', { date: today, exerciseId: id, exerciseName: name, sets, reps, done: newDone, custom: isCustom });
+      showUpdateBanner(newDone ? 'EXERCISE LOGGED' : 'UPDATED');
+    } catch(e) { toast('Saved offline', 'warn'); }
   }
 
   async function toggleMeal(id, time, name) {
@@ -1090,23 +1465,19 @@ const App = (() => {
     const existing = state.meals.find(m => m.date === today && m.mealId === id);
     const newDone = !(existing && existing.done === 'YES');
     if (existing) existing.done = newDone ? 'YES' : 'NO';
-    else state.meals.push({
-      date: today, mealId: id, mealTime: time, mealName: name,
-      done: newDone ? 'YES' : 'NO'
-    });
+    else state.meals.push({ date: today, mealId: id, mealTime: time, mealName: name, done: newDone ? 'YES' : 'NO' });
     if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
     saveCache();
     renderTrack();
     renderHome();
     try {
       await api('logMeal', { date: today, mealId: id, mealTime: time, mealName: name, done: newDone });
-    } catch(e) {
-      toast('Saved offline — will sync', 'warn');
-    }
+      showUpdateBanner(newDone ? 'MEAL LOGGED' : 'UPDATED');
+    } catch(e) { toast('Saved offline', 'warn'); }
   }
 
-  function toggleTip(id) {
-    state.expandedTip = state.expandedTip === id ? null : id;
+  function toggleDemo(id) {
+    state.expandedDemo = state.expandedDemo === id ? null : id;
     renderTrack();
   }
 
@@ -1122,30 +1493,23 @@ const App = (() => {
 
   async function saveTrack() {
     const today = todayStr();
-    const todayMeals = state.meals.filter(m => m.date === today && m.done === 'YES');
-    const autoCal = todayMeals.reduce((s,m) => {
-      const meal = DIET_PLAN.find(d => d.id === m.mealId);
-      return s + (meal ? meal.kcal : 0);
-    }, 0);
-    const autoProt = todayMeals.reduce((s,m) => {
-      const meal = DIET_PLAN.find(d => d.id === m.mealId);
-      return s + (meal ? meal.protein : 0);
-    }, 0);
-
+    const m = getTodayMacros();
     const todayEx = state.exercises.filter(e => e.date === today);
     const wkPlan = WORKOUT_PROGRAM[new Date().getDay()];
-    const totalEx = wkPlan.exercises.length + todayEx.filter(e => e.custom === 'YES').length;
+    const customCount = todayEx.filter(e => e.custom === 'YES').length;
+    const totalEx = wkPlan.exercises.length + customCount;
     const doneEx = todayEx.filter(e => e.done === 'YES').length;
     const workoutDone = totalEx > 0 && doneEx === totalEx;
+    const todayMealsList = state.meals.filter(mm => mm.date === today && mm.done === 'YES');
 
     const payload = {
       date: today,
       weight: parseFloat(document.getElementById('t_weight').value) || 0,
       workoutDone,
       workoutType: wkPlan.name,
-      calories: parseInt(document.getElementById('t_calories').value) || autoCal,
-      protein: parseInt(document.getElementById('t_protein').value) || autoProt,
-      meals: todayMeals.map(m => m.mealName).join(', '),
+      calories: parseInt(document.getElementById('t_calories').value) || m.autoCal,
+      protein: parseInt(document.getElementById('t_protein').value) || m.autoProt,
+      meals: todayMealsList.map(mm => mm.mealName).join(', '),
       sleep: document.getElementById('t_sleep').value,
       notes: document.getElementById('t_notes').value
     };
@@ -1156,6 +1520,7 @@ const App = (() => {
         date: today, dayName: DAY_NAMES[new Date().getDay()],
         plannedWorkout: wkPlan.name, completed: workoutDone
       });
+      showUpdateBanner('DAY SAVED');
       toast('Saved & analyzed', 'good');
       await refresh();
     } catch(e) {
@@ -1166,7 +1531,7 @@ const App = (() => {
   // ==================== PLAN ====================
   function renderPlan() {
     const today = new Date().getDay();
-    state.viewingDayDow = state.viewingDayDow ?? today;
+    if (state.viewingDayDow === undefined || state.viewingDayDow === null) state.viewingDayDow = today;
 
     let html = '';
     [1,2,3,4,5,6,0].forEach(dow => {
@@ -1182,14 +1547,13 @@ const App = (() => {
           <div class="plan-day ${isToday?'today':''}">${DAY_NAMES[dow]}</div>
           <div class="plan-content">
             <div class="name">${w.name.split(' — ')[0]}</div>
-            <div class="sub">${w.exercises.length} exercises · ${w.sub.split('·')[1] ? w.sub.split('·')[1].trim() : w.tags.join(', ')}</div>
+            <div class="sub">${w.exercises.length} exercises · ${w.tags.join(', ')}</div>
           </div>
           <div class="plan-check ${checkClass}">${checkContent}</div>
         </div>`;
     });
     document.getElementById('planList').innerHTML = html;
 
-    // Day detail
     const dow = state.viewingDayDow;
     const dayPlan = WORKOUT_PROGRAM[dow];
     document.getElementById('dayDetailDay').textContent = DAY_FULL[dow].toUpperCase();
@@ -1200,23 +1564,38 @@ const App = (() => {
         <strong style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;">WHY:</strong>
         ${escapeHTML(dayPlan.rationale)}
       </div>
-      ${dayPlan.exercises.map(ex => `
+      ${dayPlan.exercises.map((ex, i) => `
         <div class="exercise" style="border-top:1px solid var(--line-soft);">
-          <div style="width:28px;height:28px;border-radius:8px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;">${dayPlan.exercises.indexOf(ex)+1}</div>
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;margin-top:2px;">${i+1}</div>
           <div class="ex-body">
             <div class="ex-name">${escapeHTML(ex.name)}</div>
-            <div class="ex-meta"><span class="sets">${ex.sets} × ${ex.reps}</span></div>
-            <div style="margin-top:6px;font-size:11px;color:var(--text-3);line-height:1.5;">${escapeHTML(ex.tip)}</div>
+            <div class="ex-meta">
+              <span class="sets">${ex.sets} × ${ex.reps}</span>
+              ${ex.rest ? `<span>REST ${ex.rest}</span>` : ''}
+            </div>
+            <div class="ex-actions">
+              ${ex.video ? `<a class="ex-action" href="${ex.video}" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="3"/><path d="M10 10l5 3-5 3v-6z" fill="currentColor"/></svg>
+                WATCH
+              </a>` : ''}
+            </div>
+            <div style="margin-top:8px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border-left:2px solid var(--accent);font-size:11px;color:var(--text-2);line-height:1.55;">
+              ${EX_PIC[ex.demo] ? `<div class="demo-img-wrap" style="margin-bottom:8px;border-radius:8px;overflow:hidden;background:var(--surface-3);aspect-ratio:16/10;position:relative;">
+                <img src="${EX_PIC[ex.demo]}" alt="${escapeAttr(ex.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${EX_DEMOS[ex.demo] || EX_DEMOS.generic}</div>
+                <a href="${EX_IMG(ex.name)}" target="_blank" rel="noopener" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.7);font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1px;padding:4px 8px;border-radius:6px;text-decoration:none;">MORE ↗</a>
+              </div>` : (EX_DEMOS[ex.demo] ? `<div style="margin-bottom:8px;">${EX_DEMOS[ex.demo]}</div>` : '')}
+              ${escapeHTML(ex.tip)}
+            </div>
           </div>
         </div>`).join('')}
     `;
 
-    // Diet
     document.getElementById('dietList').innerHTML = DIET_PLAN.map(d => `
       <div class="meal">
         <div class="meal-time">${d.time}</div>
         <div class="meal-food">
-          <div>${escapeHTML(d.name)}</div>
+          <div class="meal-name">${escapeHTML(d.name)}</div>
           <div class="meal-macros">${d.kcal} kcal · ${d.protein}g protein</div>
         </div>
       </div>`).join('');
@@ -1249,6 +1628,12 @@ const App = (() => {
   // ==================== STATS ====================
   function renderStats() {
     const last30 = lastNDaysLogs(30);
+
+    // AI Insights
+    renderStatsInsights();
+
+    // Volume bars
+    renderVolumeBars();
 
     const weights = last30.filter(l => Number(l.weight) > 0).map(l => ({ date:l.date, val:Number(l.weight) }));
     drawLineChart('weightChart', weights);
@@ -1312,6 +1697,115 @@ const App = (() => {
     else { cb2.textContent = 'WEAK'; cb2.classList.add('bad'); }
   }
 
+  function renderStatsInsights() {
+    const insights = [];
+    const last30 = lastNDaysLogs(30);
+    const last7 = lastNDaysLogs(7);
+    const trend = computeWeightTrend();
+    const streak = computeStreak();
+    const p = state.profile;
+
+    // Weight projection
+    if (trend.weeks >= 1 && trend.perWeek > 0) {
+      const w = state.profile.currentWeight;
+      const weeksToGoal = Math.ceil((p.targetWeight - w) / trend.perWeek);
+      if (weeksToGoal > 0 && weeksToGoal < 100) {
+        insights.push({ type:'good', icon:'🎯', text:`At current pace, you'll hit ${p.targetWeight}kg in ~${weeksToGoal} weeks (${formatFutureDate(weeksToGoal*7)}).`, sub:'PROJECTION' });
+      }
+    }
+
+    // Compliance score
+    const last7Cal = last7.filter(l => Number(l.calories) > 0);
+    if (last7Cal.length >= 3) {
+      const hits = last7Cal.filter(l => Number(l.calories) >= p.targetCalories * 0.9).length;
+      const compliance = Math.round((hits/last7Cal.length)*100);
+      if (compliance >= 80) insights.push({ type:'good', icon:'📊', text:`${compliance}% calorie compliance last 7 days. Excellent consistency.`, sub:'7-DAY COMPLIANCE' });
+      else if (compliance < 50) insights.push({ type:'warn', icon:'📉', text:`Only ${compliance}% calorie compliance last 7 days. Consistency > intensity.`, sub:'COMPLIANCE LOW' });
+    }
+
+    // Plateau detection
+    const w14 = lastNDaysLogs(14).filter(l => Number(l.weight) > 0);
+    if (w14.length >= 5) {
+      const first = Number(w14[0].weight);
+      const last = Number(w14[w14.length-1].weight);
+      if (Math.abs(last - first) < 0.3) {
+        insights.push({ type:'warn', icon:'🚫', text:'Weight plateaued past 2 weeks. Add 200 kcal/day for 7 days, then re-evaluate.', sub:'PLATEAU DETECTED' });
+      }
+    }
+
+    // Streak
+    if (streak >= 3) insights.push({ type:'good', icon:'🔥', text:`${streak}-day logging streak. Compound effect kicks in around day 14.`, sub:'STREAK ACTIVE' });
+
+    // Workout frequency
+    const last7Workouts = state.workouts.filter(w => {
+      const d = new Date(w.date);
+      return (Date.now() - d) / 86400000 <= 7 && w.completed === 'YES';
+    });
+    if (last7Workouts.length >= 5) insights.push({ type:'good', icon:'💪', text:`${last7Workouts.length} workouts last 7 days. Optimal frequency for hypertrophy.`, sub:'TRAINING FREQUENCY OPTIMAL' });
+    else if (last7Workouts.length <= 2 && last7.length >= 5) insights.push({ type:'warn', icon:'⚠', text:`Only ${last7Workouts.length} workouts last 7 days. Need at least 4-5 for muscle gain.`, sub:'TRAINING FREQUENCY LOW' });
+
+    // Sleep avg
+    const sleeps = last7.filter(l => Number(l.sleep) > 0).map(l => Number(l.sleep));
+    if (sleeps.length >= 3) {
+      const avgSleep = sleeps.reduce((s,n)=>s+n,0)/sleeps.length;
+      if (avgSleep < 7) insights.push({ type:'warn', icon:'😴', text:`Avg ${avgSleep.toFixed(1)}h sleep. Below 7h cuts MPS by 18% (Dattilo 2011). Aim for 8h.`, sub:'RECOVERY DEFICIT' });
+      else if (avgSleep >= 7.5) insights.push({ type:'good', icon:'✓', text:`Avg ${avgSleep.toFixed(1)}h sleep — great recovery profile.`, sub:'SLEEP OPTIMAL' });
+    }
+
+    if (insights.length === 0) {
+      insights.push({ type:'good', icon:'📈', text:'Log a few more days for AI insights to kick in. Need ~5 days minimum.', sub:'BUILDING DATA' });
+    }
+
+    document.getElementById('statsInsights').innerHTML = insights.map(s => `
+      <div class="suggestion">
+        <div class="sug-icon ${s.type}">${s.icon}</div>
+        <div class="sug-text">${s.text}<small>${s.sub}</small></div>
+      </div>`).join('');
+  }
+
+  function renderVolumeBars() {
+    // Calculate weekly volume per muscle group
+    const last7 = state.exercises.filter(e => {
+      const d = new Date(e.date);
+      return (Date.now() - d) / 86400000 <= 7 && e.done === 'YES';
+    });
+
+    const muscleVolume = {};
+    last7.forEach(logEntry => {
+      // Find the matching exercise definition across all programs
+      for (const dow in WORKOUT_PROGRAM) {
+        const found = WORKOUT_PROGRAM[dow].exercises.find(x => x.id === logEntry.exerciseId);
+        if (found && found.muscles) {
+          found.muscles.forEach(m => {
+            muscleVolume[m.name] = (muscleVolume[m.name] || 0) + m.sets;
+          });
+          break;
+        }
+      }
+    });
+
+    const muscles = ['Chest','Upper Chest','Front Delts','Side Delts','Rear Delts','Lats','Mid Back','Biceps','Biceps (long head)','Triceps','Triceps (long head)','Quads','Hamstrings','Glutes','Calves','Traps','Core','Lower Back'];
+    const present = muscles.filter(m => muscleVolume[m] > 0);
+    if (present.length === 0) {
+      document.getElementById('volumeBars').innerHTML = '<div class="empty">No completed exercises in the last 7 days yet.</div>';
+      return;
+    }
+
+    document.getElementById('volumeBars').innerHTML = present.map(m => {
+      const sets = muscleVolume[m];
+      const pct = Math.min(100, (sets / 20) * 100);
+      let cls = 'low';
+      if (sets >= 10 && sets <= 20) cls = 'opt';
+      else if (sets > 20) cls = 'high';
+      return `
+        <div class="vol-bar">
+          <div class="vol-name">${m}</div>
+          <div class="vol-track"><div class="vol-fill ${cls}" style="width:${pct}%"></div></div>
+          <div class="vol-num">${sets.toFixed(1)}</div>
+        </div>`;
+    }).join('');
+  }
+
   function renderProfile() {
     const p = state.profile;
     document.getElementById('p_currentWeight').textContent = (Number(p.currentWeight)||0).toFixed(1);
@@ -1325,7 +1819,7 @@ const App = (() => {
     document.getElementById('e_weeklyGainTarget').value = p.weeklyGainTarget;
   }
 
-  // ==================== CHARTS ====================
+  // Charts
   function drawLineChart(id, points) {
     const svg = document.getElementById(id);
     svg.innerHTML = '';
@@ -1391,7 +1885,7 @@ const App = (() => {
     return state.logs.filter(l => new Date(l.date) >= cutoff).sort((a,b) => a.date.localeCompare(b.date));
   }
 
-  // ==================== ACTIONS ====================
+  // Actions
   function go(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelector(`.page[data-page="${name}"]`).classList.add('active');
@@ -1410,6 +1904,7 @@ const App = (() => {
     };
     try {
       await api('updateProfile', payload);
+      showUpdateBanner('TARGETS SAVED');
       toast('Targets saved', 'good');
       await refresh();
     } catch(e) { toast('Failed: ' + e.message, 'bad'); }
@@ -1441,10 +1936,14 @@ const App = (() => {
     else toast('iOS: Share → Add to Home Screen', 'good');
   }
 
-  // ==================== HELPERS ====================
+  // Helpers
   function todayStr() { return formatDate(new Date()); }
   function formatDate(d) {
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function formatFutureDate(daysAhead) {
+    const d = new Date(); d.setDate(d.getDate() + daysAhead);
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
   }
   function escapeHTML(s) {
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1452,7 +1951,7 @@ const App = (() => {
   function escapeAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
   function toast(msg, kind) {
     const el = document.getElementById('toast');
-    el.textContent = msg;
+    el.innerHTML = `<span class="toast-dot"></span><span>${escapeHTML(msg)}</span>`;
     el.className = 'toast show' + (kind ? ' ' + kind : '');
     clearTimeout(el._t);
     el._t = setTimeout(() => el.className = 'toast', 2200);
@@ -1462,7 +1961,7 @@ const App = (() => {
   }
 
   return { init, go, refresh, saveTrack, saveProfile, saveApiUrl, resetApiUrl,
-    installPwa, toggleExercise, toggleMeal, toggleTip, addCustomExercise, viewDay };
+    installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
