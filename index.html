@@ -1430,19 +1430,8 @@ const WORKOUT_PLANS = {
 // Default plan if none selected yet
 const DEFAULT_PLAN_ID = 'ppl_6day';
 
-// Backward compat — keep WORKOUT_PROGRAM as alias to current schedule
-function getActivePlan() {
-  const planId = state.profile.activePlanId || DEFAULT_PLAN_ID;
-  return WORKOUT_PLANS[planId] || WORKOUT_PLANS[DEFAULT_PLAN_ID];
-}
-
-function getWorkoutForToday() {
-  return getActivePlan().schedule[new Date().getDay()];
-}
-
-function getWorkoutForDow(dow) {
-  return getActivePlan().schedule[dow];
-}
+// Helper functions (getActivePlan, getWorkoutForToday, getWorkoutForDow)
+// are defined INSIDE the App IIFE below since they reference `state`.
 
 const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1472,6 +1461,18 @@ const App = (() => {
     expandedPlanCardId: null,
     dismissedRecommendation: null
   };
+
+  // Plan helpers — must be inside IIFE for `state` access
+  function getActivePlan() {
+    const planId = state.profile.activePlanId || DEFAULT_PLAN_ID;
+    return WORKOUT_PLANS[planId] || WORKOUT_PLANS[DEFAULT_PLAN_ID];
+  }
+  function getWorkoutForToday() {
+    return getActivePlan().schedule[new Date().getDay()];
+  }
+  function getWorkoutForDow(dow) {
+    return getActivePlan().schedule[dow];
+  }
 
   function init() {
     setTodayLabel();
