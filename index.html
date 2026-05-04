@@ -201,6 +201,13 @@ textarea{resize:vertical;min-height:80px;}
   background:var(--surface-2);display:flex;align-items:center;justify-content:center;
   color:transparent;font-size:14px;font-weight:700;flex-shrink:0;transition:all .15s;}
 .meal-check.done{background:var(--accent);color:#000;border-color:var(--accent);}
+.meal-check.locked{background:var(--surface);border-color:var(--line-soft);
+  color:var(--text-3);cursor:not-allowed;font-size:11px;}
+.meal.locked{opacity:.5;}
+.meal.locked .meal-time{color:var(--text-3);}
+.meal-countdown{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
+  letter-spacing:.5px;margin-top:2px;display:block;}
+.meal-countdown.now{color:var(--accent);animation:pulse 1.5s infinite;}
 .meal-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);
   letter-spacing:1px;width:64px;flex-shrink:0;}
 .meal-food{flex:1;font-size:13px;line-height:1.4;}
@@ -1436,17 +1443,23 @@ const DEFAULT_PLAN_ID = 'ppl_6day';
 const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
+/* DIET_PLAN — `h` and `m` are scheduled hour/minute (24h).
+ * `postWO: true` means "unlocks after workout" instead of by clock.
+ */
 const DIET_PLAN = [
-  { id:'m1', time:'5:30 AM', name:'Soaked chana + moong + kismis + soya', kcal:280, protein:18 },
-  { id:'m2', time:'6:00 AM', name:'Banana + creatine 5g (pre-workout)', kcal:110, protein:1 },
-  { id:'m3', time:'POST-WO', name:'Whey protein shake (1 scoop) + water', kcal:130, protein:25 },
-  { id:'m4', time:'9:00 AM', name:'Oats (60g) + milk + 10 almonds', kcal:430, protein:14 },
-  { id:'m5', time:'11:00 AM',name:'3 whole eggs (boiled or omelet)', kcal:220, protein:18 },
-  { id:'m6', time:'2:00 PM', name:'Lunch: 3 roti + dal + rice + paneer (100g)', kcal:780, protein:28 },
-  { id:'m7', time:'5:00 PM', name:'2 slices bread + 2 tbsp peanut butter', kcal:330, protein:11 },
-  { id:'m8', time:'8:00 PM', name:'Dinner: chicken (150g) OR paneer + 2 roti', kcal:520, protein:38 },
-  { id:'m9', time:'10:00 PM',name:'Glass of milk + 6 almonds', kcal:200, protein:9 }
+  { id:'m1', time:'5:30 AM', h:5,  m:30, name:'Soaked chana + moong + kismis + soya', kcal:280, protein:18 },
+  { id:'m2', time:'6:00 AM', h:6,  m:0,  name:'Banana + creatine 5g (pre-workout)', kcal:110, protein:1 },
+  { id:'m3', time:'POST-WO', h:8,  m:0,  postWO:true, name:'Whey protein shake (1 scoop) + water', kcal:130, protein:25 },
+  { id:'m4', time:'9:00 AM', h:9,  m:0,  name:'Oats (60g) + milk + 10 almonds', kcal:430, protein:14 },
+  { id:'m5', time:'11:00 AM',h:11, m:0,  name:'3 whole eggs (boiled or omelet)', kcal:220, protein:18 },
+  { id:'m6', time:'2:00 PM', h:14, m:0,  name:'Lunch: 3 roti + dal + rice + paneer (100g)', kcal:780, protein:28 },
+  { id:'m7', time:'5:00 PM', h:17, m:0,  name:'2 slices bread + 2 tbsp peanut butter', kcal:330, protein:11 },
+  { id:'m8', time:'8:00 PM', h:20, m:0,  name:'Dinner: chicken (150g) OR paneer + 2 roti', kcal:520, protein:38 },
+  { id:'m9', time:'10:00 PM',h:22, m:0,  name:'Glass of milk + 6 almonds', kcal:200, protein:9 }
 ];
+
+// 15-minute grace window — meal can be ticked 15 min before scheduled time.
+const MEAL_GRACE_MINUTES = 15;
 
 // ============================================================
 const App = (() => {
@@ -1472,6 +1485,47 @@ const App = (() => {
   }
   function getWorkoutForDow(dow) {
     return getActivePlan().schedule[dow];
+  }
+
+  /**
+   * Time-gated meal locking.
+   * Meals can be ticked starting (scheduled time - GRACE minutes).
+   * POST-WO meal unlocks ONLY after the user ticks at least one workout exercise today.
+   * Returns: { unlocked:boolean, reason:string, minutesUntil:number }
+   */
+  function getMealLockStatus(meal) {
+    const now = new Date();
+    const today = todayStr();
+
+    if (meal.postWO) {
+      // Unlock once any workout exercise is checked today
+      const anyDone = state.exercises.some(e => e.date === today && e.done === 'YES');
+      if (anyDone) return { unlocked: true, reason: 'After workout' };
+      return { unlocked: false, reason: 'Complete a workout exercise first', minutesUntil: -1 };
+    }
+
+    const scheduled = new Date();
+    scheduled.setHours(meal.h, meal.m, 0, 0);
+    const unlockAt = new Date(scheduled.getTime() - MEAL_GRACE_MINUTES * 60000);
+    const minutesUntil = Math.ceil((unlockAt - now) / 60000);
+
+    if (now >= unlockAt) {
+      // Window: in the upcoming hour after scheduled = "now is the time"
+      const minutesPast = Math.floor((now - scheduled) / 60000);
+      if (minutesPast >= -MEAL_GRACE_MINUTES && minutesPast <= 60) {
+        return { unlocked: true, reason: 'Now', isNow: true };
+      }
+      return { unlocked: true, reason: 'Available', isNow: false };
+    }
+    return { unlocked: false, minutesUntil };
+  }
+
+  function formatCountdown(mins) {
+    if (mins <= 0) return 'now';
+    if (mins < 60) return `in ${mins}m`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m === 0 ? `in ${h}h` : `in ${h}h ${m}m`;
   }
 
   function init() {
@@ -1615,6 +1669,14 @@ const App = (() => {
     el.textContent = txt;
   }
   setInterval(renderLastSync, 15000);
+
+  // Re-render Track every 60s so meal countdowns tick down and meals auto-unlock at their scheduled time
+  setInterval(() => {
+    if (document.visibilityState === 'visible'
+        && document.querySelector('.page[data-page="track"].active')) {
+      renderTrack();
+    }
+  }, 60000);
 
   // ==================== HOME ====================
   function todayLog() { return state.logs.find(l => l.date === todayStr()) || null; }
@@ -1929,15 +1991,25 @@ const App = (() => {
 
     document.getElementById('mealList').innerHTML = DIET_PLAN.map(meal => {
       const done = todayMeals.find(m => m.mealId === meal.id && m.done === 'YES');
+      const lock = getMealLockStatus(meal);
+      const isLocked = !lock.unlocked && !done;
+      const countdown = isLocked
+        ? (meal.postWO ? '🔒 after workout' : '🔒 ' + formatCountdown(lock.minutesUntil))
+        : (lock.isNow && !done ? '⚡ time to eat' : '');
+      const onclickAttr = isLocked
+        ? `onclick="App.tryLockedMeal('${meal.id}')"`
+        : `onclick="App.toggleMeal('${meal.id}', '${meal.time}', '${escapeAttr(meal.name)}')"`;
+      const checkContent = done ? '✓' : (isLocked ? '🔒' : '');
       return `
-        <div class="meal">
-          <button class="meal-check ${done?'done':''}" onclick="App.toggleMeal('${meal.id}', '${meal.time}', '${escapeAttr(meal.name)}')">
-            ${done?'✓':''}
+        <div class="meal ${isLocked?'locked':''}">
+          <button class="meal-check ${done?'done':''} ${isLocked?'locked':''}" ${onclickAttr}>
+            ${checkContent}
           </button>
           <div class="meal-time">${meal.time}</div>
           <div class="meal-food ${done?'done':''}">
             <div class="meal-name">${escapeHTML(meal.name)}</div>
             <div class="meal-macros">${meal.kcal} kcal · ${meal.protein}g protein</div>
+            ${countdown ? `<div class="meal-countdown ${lock.isNow?'now':''}">${countdown}</div>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -1974,8 +2046,23 @@ const App = (() => {
 
   async function toggleMeal(id, time, name) {
     const today = todayStr();
+    const meal = DIET_PLAN.find(d => d.id === id);
     const existing = state.meals.find(m => m.date === today && m.mealId === id);
-    const newDone = !(existing && existing.done === 'YES');
+    const isCurrentlyDone = existing && existing.done === 'YES';
+
+    // Guard: only check lock when CHECKING (not unchecking).
+    // Unchecking a previously-ticked meal is always allowed (correction).
+    if (!isCurrentlyDone && meal) {
+      const lock = getMealLockStatus(meal);
+      if (!lock.unlocked) {
+        const wait = meal.postWO ? 'Complete a workout exercise first.' : `Available ${formatCountdown(lock.minutesUntil)}.`;
+        toast('🔒 ' + wait, 'warn');
+        if (navigator.vibrate) navigator.vibrate([6, 30, 6]);
+        return;
+      }
+    }
+
+    const newDone = !isCurrentlyDone;
     if (existing) existing.done = newDone ? 'YES' : 'NO';
     else state.meals.push({ date: today, mealId: id, mealTime: time, mealName: name, done: newDone ? 'YES' : 'NO' });
     if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
@@ -1986,6 +2073,22 @@ const App = (() => {
       await api('logMeal', { date: today, mealId: id, mealTime: time, mealName: name, done: newDone });
       showUpdateBanner(newDone ? 'MEAL LOGGED' : 'UPDATED');
     } catch(e) { toast('Saved offline', 'warn'); }
+  }
+
+  function tryLockedMeal(id) {
+    const meal = DIET_PLAN.find(d => d.id === id);
+    if (!meal) return;
+    const lock = getMealLockStatus(meal);
+    if (lock.unlocked) {
+      toggleMeal(id, meal.time, meal.name);
+      return;
+    }
+    if (navigator.vibrate) navigator.vibrate([6, 30, 6]);
+    if (meal.postWO) {
+      toast('🔒 This meal unlocks after your workout', 'warn');
+    } else {
+      toast(`🔒 Available ${formatCountdown(lock.minutesUntil)} (at ${meal.time})`, 'warn');
+    }
   }
 
   function toggleDemo(id) {
@@ -2771,7 +2874,7 @@ const App = (() => {
   return { init, go, refresh, saveTrack, saveProfile, saveApiUrl, resetApiUrl,
     installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay,
     pickPlan, togglePlanCard, confirmPlan, openPlanSwitcher, applyPlanSwitch,
-    acceptRecommendation, dismissRecommendation };
+    acceptRecommendation, dismissRecommendation, tryLockedMeal };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
