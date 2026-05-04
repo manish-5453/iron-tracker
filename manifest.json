@@ -1,13 +1,13 @@
 {
-  "name": "IRON — Gym Tracker",
-  "short_name": "IRON",
+  "name": "MN — Gym Tracker",
+  "short_name": "MN",
   "description": "Mobile gym & nutrition tracker for muscle gain",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa",
   "categories": ["health", "fitness", "lifestyle"],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
