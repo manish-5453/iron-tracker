@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="IRON" />
-<title>MN — Gym Tracker</title>
+<title>IRON — Gym Tracker</title>
 
 <link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="icon-192.png" />
@@ -332,6 +332,60 @@ textarea{resize:vertical;min-height:80px;}
 
 ::-webkit-scrollbar{display:none;}
 
+/* === Workout set logger === */
+.ex-log-section{margin-top:10px;padding:12px;background:var(--surface-2);border-radius:10px;
+  border:1px solid var(--line-soft);display:none;}
+.ex-log-section.show{display:block;animation:fadeUp .25s ease both;}
+.ex-log-row{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:8px;align-items:center;
+  margin-bottom:6px;padding:6px 0;}
+.ex-log-row.header{padding:0 0 4px;border-bottom:1px solid var(--line-soft);
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
+  letter-spacing:1px;text-transform:uppercase;}
+.ex-log-row .set-num{width:28px;height:28px;border-radius:8px;background:var(--surface-3);
+  display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:700;color:var(--accent);}
+.ex-log-row .set-num.done{background:var(--accent);color:#fff;}
+.ex-log-row input[type="number"]{padding:8px 10px;font-size:14px;text-align:center;
+  font-weight:600;background:#fff;}
+.ex-log-row input.kg{color:var(--accent);}
+.ex-log-tick{width:34px;height:34px;border-radius:10px;border:2px solid var(--line);
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  color:transparent;font-size:14px;font-weight:700;flex-shrink:0;cursor:pointer;
+  transition:all .15s;}
+.ex-log-tick.done{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ex-log-meta{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;
+  border-top:1px solid var(--line-soft);}
+.ex-log-meta .last-session{font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--text-3);letter-spacing:.5px;}
+.ex-log-meta .last-session strong{color:var(--accent);}
+.ex-log-meta .progress-target{font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--accent);letter-spacing:.5px;font-weight:700;}
+
+/* Recovery indicator on home */
+.recovery-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.recovery-bar{flex:1;height:6px;background:var(--surface-3);border-radius:999px;overflow:hidden;
+  margin:0 12px;}
+.recovery-fill{height:100%;background:linear-gradient(90deg, var(--accent), #16a34a);
+  transition:width .6s;border-radius:999px;}
+.recovery-fill.low{background:linear-gradient(90deg, #d97706, #f59e0b);}
+.recovery-fill.bad{background:linear-gradient(90deg, #dc2626, #ef4444);}
+.recovery-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);
+  letter-spacing:1px;}
+
+
+/* TDEE recommendation card */
+.tdee-card{background:linear-gradient(135deg, rgba(10,125,44,.06), rgba(10,125,44,.02));
+  border:1px solid rgba(10,125,44,.2);}
+.tdee-card .label{font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;
+  display:flex;align-items:center;gap:6px;}
+
+/* PR badge for personal records */
+.pr-badge{display:inline-flex;align-items:center;gap:4px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+  padding:3px 8px;border-radius:999px;background:var(--accent);color:#fff;
+  letter-spacing:1px;animation:pulse 2s infinite;}
+
 /* === Plan selection cards === */
 .plan-card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;
   padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;position:relative;}
@@ -494,6 +548,23 @@ textarea{resize:vertical;min-height:80px;}
       <div class="muscle-tags" id="workoutTags"></div>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="App.go('track')">Open Checklist →</button>
+      </div>
+    </div>
+
+    <div class="card" id="recoveryCard">
+      <div class="card-title">
+        <span>Recovery Score</span>
+        <span class="badge" id="recoveryBadge">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-num" id="recoveryNum">—</span>
+        <span class="stat-unit">/100</span>
+        <span class="stat-target" id="recoveryHint">—</span>
+      </div>
+      <div class="progress"><i id="recoveryProgress" style="width:0%"></i></div>
+      <div class="recovery-row">
+        <span class="recovery-label">SLEEP <span id="recoverySleep">—</span></span>
+        <span class="recovery-label" id="recoveryOverlap">MUSCLE OVERLAP —</span>
       </div>
     </div>
 
@@ -861,176 +932,249 @@ const EX_DEMOS = {
 
 const yt = (q) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q + ' proper form jeff nippard');
 
-/* PUSH DAY */
+/* ========================================================================
+ * EXERCISE PROGRAMS — Each exercise has:
+ *   - sets, reps, rest
+ *   - tempo: "eccentric-pause-concentric" e.g. "3-1-1" = 3sec down, 1sec pause, 1sec up
+ *   - warmup: number of warm-up sets recommended before working sets
+ *   - startWeight: suggested starting weight in kg (for a 51kg beginner)
+ *   - intensity: special protocol (e.g. "drop set last", "rest-pause final")
+ *   - muscles: array of {name, sets} for accurate volume tracking
+ *   - tip: form cue + scientific rationale
+ *   - demo, video: visual references
+ *
+ * Exercise selection prioritizes:
+ *   1. Mass-builders with proven hypertrophy data (compound first)
+ *   2. Stretched-position emphasis (incline curls, RDL, overhead extensions)
+ *   3. Cable variations for constant tension where they win
+ *   4. Hard finishers that drive recovery adaptations
+ * ====================================================================== */
+
+/* PUSH DAY — Chest, Shoulders, Triceps */
 const PUSH_EXERCISES = [
   { id:'p1', name:'Barbell Bench Press', sets:4, reps:'6-8', rest:'2-3 min',
-    muscles:[{name:'Chest', sets:4},{name:'Triceps',sets:1},{name:'Front Delts',sets:1}],
-    tip:'Keep shoulder blades retracted, slight arch, bar to lower chest. Pause 1 sec at chest. Drive feet hard.',
-    video: yt('barbell bench press tutorial'), demo: 'bench' },
-  { id:'p2', name:'Incline DB Press (30°)', sets:3, reps:'8-10', rest:'90s',
-    muscles:[{name:'Upper Chest', sets:3},{name:'Front Delts',sets:1},{name:'Triceps',sets:0.5}],
-    tip:'30° incline maximally targets upper chest (clavicular head). Higher angle becomes shoulder-dominant.',
-    video: yt('incline dumbbell press 30 degrees'), demo: 'press' },
-  { id:'p3', name:'Seated DB Shoulder Press', sets:3, reps:'8-10', rest:'90s',
-    muscles:[{name:'Front Delts', sets:3},{name:'Triceps',sets:1}],
-    tip:'Stop just before lockout to keep tension on delts. Don\'t flare elbows out — slight angle protects shoulders.',
-    video: yt('seated dumbbell shoulder press'), demo: 'press' },
-  { id:'p4', name:'Cable / DB Lateral Raise', sets:3, reps:'12-15', rest:'60s',
-    muscles:[{name:'Side Delts', sets:3}],
-    tip:'Lead with elbows, slight forward lean, slow eccentric. Light weight is fine — feel the burn in side delt.',
-    video: yt('lateral raise side delt'), demo: 'raise' },
-  { id:'p5', name:'Cable Tricep Pushdown (rope)', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Triceps', sets:3}],
-    tip:'Elbows pinned to sides. Spread the rope at the bottom for full lateral head contraction.',
-    video: yt('rope tricep pushdown'), demo: 'pushdown' },
-  { id:'p6', name:'Overhead Tricep Extension (DB or rope)', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Triceps', sets:3}],
-    tip:'Long head of triceps only stretches in overhead position — crucial for arm size.',
-    video: yt('overhead tricep extension'), demo: 'pushdown' }
+    tempo:'3-1-1', warmup:2, startWeight:30,
+    muscles:[{name:'Chest',sets:4},{name:'Triceps',sets:1},{name:'Front Delts',sets:1}],
+    tip:'King chest builder. Retract scapula hard, slight arch, bar to lower chest. 1-sec pause = no bouncing. Tempo 3-1-1 hammers eccentric stretch.',
+    video: yt('barbell bench press tutorial'), demo:'bench' },
+  { id:'p2', name:'Incline DB Press (30°)', sets:4, reps:'8-10', rest:'90s',
+    tempo:'2-1-1', warmup:1, startWeight:10,
+    muscles:[{name:'Upper Chest',sets:4},{name:'Front Delts',sets:1},{name:'Triceps',sets:0.5}],
+    tip:'30° EXACTLY — higher becomes shoulder press. DBs allow deeper stretch than barbell. Top 2 exercise for upper chest mass.',
+    video: yt('incline dumbbell press 30 degrees'), demo:'press' },
+  { id:'p3', name:'Machine Chest Press OR Cable Fly', sets:3, reps:'10-12', rest:'75s',
+    tempo:'2-1-1', warmup:0, startWeight:20,
+    muscles:[{name:'Chest',sets:3}],
+    tip:'After heavy compounds, machine isolates chest fully. Cable fly = constant tension throughout — squeeze HARD at top.',
+    video: yt('cable chest fly proper'), demo:'press' },
+  { id:'p4', name:'Seated DB Shoulder Press', sets:3, reps:'8-10', rest:'90s',
+    tempo:'2-1-1', warmup:1, startWeight:8,
+    muscles:[{name:'Front Delts',sets:3},{name:'Triceps',sets:1}],
+    tip:'Stop just before lockout — keeps tension on delts. Slight forward angle (10°) protects shoulders vs strict vertical.',
+    video: yt('seated dumbbell shoulder press'), demo:'press' },
+  { id:'p5', name:'Cable Lateral Raise', sets:4, reps:'12-15', rest:'45s',
+    tempo:'2-1-2', warmup:0, startWeight:5,
+    muscles:[{name:'Side Delts',sets:4}],
+    tip:'Cable > DB for side delts (constant tension). Lead with elbows, slight forward lean. Last set: drop the weight, do 8 more (drop set).',
+    intensity:'Drop set on final set',
+    video: yt('cable lateral raise side delt'), demo:'raise' },
+  { id:'p6', name:'Tricep Pushdown (rope)', sets:3, reps:'10-12', rest:'60s',
+    tempo:'2-1-1', warmup:0, startWeight:15,
+    muscles:[{name:'Triceps',sets:3}],
+    tip:'Elbows GLUED to sides. Spread the rope at the bottom — full lateral head contraction. Don\'t use shoulders.',
+    video: yt('rope tricep pushdown'), demo:'pushdown' },
+  { id:'p7', name:'Overhead DB Tricep Extension', sets:3, reps:'10-12', rest:'60s',
+    tempo:'3-1-1', warmup:0, startWeight:8,
+    muscles:[{name:'Triceps (long head)',sets:3}],
+    tip:'Long head ONLY stretches in overhead position — biggest tricep head, ignored by most. Critical for arm size.',
+    video: yt('overhead tricep extension'), demo:'pushdown' }
 ];
 
-/* PULL DAY */
+/* PULL DAY — Back, Biceps, Rear Delts */
 const PULL_EXERCISES = [
-  { id:'pl1', name:'Pull-ups (or Lat Pulldown)', sets:4, reps:'6-10', rest:'2 min',
-    muscles:[{name:'Lats', sets:4},{name:'Biceps',sets:1.5},{name:'Mid Back',sets:1}],
-    tip:'Vertical pull = lat width. Drive elbows down to the floor (not back). If can\'t do pull-ups, use band assist.',
-    video: yt('pull up tutorial proper form'), demo: 'pullup' },
-  { id:'pl2', name:'Barbell Row (or Pendlay Row)', sets:4, reps:'6-8', rest:'2 min',
-    muscles:[{name:'Mid Back', sets:4},{name:'Lats',sets:2},{name:'Biceps',sets:1},{name:'Rear Delts',sets:1}],
-    tip:'Horizontal pull = back thickness. Pull to lower chest/upper abs. Keep torso 45° to hide cheating.',
-    video: yt('barbell row proper form'), demo: 'row' },
-  { id:'pl3', name:'Seated Cable Row', sets:3, reps:'10-12', rest:'90s',
-    muscles:[{name:'Mid Back', sets:3},{name:'Lats',sets:1.5},{name:'Biceps',sets:1}],
-    tip:'Squeeze shoulder blades together at end-range. Don\'t lean back too much — keep tension constant.',
-    video: yt('seated cable row'), demo: 'row' },
-  { id:'pl4', name:'Face Pulls (cable, rope)', sets:3, reps:'12-15', rest:'45s',
-    muscles:[{name:'Rear Delts', sets:3},{name:'Mid Back',sets:1}],
-    tip:'Pull rope to face/forehead, external rotation at end. Best shoulder-health exercise — saves you long-term.',
-    video: yt('face pulls rear delt'), demo: 'facepull' },
-  { id:'pl5', name:'Barbell or EZ-Bar Curl', sets:3, reps:'8-10', rest:'60s',
-    muscles:[{name:'Biceps', sets:3}],
-    tip:'Don\'t swing the body. Slight elbow drift forward at top is OK to keep tension.',
-    video: yt('barbell curl proper form'), demo: 'curl' },
-  { id:'pl6', name:'Incline DB Curl (lying back)', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Biceps (long head)', sets:3}],
-    tip:'Stretched-position curl = max long head growth. Sit on 45° incline bench, let arms hang straight.',
-    video: yt('incline dumbbell curl long head'), demo: 'curl' }
+  { id:'pl1', name:'Pull-ups (or Lat Pulldown heavy)', sets:4, reps:'6-10', rest:'2 min',
+    tempo:'2-1-2', warmup:1, startWeight:0,
+    muscles:[{name:'Lats',sets:4},{name:'Biceps',sets:1.5},{name:'Mid Back',sets:1}],
+    tip:'Vertical pull = LAT WIDTH. Drive elbows DOWN to floor (not back). Use band assist if needed. Pause 1s at top.',
+    video: yt('pull up tutorial proper form'), demo:'pullup' },
+  { id:'pl2', name:'Barbell Row (Pendlay style)', sets:4, reps:'6-8', rest:'2 min',
+    tempo:'2-0-1', warmup:2, startWeight:25,
+    muscles:[{name:'Mid Back',sets:4},{name:'Lats',sets:2},{name:'Biceps',sets:1},{name:'Rear Delts',sets:1}],
+    tip:'Horizontal pull = THICKNESS. Pull explosively to lower chest, slow eccentric. Torso 45° — Pendlay (each rep from floor) is strict.',
+    video: yt('barbell row proper form'), demo:'row' },
+  { id:'pl3', name:'Chest-Supported T-Bar Row OR Seated Cable Row', sets:3, reps:'10-12', rest:'90s',
+    tempo:'2-1-2', warmup:0, startWeight:20,
+    muscles:[{name:'Mid Back',sets:3},{name:'Lats',sets:1.5},{name:'Biceps',sets:1}],
+    tip:'Chest support removes lower-back fatigue → 100% back focus. Squeeze blades hard at end. 2-sec hold = mind-muscle connection.',
+    video: yt('chest supported t bar row'), demo:'row' },
+  { id:'pl4', name:'Lat Pulldown (wide grip)', sets:3, reps:'10-12', rest:'75s',
+    tempo:'2-1-2', warmup:0, startWeight:25,
+    muscles:[{name:'Lats',sets:3}],
+    tip:'Wide grip emphasizes upper lats (V-taper). Slight backward lean (10°). Pull to upper chest, squeeze, control eccentric.',
+    video: yt('lat pulldown wide grip'), demo:'pullup' },
+  { id:'pl5', name:'Face Pulls (cable rope)', sets:3, reps:'15-20', rest:'45s',
+    tempo:'2-1-2', warmup:0, startWeight:10,
+    muscles:[{name:'Rear Delts',sets:3},{name:'Mid Back',sets:1}],
+    tip:'Best shoulder-health exercise — saves you long-term. Pull rope to face, EXTERNAL ROTATION at end (knuckles to ears).',
+    video: yt('face pulls rear delt'), demo:'facepull' },
+  { id:'pl6', name:'EZ-Bar Preacher Curl', sets:3, reps:'8-10', rest:'60s',
+    tempo:'3-0-1', warmup:1, startWeight:10,
+    muscles:[{name:'Biceps',sets:3}],
+    tip:'Preacher = no body english, isolates biceps. Don\'t fully extend at bottom (joint stress). Slow eccentric grows muscle.',
+    video: yt('ez bar preacher curl'), demo:'curl' },
+  { id:'pl7', name:'Incline DB Curl (lying back)', sets:3, reps:'10-12', rest:'60s',
+    tempo:'3-0-1', warmup:0, startWeight:6,
+    muscles:[{name:'Biceps (long head)',sets:3}],
+    tip:'STRETCHED-position curl = max long head growth. 45° incline, arms hang straight, supinate palms. Last set: rest-pause (15s breaks at failure).',
+    intensity:'Rest-pause final set',
+    video: yt('incline dumbbell curl long head'), demo:'curl' }
 ];
 
-/* LEG DAY */
+/* LEG DAY — Quads, Hams, Glutes, Calves */
 const LEG_EXERCISES = [
   { id:'l1', name:'Barbell Back Squat', sets:4, reps:'6-8', rest:'3 min',
-    muscles:[{name:'Quads', sets:4},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:1}],
-    tip:'King of leg exercises. Below parallel for full quad/glute development. Brace abs hard. Knees track over toes.',
-    video: yt('barbell back squat tutorial'), demo: 'squat' },
+    tempo:'3-1-1', warmup:3, startWeight:30,
+    muscles:[{name:'Quads',sets:4},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:1}],
+    tip:'KING of leg exercises. Below parallel — no half-reps. Brace abs HARD, knees track over toes. Tempo 3-1-1 = controlled.',
+    video: yt('barbell back squat tutorial'), demo:'squat' },
   { id:'l2', name:'Romanian Deadlift (RDL)', sets:4, reps:'8-10', rest:'2 min',
-    muscles:[{name:'Hamstrings', sets:4},{name:'Glutes',sets:3}],
-    tip:'Hinge at hips, slight knee bend, push hips back. Lower until you feel deep hamstring stretch — that\'s your range.',
-    video: yt('romanian deadlift form'), demo: 'deadlift' },
-  { id:'l3', name:'Leg Press (Hack Squat alt.)', sets:3, reps:'10-12', rest:'2 min',
-    muscles:[{name:'Quads', sets:3},{name:'Glutes',sets:1}],
-    tip:'Foot placement: low = quad-focus, high = glute/ham-focus. Don\'t lock knees at top.',
-    video: yt('leg press proper form'), demo: 'legpress' },
-  { id:'l4', name:'Lying or Seated Leg Curl', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Hamstrings', sets:3}],
-    tip:'Direct hamstring isolation. 3-second eccentric (slow lowering) for max growth.',
-    video: yt('lying leg curl'), demo: 'legcurl' },
-  { id:'l5', name:'Walking Lunges (DB)', sets:3, reps:'10/leg', rest:'90s',
-    muscles:[{name:'Quads', sets:1.5},{name:'Glutes',sets:2},{name:'Hamstrings',sets:1}],
-    tip:'Long step targets glutes more, short step targets quads. Sink deep, drive through front heel.',
-    video: yt('walking lunges dumbbell'), demo: 'lunge' },
-  { id:'l6', name:'Standing Calf Raise', sets:4, reps:'12-15', rest:'45s',
-    muscles:[{name:'Calves', sets:4}],
-    tip:'1-sec pause at top, full stretch at bottom. Calves recover fast — train them hard.',
-    video: yt('standing calf raise'), demo: 'calf' }
+    tempo:'3-0-1', warmup:2, startWeight:30,
+    muscles:[{name:'Hamstrings',sets:4},{name:'Glutes',sets:3}],
+    tip:'Hinge at HIPS not knees. Push hips back, slight knee bend. Lower until you feel DEEP hamstring stretch — that\'s your range.',
+    video: yt('romanian deadlift form'), demo:'deadlift' },
+  { id:'l3', name:'Hack Squat OR Leg Press', sets:3, reps:'10-12', rest:'2 min',
+    tempo:'2-1-1', warmup:1, startWeight:60,
+    muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:1}],
+    tip:'Quad-isolation machine work after squat. Foot placement: low/narrow = quads, high/wide = glutes. Don\'t lock knees at top.',
+    video: yt('hack squat machine'), demo:'legpress' },
+  { id:'l4', name:'Lying Leg Curl', sets:4, reps:'10-12', rest:'60s',
+    tempo:'3-1-1', warmup:0, startWeight:15,
+    muscles:[{name:'Hamstrings',sets:4}],
+    tip:'Direct hamstring isolation, knee-flexion focus (RDL is hip-extension). 3-sec eccentric for max growth. Point toes!',
+    video: yt('lying leg curl'), demo:'legcurl' },
+  { id:'l5', name:'Walking DB Lunges', sets:3, reps:'10/leg', rest:'90s',
+    tempo:'2-0-1', warmup:0, startWeight:8,
+    muscles:[{name:'Quads',sets:1.5},{name:'Glutes',sets:2},{name:'Hamstrings',sets:1}],
+    tip:'Long step → glutes, short step → quads. Sink deep, drive through front HEEL. Single-leg = balance + strength.',
+    video: yt('walking lunges dumbbell'), demo:'lunge' },
+  { id:'l6', name:'Standing Calf Raise', sets:5, reps:'10-15', rest:'45s',
+    tempo:'2-2-1', warmup:0, startWeight:20,
+    muscles:[{name:'Calves',sets:5}],
+    tip:'CALVES need volume + stretch. 2-sec pause at TOP, full stretch at bottom. Slow up, hold, slow down. Hard to grow — train them hard.',
+    video: yt('standing calf raise'), demo:'calf' }
 ];
 
-/* SHOULDER DAY */
+/* SHOULDER SPECIALIZATION DAY */
 const SHOULDER_EXERCISES = [
-  { id:'s1', name:'Standing Overhead Press (BB or DB)', sets:4, reps:'6-8', rest:'2 min',
-    muscles:[{name:'Front Delts', sets:4},{name:'Side Delts',sets:1},{name:'Triceps',sets:1.5}],
-    tip:'Standing = core engagement. Bar travels straight up over crown of head, glutes squeezed.',
-    video: yt('standing overhead press barbell'), demo: 'press' },
-  { id:'s2', name:'Cable Lateral Raise', sets:4, reps:'12-15', rest:'45s',
-    muscles:[{name:'Side Delts', sets:4}],
-    tip:'Cable keeps tension throughout entire range — superior to dumbbells. Cross-body version is best.',
-    video: yt('cable lateral raise side delt'), demo: 'raise' },
-  { id:'s3', name:'Reverse Pec Deck / Rear Delt Fly', sets:3, reps:'12-15', rest:'45s',
-    muscles:[{name:'Rear Delts', sets:3}],
-    tip:'Imagine pushing through walls with elbows. Don\'t let traps take over — keep them down.',
-    video: yt('reverse pec deck rear delt'), demo: 'raise' },
-  { id:'s4', name:'Barbell or DB Shrugs', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Traps', sets:3}],
-    tip:'Straight up, 1-sec squeeze at top. No rolling — that\'s a myth and adds zero growth.',
-    video: yt('barbell shrugs proper form'), demo: 'shrug' },
-  { id:'s5', name:'Incline DB Curl', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Biceps (long head)', sets:3}],
-    tip:'Bench at 45°, arms hang straight. Stretches biceps fully — top 1-2 exercises for arm size.',
-    video: yt('incline dumbbell curl'), demo: 'curl' },
-  { id:'s6', name:'Skull Crushers (EZ-bar)', sets:3, reps:'10-12', rest:'60s',
-    muscles:[{name:'Triceps (long head)', sets:3}],
-    tip:'Lower behind head (not to forehead) for max long-head stretch. Keep elbows in.',
-    video: yt('skull crushers ez bar'), demo: 'pushdown' }
+  { id:'s1', name:'Standing Overhead Press', sets:4, reps:'6-8', rest:'2-3 min',
+    tempo:'2-0-1', warmup:2, startWeight:20,
+    muscles:[{name:'Front Delts',sets:4},{name:'Side Delts',sets:1},{name:'Triceps',sets:1.5}],
+    tip:'Standing OHP = full body. Squeeze glutes hard, brace core, bar straight up over crown of head. Don\'t lean back.',
+    video: yt('standing overhead press barbell'), demo:'press' },
+  { id:'s2', name:'Cable Lateral Raise (one arm)', sets:4, reps:'12-15', rest:'45s',
+    tempo:'2-1-2', warmup:0, startWeight:5,
+    muscles:[{name:'Side Delts',sets:4}],
+    tip:'Single-arm cable from BEHIND body (cross-body) = best mechanics for side delts. 2-sec hold at top burns brutal.',
+    intensity:'Drop set last set',
+    video: yt('cable lateral raise cross body'), demo:'raise' },
+  { id:'s3', name:'DB Lateral Raise (myo-reps)', sets:1, reps:'15+5+5+5', rest:'15s between',
+    tempo:'1-0-1', warmup:0, startWeight:5,
+    muscles:[{name:'Side Delts',sets:2}],
+    tip:'1 activation set to near-failure (15 reps), then 3 mini-sets of 5 with 15s breaks. Brutal pump = growth.',
+    intensity:'Myo-rep finisher',
+    video: yt('myo reps lateral raises'), demo:'raise' },
+  { id:'s4', name:'Reverse Pec Deck (rear delts)', sets:4, reps:'12-15', rest:'45s',
+    tempo:'2-1-2', warmup:0, startWeight:15,
+    muscles:[{name:'Rear Delts',sets:4}],
+    tip:'Push through walls with elbows. Don\'t let traps take over — chest up, traps DOWN. Squeeze blades at end.',
+    video: yt('reverse pec deck rear delt'), demo:'raise' },
+  { id:'s5', name:'Barbell Shrugs', sets:3, reps:'10-12', rest:'60s',
+    tempo:'2-2-1', warmup:0, startWeight:30,
+    muscles:[{name:'Traps',sets:3}],
+    tip:'STRAIGHT up — no rolling (myth). 2-sec squeeze at top. Heavy weight, full ROM.',
+    video: yt('barbell shrugs proper form'), demo:'shrug' },
+  { id:'s6', name:'Incline DB Curl', sets:3, reps:'10-12', rest:'60s',
+    tempo:'3-0-1', warmup:0, startWeight:6,
+    muscles:[{name:'Biceps (long head)',sets:3}],
+    tip:'Stretched bicep position = max growth. Bench 45°, arms hang straight, supinate at top.',
+    video: yt('incline dumbbell curl'), demo:'curl' },
+  { id:'s7', name:'Skull Crushers (EZ-bar)', sets:3, reps:'10-12', rest:'60s',
+    tempo:'3-0-1', warmup:0, startWeight:12,
+    muscles:[{name:'Triceps (long head)',sets:3}],
+    tip:'Lower bar BEHIND head (not to forehead) — max long-head stretch. Keep elbows in, don\'t flare.',
+    video: yt('skull crushers ez bar'), demo:'pushdown' }
 ];
 
 /* FULL BODY POWER DAY */
 const FULLBODY_EXERCISES = [
   { id:'f1', name:'Conventional Deadlift', sets:4, reps:'5', rest:'3 min',
-    muscles:[{name:'Hamstrings', sets:2.5},{name:'Glutes',sets:3},{name:'Mid Back',sets:2},{name:'Lats',sets:1.5},{name:'Lower Back',sets:3}],
-    tip:'King lift. Bar over mid-foot, brace lats and core, push the floor away. Belt OK for top sets.',
-    video: yt('conventional deadlift tutorial'), demo: 'deadlift' },
-  { id:'f2', name:'Bench Press (heavy)', sets:3, reps:'5-6', rest:'2-3 min',
-    muscles:[{name:'Chest', sets:3},{name:'Triceps',sets:1},{name:'Front Delts',sets:1}],
-    tip:'Heavy chest day #2. Try to hit same or 1 rep more than Monday — that\'s progressive overload.',
-    video: yt('bench press heavy strength'), demo: 'bench' },
-  { id:'f3', name:'Weighted Pull-ups (or Lat Pulldown heavy)', sets:3, reps:'5-8', rest:'2 min',
-    muscles:[{name:'Lats', sets:3},{name:'Biceps',sets:1.5},{name:'Mid Back',sets:1}],
-    tip:'Once you can do 8+ bodyweight pullups, add weight via dip belt. 5kg jumps work great.',
-    video: yt('weighted pull ups'), demo: 'pullup' },
-  { id:'f4', name:'Bulgarian Split Squat', sets:3, reps:'8/leg', rest:'90s',
-    muscles:[{name:'Quads', sets:2},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:0.5}],
-    tip:'Brutal but effective. Front knee should track straight, back leg passive. Builds single-leg strength.',
-    video: yt('bulgarian split squat'), demo: 'lunge' },
-  { id:'f5', name:'Plank + Side Plank', sets:2, reps:'45s each', rest:'30s',
-    muscles:[{name:'Core', sets:2}],
-    tip:'Core stability transfers to every lift. Squeeze glutes, brace abs, no sagging hips.',
-    video: yt('plank proper form'), demo: 'plank' }
+    tempo:'1-0-1', warmup:3, startWeight:40,
+    muscles:[{name:'Hamstrings',sets:2.5},{name:'Glutes',sets:3},{name:'Mid Back',sets:2},{name:'Lats',sets:1.5},{name:'Lower Back',sets:3}],
+    tip:'KING lift — hits everything from calves to traps. Bar over MID-FOOT, brace lats hard, push the floor away. Reset between reps.',
+    video: yt('conventional deadlift tutorial'), demo:'deadlift' },
+  { id:'f2', name:'Bench Press (heavy)', sets:4, reps:'5-6', rest:'2-3 min',
+    tempo:'2-1-1', warmup:2, startWeight:30,
+    muscles:[{name:'Chest',sets:4},{name:'Triceps',sets:1.5},{name:'Front Delts',sets:1}],
+    tip:'Heavy chest day #2 of week. Goal: hit same/1 rep more than Monday. Progressive overload literally written into the program.',
+    video: yt('bench press heavy strength'), demo:'bench' },
+  { id:'f3', name:'Weighted Pull-ups', sets:3, reps:'5-8', rest:'2 min',
+    tempo:'2-1-2', warmup:1, startWeight:0,
+    muscles:[{name:'Lats',sets:3},{name:'Biceps',sets:1.5},{name:'Mid Back',sets:1}],
+    tip:'Once 8+ bodyweight pull-ups feel easy → add weight via dip belt. 2.5kg jumps work great. Strict form first.',
+    video: yt('weighted pull ups dip belt'), demo:'pullup' },
+  { id:'f4', name:'Bulgarian Split Squat', sets:3, reps:'8-10/leg', rest:'90s',
+    tempo:'3-1-1', warmup:0, startWeight:8,
+    muscles:[{name:'Quads',sets:2},{name:'Glutes',sets:2.5},{name:'Hamstrings',sets:0.5}],
+    tip:'Brutal but builds single-leg strength + symmetry. Front knee tracks straight, back leg passive. Sink deep.',
+    video: yt('bulgarian split squat'), demo:'lunge' },
+  { id:'f5', name:'Hammer Curl + Tricep Pushdown SUPERSET', sets:3, reps:'10-12 each', rest:'75s',
+    tempo:'2-0-1', warmup:0, startWeight:8,
+    muscles:[{name:'Biceps',sets:3},{name:'Triceps',sets:3}],
+    tip:'Superset = no rest between curl and pushdown. Time-efficient finisher. Brachialis (hammer) = thicker arms.',
+    intensity:'Antagonist superset',
+    video: yt('biceps triceps superset'), demo:'curl' },
+  { id:'f6', name:'Plank + Side Plank', sets:3, reps:'45s each', rest:'30s',
+    tempo:'hold', warmup:0, startWeight:0,
+    muscles:[{name:'Core',sets:3}],
+    tip:'Core stability transfers to EVERY lift — bigger squats, deadlifts. Squeeze glutes, brace abs hard, no sagging.',
+    video: yt('plank proper form'), demo:'plank' }
 ];
 
-/* RECOVERY DAY */
+/* RECOVERY DAY (Sunday) */
 const RECOVERY_EXERCISES = [
-  { id:'r1', name:'10-min Easy Walk', sets:1, reps:'10 min', rest:'-',
-    muscles:[],
-    tip:'Active recovery = blood flow without stress. Reduces DOMS, helps next workout.',
-    video: yt('active recovery walk'), demo: 'walk' },
-  { id:'r2', name:'Foam Rolling (full body)', sets:1, reps:'8 min', rest:'-',
-    muscles:[],
-    tip:'Hit quads, IT band, lats, mid-back. Slow rolls, pause on tight spots.',
-    video: yt('foam rolling full body recovery'), demo: 'stretch' },
+  { id:'r1', name:'15-min Easy Walk', sets:1, reps:'15 min', rest:'-',
+    tempo:'-', warmup:0, startWeight:0, muscles:[],
+    tip:'Active recovery = blood flow without stress. Reduces DOMS, helps next workout. Outdoor > treadmill.',
+    video: yt('active recovery walk'), demo:'walk' },
+  { id:'r2', name:'Foam Rolling (full body)', sets:1, reps:'10 min', rest:'-',
+    tempo:'slow', warmup:0, startWeight:0, muscles:[],
+    tip:'Hit quads, IT band, lats, mid-back, glutes. Slow rolls, pause 30s on tight spots. Pre-bed = best sleep.',
+    video: yt('foam rolling full body recovery'), demo:'stretch' },
   { id:'r3', name:'Static Stretching (hams, hips, chest)', sets:1, reps:'30s × 2', rest:'-',
-    muscles:[],
-    tip:'Hold each stretch 30 sec, breathe deeply. Best done at end of day.',
-    video: yt('full body static stretch'), demo: 'stretch' }
+    tempo:'hold', warmup:0, startWeight:0, muscles:[],
+    tip:'Hold each stretch 30 sec, breathe deeply. Best done at end of day, after warm shower.',
+    video: yt('full body static stretch'), demo:'stretch' }
 ];
 
-/* VOLLEYBALL DAY */
+/* VOLLEYBALL DAY (Saturday) */
 const VOLLEYBALL_EXERCISES = [
-  { id:'v1', name:'Dynamic Warm-up', sets:1, reps:'5 min', rest:'-',
-    muscles:[],
-    tip:'Arm circles, leg swings, jumping jacks, hip openers. Cuts injury risk by ~40% vs static.',
-    video: yt('dynamic warm up volleyball'), demo: 'stretch' },
+  { id:'v1', name:'Dynamic Warm-up', sets:1, reps:'5-7 min', rest:'-',
+    tempo:'-', warmup:0, startWeight:0, muscles:[],
+    tip:'Arm circles, leg swings, jumping jacks, hip openers, high knees. Cuts injury risk by ~40% vs static stretching.',
+    video: yt('dynamic warm up volleyball'), demo:'stretch' },
   { id:'v2', name:'Volleyball Match / Practice', sets:1, reps:'60-90 min', rest:'-',
-    muscles:[{name:'Calves', sets:1},{name:'Quads',sets:0.5},{name:'Glutes',sets:0.5}],
+    tempo:'-', warmup:0, startWeight:0,
+    muscles:[{name:'Calves',sets:1},{name:'Quads',sets:0.5},{name:'Glutes',sets:0.5}],
     tip:'High-intensity intervals. Drink water every set. Eat banana + oats 1h before.',
-    video: yt('volleyball training drills'), demo: 'walk' },
+    video: yt('volleyball training drills'), demo:'walk' },
   { id:'v3', name:'Cool-down Stretch', sets:1, reps:'5 min', rest:'-',
-    muscles:[],
+    tempo:'hold', warmup:0, startWeight:0, muscles:[],
     tip:'Especially calves, hamstrings, shoulders. Reduces next-day stiffness.',
-    video: yt('cool down stretch volleyball'), demo: 'stretch' },
+    video: yt('cool down stretch volleyball'), demo:'stretch' },
   { id:'v4', name:'Post-game Protein Shake', sets:1, reps:'30g', rest:'-',
-    muscles:[],
-    tip:'Within 1 hr of finishing. Helps overnight recovery and tomorrow\'s session.',
-    video: yt('post workout protein timing'), demo: 'generic' }
+    tempo:'-', warmup:0, startWeight:0, muscles:[],
+    tip:'Within 1 hr of finishing. 30g whey + banana + milk = perfect recovery shake.',
+    video: yt('post workout protein timing'), demo:'generic' }
 ];
 
 /* === 5 WORKOUT PLANS — user selects one, AI coach can suggest switching ===
@@ -1473,6 +1617,7 @@ const DIET_PLAN = [
 // 15-minute grace window — meal can be ticked 15 min before scheduled time.
 const MEAL_GRACE_MINUTES = 15;
 
+
 // ============================================================
 const App = (() => {
   let state = {
@@ -1480,6 +1625,7 @@ const App = (() => {
     profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4, activePlanId:'' },
     logs: [], workouts: [], exercises: [], meals: [],
     expandedDemo: null,
+    expandedExLog: null,
     viewingDayDow: new Date().getDay(),
     lastSyncTs: null,
     pickedPlanId: null,
@@ -1591,7 +1737,8 @@ const App = (() => {
   function saveCache(){
     localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify({
       profile: state.profile, logs: state.logs, workouts: state.workouts,
-      exercises: state.exercises, meals: state.meals, lastSyncTs: state.lastSyncTs
+      exercises: state.exercises, meals: state.meals,
+      lastSyncTs: state.lastSyncTs
     }));
   }
 
@@ -1723,12 +1870,148 @@ const App = (() => {
     return latest;
   }
 
+  /**
+   * Find the most recent completed session for a given exercise.
+   * Used to suggest progressive overload target.
+   */
+  function getLastExerciseSession(exId) {
+    const records = state.exercises
+      .filter(e => e.exerciseId === exId && e.done === 'YES' && e.date !== todayStr() && Number(e.weight) > 0)
+      .sort((a,b) => b.date.localeCompare(a.date));
+    return records[0] || null;
+  }
+
+  /**
+   * Compute progressive overload target for next session.
+   * Strategy:
+   *   - If last week hit top of rep range with 1+ RIR → add 2.5kg
+   *   - If hit middle of rep range → try 1 more rep at same weight
+   *   - If failed to hit min reps → repeat or deload 5%
+   */
+  function computeProgressionTarget(ex, last) {
+    if (!last) {
+      return {
+        suggestedWeight: ex.startWeight || 10,
+        label: 'START LIGHT · LEARN FORM',
+        tip: 'first session — focus on form'
+      };
+    }
+    const lastWeight = Number(last.weight) || 0;
+    const lastReps = Number(String(last.reps).split(',')[0].trim()) || 0;
+    const repsRange = typeof ex.reps === 'string' ? ex.reps.split('-').map(n => parseInt(n)) : [ex.reps, ex.reps];
+    const minReps = repsRange[0] || lastReps;
+    const maxReps = repsRange[1] || repsRange[0] || lastReps;
+
+    if (lastReps >= maxReps) {
+      const newWeight = +(lastWeight + 2.5).toFixed(1);
+      return {
+        suggestedWeight: newWeight,
+        label: `↑ ADD 2.5KG → ${newWeight}KG`,
+        tip: `try ${newWeight}kg × ${minReps}+ reps`
+      };
+    }
+    if (lastReps >= minReps) {
+      return {
+        suggestedWeight: lastWeight,
+        label: `+1 REP @ ${lastWeight}KG`,
+        tip: `try ${lastWeight}kg × ${lastReps + 1} reps`
+      };
+    }
+    return {
+      suggestedWeight: lastWeight,
+      label: `MATCH ${lastReps} REPS @ ${lastWeight}KG`,
+      tip: `repeat last session, hit min ${minReps}`
+    };
+  }
+
+  /**
+   * Recovery score: based on yesterday's training volume + sleep + workout overlap.
+   * Returns { score: 0-100, label: '...', warn: bool }
+   */
+  function getRecoveryScore() {
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const yestDate = formatDate(yest);
+    const yestEx = state.exercises.filter(e => e.date === yestDate && e.done === 'YES');
+    const yestWorkVolume = yestEx.length;
+    const todayPlan = getWorkoutForToday();
+    const todayMuscles = new Set();
+    todayPlan.exercises.forEach(ex => (ex.muscles||[]).forEach(m => todayMuscles.add(m.name)));
+    let overlap = 0;
+    yestEx.forEach(e => {
+      const planEx = findExerciseInPlans(e.exerciseId);
+      if (planEx) (planEx.muscles||[]).forEach(m => { if (todayMuscles.has(m.name)) overlap++; });
+    });
+    const yestLog = state.logs.find(l => l.date === yestDate);
+    const sleep = Number(yestLog?.sleep) || 7;
+
+    let score = 100;
+    if (sleep < 6) score -= 30;
+    else if (sleep < 7) score -= 15;
+    if (yestWorkVolume >= 6 && overlap >= 2) score -= 25;
+    if (yestWorkVolume >= 8) score -= 10;
+    score = Math.max(0, Math.min(100, score));
+
+    let label = 'FRESH';
+    let warn = false;
+    if (score < 50) { label = 'POOR — DELOAD'; warn = true; }
+    else if (score < 70) { label = 'OK — CAUTION'; warn = true; }
+    else if (score >= 90) label = 'PRIMED';
+    return { score, label, warn, overlap, sleep };
+  }
+
+  function findExerciseInPlans(exId) {
+    for (const planId in WORKOUT_PLANS) {
+      for (const dow in WORKOUT_PLANS[planId].schedule) {
+        const ex = WORKOUT_PLANS[planId].schedule[dow].exercises.find(e => e.id === exId);
+        if (ex) return ex;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Adaptive TDEE: from 14-day weight change vs avg calorie intake,
+   * back-calculate true maintenance calories.
+   */
+  function computeAdaptiveTDEE() {
+    const last14 = lastNDaysLogs(14);
+    const weighIns = last14.filter(l => Number(l.weight) > 0).sort((a,b) => a.date.localeCompare(b.date));
+    const calLogs = last14.filter(l => Number(l.calories) > 0);
+    if (weighIns.length < 5 || calLogs.length < 5) return null;
+
+    const days = (new Date(weighIns[weighIns.length-1].date) - new Date(weighIns[0].date)) / 86400000;
+    if (days < 7) return null;
+
+    const weightChange = Number(weighIns[weighIns.length-1].weight) - Number(weighIns[0].weight);
+    const avgCal = calLogs.reduce((s,l) => s + Number(l.calories), 0) / calLogs.length;
+
+    // 1kg fat ≈ 7700 kcal, 1kg lean ≈ 1800 kcal. Weighted ~5500 for natural lean bulk.
+    const kcalPerKg = 5500;
+    const surplusPerDay = (weightChange * kcalPerKg) / days;
+    const estimatedTDEE = Math.round(avgCal - surplusPerDay);
+
+    const targetSurplus = 300; // kcal above maintenance for lean bulk
+    const newTarget = estimatedTDEE + targetSurplus;
+    const currentTarget = state.profile.targetCalories;
+    const adjustment = newTarget - currentTarget;
+
+    return {
+      tdee: estimatedTDEE,
+      avgIntake: Math.round(avgCal),
+      weightChangePerWeek: +(weightChange / days * 7).toFixed(2),
+      currentTarget,
+      newTarget,
+      adjustment,
+      shouldAdjust: Math.abs(adjustment) >= 150
+    };
+  }
+
+
   function getTodayMacros() {
     const log = todayLog();
     const mealMap = getTodayMealMap();
-    // Only count meals that are (a) currently YES and (b) part of the active diet plan
-    const checkedMeals = Object.values(mealMap).filter(m => m.done === 'YES');
 
+    const checkedMeals = Object.values(mealMap).filter(m => m.done === 'YES');
     const autoCal = checkedMeals.reduce((s,m) => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
       return s + (meal ? meal.kcal : 0);
@@ -1738,8 +2021,7 @@ const App = (() => {
       return s + (meal ? meal.protein : 0);
     }, 0);
 
-    // Prefer auto-calc when meals are checked; only fall back to manual log when no meals checked.
-    // This way unchecking a meal correctly reduces dashboard total.
+    // Prefer auto-calc when meals checked; fall back to manual log only when nothing checked.
     const cal  = checkedMeals.length > 0 ? autoCal  : (Number(log?.calories) || 0);
     const prot = checkedMeals.length > 0 ? autoProt : (Number(log?.protein) || 0);
 
@@ -1810,6 +2092,28 @@ const App = (() => {
     if (totalEx > 0 && doneEx === totalEx) { wBadge.textContent = 'COMPLETE ✓'; wBadge.classList.add('good'); }
     else if (doneEx > 0) { wBadge.textContent = `${doneEx}/${totalEx}`; wBadge.classList.add('warn'); }
     else { wBadge.textContent = 'PENDING'; }
+
+    // Recovery score
+    const recovery = getRecoveryScore();
+    document.getElementById('recoveryNum').textContent = recovery.score;
+    const recBadge = document.getElementById('recoveryBadge');
+    recBadge.textContent = recovery.label;
+    recBadge.classList.remove('good','warn','bad');
+    if (recovery.score >= 80) recBadge.classList.add('good');
+    else if (recovery.score >= 60) recBadge.classList.add('warn');
+    else recBadge.classList.add('bad');
+    document.getElementById('recoveryHint').textContent =
+      recovery.score >= 80 ? 'go heavy' :
+      recovery.score >= 60 ? 'normal session' :
+      recovery.score >= 40 ? 'reduce volume 20%' : 'rest day recommended';
+    const recProg = document.getElementById('recoveryProgress');
+    recProg.style.width = recovery.score + '%';
+    recProg.classList.remove('warn','bad');
+    if (recovery.score < 40) recProg.classList.add('bad');
+    else if (recovery.score < 70) recProg.classList.add('warn');
+    document.getElementById('recoverySleep').textContent = recovery.sleep + 'h';
+    document.getElementById('recoveryOverlap').textContent =
+      recovery.overlap > 0 ? `OVERLAP WITH YESTERDAY: ${recovery.overlap}` : 'NO MUSCLE OVERLAP';
 
     renderSuggestions(m.cal, m.prot, w, doneEx, totalEx, trend, m.mealCount);
   }
@@ -1993,20 +2297,42 @@ const App = (() => {
 
     document.getElementById('exerciseList').innerHTML = allExercises.map(ex => {
       const done = todayEx.find(t => t.exerciseId === ex.id && t.done === 'YES');
+      const todayRecord = todayEx.find(t => t.exerciseId === ex.id);
       const demoShown = state.expandedDemo === ex.id;
+      const logShown = state.expandedExLog === ex.id;
+      const last = getLastExerciseSession(ex.id);
+      const target = computeProgressionTarget(ex, last);
+      const currentWeight = (todayRecord && Number(todayRecord.weight)) || target.suggestedWeight;
+      const currentSets = (todayRecord && Number(todayRecord.sets)) || ex.sets;
+      const currentReps = (todayRecord && todayRecord.reps) || (typeof ex.reps === 'string' ? ex.reps.split('-')[0] : ex.reps);
+      const isPR = last && Number(currentWeight) > Number(last.weight || 0);
+
       return `
         <div class="exercise">
-          <button class="ex-check ${done?'done':''}" onclick="App.toggleExercise('${ex.id}', '${escapeAttr(ex.name)}', '${ex.sets}', '${ex.reps}', ${ex.custom})">
+          <button class="ex-check ${done?'done':''}" onclick="App.toggleExercise('${ex.id}', '${escapeAttr(ex.name)}', ${ex.sets}, '${ex.reps}', ${ex.custom})">
             ${done?'✓':''}
           </button>
           <div class="ex-body">
-            <div class="ex-name ${done?'done':''}">${escapeHTML(ex.name)}</div>
+            <div class="ex-name ${done?'done':''}">${escapeHTML(ex.name)} ${isPR && done ? '<span class="pr-badge">PR</span>' : ''}</div>
             <div class="ex-meta">
               <span class="sets">${ex.sets} × ${ex.reps}</span>
               ${ex.rest ? `<span>REST ${ex.rest}</span>` : ''}
-              ${ex.custom ? '<span style="color:#fbbf24">CUSTOM</span>' : ''}
+              ${ex.tempo && ex.tempo !== '-' ? `<span>TEMPO ${ex.tempo}</span>` : ''}
+              ${ex.warmup ? `<span>+${ex.warmup} WARM-UP</span>` : ''}
+              ${ex.intensity ? `<span style="color:#d97706;">⚡ ${escapeHTML(ex.intensity)}</span>` : ''}
+              ${ex.custom ? '<span style="color:#d97706">CUSTOM</span>' : ''}
             </div>
+            ${last ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:.5px;margin-top:4px;">
+              LAST: <strong style="color:var(--accent);">${last.weight}kg × ${last.reps} (${last.sets} sets)</strong>
+              · ${target.tip}
+            </div>` : (ex.startWeight ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:.5px;margin-top:4px;">
+              SUGGESTED START: <strong style="color:var(--accent);">${ex.startWeight}kg × ${typeof ex.reps === 'string' ? ex.reps.split('-')[0] : ex.reps}</strong>
+            </div>` : '')}
             <div class="ex-actions">
+              <button class="ex-action" onclick="App.toggleExLog('${ex.id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                ${logShown?'CLOSE':'LOG'}
+              </button>
               <button class="ex-action" onclick="App.toggleDemo('${ex.id}')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z"/></svg>
                 ${demoShown?'HIDE':'DEMO'}
@@ -2015,6 +2341,26 @@ const App = (() => {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="3"/><path d="M10 10l5 3-5 3v-6z" fill="currentColor"/></svg>
                 VIDEO
               </a>` : ''}
+            </div>
+            <div class="ex-log-section ${logShown?'show':''}">
+              <div class="ex-log-row header">
+                <span></span>
+                <span>WEIGHT (KG)</span>
+                <span>REPS DONE</span>
+                <span></span>
+              </div>
+              <div class="ex-log-row">
+                <div class="set-num ${done?'done':''}">${currentSets}×</div>
+                <input type="number" class="kg" id="ex_w_${ex.id}" inputmode="decimal" step="0.5" placeholder="${target.suggestedWeight}" value="${currentWeight || ''}" />
+                <input type="text" id="ex_r_${ex.id}" inputmode="numeric" placeholder="${typeof ex.reps === 'string' ? ex.reps : ex.reps}" value="${currentReps || ''}" />
+                <button class="ex-log-tick ${done?'done':''}" onclick="App.saveExerciseLog('${ex.id}', '${escapeAttr(ex.name)}', ${ex.custom})">
+                  ${done?'✓':'✓'}
+                </button>
+              </div>
+              <div class="ex-log-meta">
+                <span class="last-session">${last ? `Prev: ${last.weight}kg × ${last.reps}` : 'No history yet'}</span>
+                <span class="progress-target">${target.label}</span>
+              </div>
             </div>
             <div class="ex-demo ${demoShown?'show':''}">
               <div class="demo-label">FORM REFERENCE</div>
@@ -2083,18 +2429,80 @@ const App = (() => {
     const today = todayStr();
     const existing = state.exercises.find(e => e.date === today && e.exerciseId === id);
     const newDone = !(existing && existing.done === 'YES');
-    if (existing) existing.done = newDone ? 'YES' : 'NO';
-    else state.exercises.push({
-      date: today, exerciseId: id, exerciseName: name, sets, reps,
-      done: newDone ? 'YES' : 'NO', custom: isCustom ? 'YES' : 'NO'
-    });
+    // Preserve weight/sets/reps if already logged via set logger
+    const weight = existing ? Number(existing.weight) || 0 : 0;
+    const actualSets = existing ? (Number(existing.sets) || sets) : sets;
+    const actualReps = existing ? (existing.reps || reps) : reps;
+
+    if (existing) {
+      existing.done = newDone ? 'YES' : 'NO';
+    } else {
+      state.exercises.push({
+        date: today, exerciseId: id, exerciseName: name,
+        sets: actualSets, reps: actualReps, weight,
+        done: newDone ? 'YES' : 'NO', custom: isCustom ? 'YES' : 'NO'
+      });
+    }
     if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
     saveCache();
     renderTrack();
     renderHome();
     try {
-      await api('logExercise', { date: today, exerciseId: id, exerciseName: name, sets, reps, done: newDone, custom: isCustom });
+      await api('logExercise', {
+        date: today, exerciseId: id, exerciseName: name,
+        sets: actualSets, reps: actualReps, weight,
+        done: newDone, custom: isCustom
+      });
       showUpdateBanner(newDone ? 'EXERCISE LOGGED' : 'UPDATED');
+    } catch(e) { toast('Saved offline', 'warn'); }
+  }
+
+  function toggleExLog(id) {
+    state.expandedExLog = state.expandedExLog === id ? null : id;
+    renderTrack();
+  }
+
+  async function saveExerciseLog(id, name, isCustom) {
+    const today = todayStr();
+    const wInput = document.getElementById('ex_w_' + id);
+    const rInput = document.getElementById('ex_r_' + id);
+    const weight = parseFloat(wInput.value) || 0;
+    const reps = rInput.value.trim() || '';
+
+    if (!weight && !reps) { toast('Enter weight or reps', 'bad'); return; }
+
+    const existing = state.exercises.find(e => e.date === today && e.exerciseId === id);
+    const planEx = findExerciseInPlans(id);
+    const sets = (existing && existing.sets) || (planEx && planEx.sets) || 3;
+
+    if (existing) {
+      existing.weight = weight;
+      existing.reps = reps;
+      existing.sets = sets;
+      existing.done = 'YES';
+    } else {
+      state.exercises.push({
+        date: today, exerciseId: id, exerciseName: name,
+        sets, reps, weight, done: 'YES', custom: isCustom ? 'YES' : 'NO'
+      });
+    }
+
+    // Detect PR
+    const last = getLastExerciseSession(id);
+    const isPR = last && weight > Number(last.weight || 0);
+
+    if (navigator.vibrate) navigator.vibrate(isPR ? [10,30,10,30,10] : 12);
+    saveCache();
+    state.expandedExLog = null; // close logger after save
+    renderTrack();
+    renderHome();
+    try {
+      await api('logExercise', {
+        date: today, exerciseId: id, exerciseName: name,
+        sets, reps, weight, done: true, custom: isCustom
+      });
+      showUpdateBanner(isPR ? '🔥 PR LOGGED!' : 'SET LOGGED');
+      if (isPR) toast(`PR! ${weight}kg × ${reps} reps`, 'good');
     } catch(e) { toast('Saved offline', 'warn'); }
   }
 
@@ -2684,6 +3092,27 @@ const App = (() => {
     const streak = computeStreak();
     const p = state.profile;
 
+    // Adaptive TDEE — if we have enough data
+    const tdee = computeAdaptiveTDEE();
+    if (tdee && tdee.shouldAdjust) {
+      const dir = tdee.adjustment > 0 ? 'increase' : 'decrease';
+      insights.push({
+        type: tdee.adjustment > 0 ? 'warn' : 'good',
+        icon: tdee.adjustment > 0 ? '⬆' : '⬇',
+        text: `Your real maintenance is ~${tdee.tdee} kcal. To hit ${p.weeklyGainTarget}kg/wk gain, ${dir} target by ${Math.abs(tdee.adjustment)} kcal → ${tdee.newTarget} kcal.`,
+        sub:`ADAPTIVE TDEE · ${tdee.weightChangePerWeek}KG/WK ACTUAL`,
+        action: 'applyTDEE',
+        actionData: tdee.newTarget
+      });
+    } else if (tdee) {
+      insights.push({
+        type: 'good',
+        icon: '🎯',
+        text: `Real TDEE: ${tdee.tdee} kcal. Current target ${tdee.currentTarget} is well-calibrated for your gain rate.`,
+        sub: 'TDEE LOCKED IN'
+      });
+    }
+
     // Weight projection
     if (trend.weeks >= 1 && trend.perWeek > 0) {
       const w = state.profile.currentWeight;
@@ -2738,7 +3167,11 @@ const App = (() => {
     document.getElementById('statsInsights').innerHTML = insights.map(s => `
       <div class="suggestion">
         <div class="sug-icon ${s.type}">${s.icon}</div>
-        <div class="sug-text">${s.text}<small>${s.sub}</small></div>
+        <div class="sug-text">
+          ${s.text}
+          <small>${s.sub}</small>
+          ${s.action === 'applyTDEE' ? `<button class="ex-action" style="margin-top:6px;background:var(--accent);color:#fff;" onclick="App.applyTDEE(${s.actionData})">Apply ${s.actionData} kcal target</button>` : ''}
+        </div>
       </div>`).join('');
   }
 
@@ -2891,6 +3324,16 @@ const App = (() => {
     } catch(e) { toast('Failed: ' + e.message, 'bad'); }
   }
 
+  async function applyTDEE(newTarget) {
+    state.profile.targetCalories = newTarget;
+    saveCache();
+    showUpdateBanner('TARGET UPDATED');
+    toast(`Calorie target now ${newTarget} kcal`, 'good');
+    renderAll();
+    try { await api('updateProfile', { targetCalories: newTarget }); }
+    catch(e){}
+  }
+
   function saveApiUrl() {
     const url = document.getElementById('setupUrl').value.trim();
     if (!url || !url.includes('script.google.com')) { toast('Invalid URL', 'bad'); return; }
@@ -2944,7 +3387,8 @@ const App = (() => {
   return { init, go, refresh, saveTrack, saveProfile, saveApiUrl, resetApiUrl,
     installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay,
     pickPlan, togglePlanCard, confirmPlan, openPlanSwitcher, applyPlanSwitch,
-    acceptRecommendation, dismissRecommendation, tryLockedMeal };
+    acceptRecommendation, dismissRecommendation, tryLockedMeal,
+    toggleExLog, saveExerciseLog, applyTDEE };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
