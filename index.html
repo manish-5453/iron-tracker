@@ -455,6 +455,52 @@ textarea{resize:vertical;min-height:80px;}
   font-size:16px;cursor:pointer;border:0;flex-shrink:0;}
 .extra-food-del:active{background:rgba(220,38,38,.10);color:var(--bad);}
 
+/* === Water tracker === */
+.water-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:space-between;
+  margin-top:10px;}
+.water-cup{width:32px;height:42px;border-radius:6px 6px 12px 12px;
+  border:2px solid var(--line);background:var(--surface-2);cursor:pointer;
+  position:relative;overflow:hidden;transition:all .15s;flex-shrink:0;}
+.water-cup:active{transform:scale(.92);}
+.water-cup.filled{background:linear-gradient(180deg, transparent 0%, transparent 20%, #3b82f6 20%, #2563eb 100%);
+  border-color:#2563eb;}
+.water-cup.filled::after{content:"💧";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:14px;}
+.water-summary{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;}
+.water-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);letter-spacing:1px;line-height:1;}
+.water-target{color:var(--text-3);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;}
+
+/* === Measurements card === */
+.measure-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.measure-item{padding:10px 12px;background:var(--surface-2);border-radius:10px;
+  border:1px solid var(--line-soft);}
+.measure-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
+  letter-spacing:1px;text-transform:uppercase;}
+.measure-value{display:flex;align-items:baseline;gap:4px;margin-top:2px;}
+.measure-num{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);letter-spacing:.5px;line-height:1;}
+.measure-unit{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);}
+.measure-delta{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.5px;
+  margin-top:3px;display:block;}
+.measure-delta.up{color:var(--accent);}
+.measure-delta.down{color:var(--warn);}
+.measure-delta.flat{color:var(--text-3);}
+
+/* Measurement entry form */
+.measure-form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.measure-form-row .form-group{margin:0;}
+
+/* Sleep card */
+.sleep-card .stat-row .stat-num{color:var(--accent);}
+.sleep-bar{display:flex;gap:3px;margin-top:8px;}
+.sleep-day{flex:1;height:36px;border-radius:4px;background:var(--surface-3);
+  position:relative;display:flex;align-items:flex-end;justify-content:center;font-size:9px;
+  font-family:'JetBrains Mono',monospace;color:var(--text-3);padding-bottom:2px;}
+.sleep-day .fill{position:absolute;left:0;right:0;bottom:0;border-radius:4px;
+  background:linear-gradient(180deg, var(--accent) 0%, #16a34a 100%);transition:height .4s;}
+.sleep-day .fill.low{background:linear-gradient(180deg, #d97706 0%, #f59e0b 100%);}
+.sleep-day .fill.bad{background:linear-gradient(180deg, #dc2626 0%, #ef4444 100%);}
+.sleep-day .lbl{position:relative;z-index:1;}
+
 /* === Plan selection cards === */
 .plan-card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;
   padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;position:relative;}
@@ -635,6 +681,37 @@ textarea{resize:vertical;min-height:80px;}
         <span class="recovery-label">SLEEP <span id="recoverySleep">—</span></span>
         <span class="recovery-label" id="recoveryOverlap">MUSCLE OVERLAP —</span>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Water Intake</span>
+        <span class="badge" id="waterBadge">0/8</span>
+      </div>
+      <div class="water-summary">
+        <span><span class="water-num" id="waterNum">0</span><span class="water-target"> / 8 GLASSES · ~2L</span></span>
+        <span class="water-target" id="waterAvg">—</span>
+      </div>
+      <div class="water-row" id="waterCups"></div>
+      <p style="font-size:11px;color:var(--text-3);margin:8px 0 0;line-height:1.4;">
+        Tap a cup to log a glass (~250ml). 8 glasses ≈ 2L target for muscle gain.
+      </p>
+    </div>
+
+    <div class="card sleep-card">
+      <div class="card-title">
+        <span>Sleep · Last 7 Days</span>
+        <span class="badge" id="sleepBadge">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-num" id="sleepNum">—</span>
+        <span class="stat-unit">H AVG</span>
+        <span class="stat-target" id="sleepHint">—</span>
+      </div>
+      <div class="sleep-bar" id="sleepBar"></div>
+      <p style="font-size:11px;color:var(--text-3);margin:8px 0 0;line-height:1.4;">
+        Sleep is when muscle is built. Aim for 7.5–8.5h. Log on Track tab daily.
+      </p>
     </div>
 
     <div class="card">
@@ -893,6 +970,51 @@ textarea{resize:vertical;min-height:80px;}
         <span class="value"><span id="p_targetProtein">110</span><small>G</small></span></div>
       <div class="profile-row"><span class="label">Weekly Gain</span>
         <span class="value"><span id="p_weeklyGainTarget">0.4</span><small>KG/WK</small></span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Body Measurements</span>
+        <span class="badge" id="measureBadge">—</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.5;">
+        Measure weekly (same time, same conditions). Waist + arms = honesty meter for muscle vs fat gain.
+      </p>
+      <div id="measureCurrentGrid" class="measure-grid"></div>
+      <button class="btn btn-secondary" onclick="App.openMeasureForm()" style="margin-top:12px;" id="measureToggleBtn">
+        + Add Measurements
+      </button>
+
+      <div id="measureForm" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);">
+        <p style="font-size:11px;color:var(--text-3);margin:0 0 10px;">All in cm. Leave blank what you don't measure.</p>
+        <div class="measure-form-row">
+          <div class="form-group"><label>Chest</label>
+            <input type="number" id="m_chest" step="0.5" inputmode="decimal" placeholder="cm"></div>
+          <div class="form-group"><label>Waist</label>
+            <input type="number" id="m_waist" step="0.5" inputmode="decimal" placeholder="cm"></div>
+        </div>
+        <div class="measure-form-row">
+          <div class="form-group"><label>Hips</label>
+            <input type="number" id="m_hips" step="0.5" inputmode="decimal" placeholder="cm"></div>
+          <div class="form-group"><label>Neck</label>
+            <input type="number" id="m_neck" step="0.5" inputmode="decimal" placeholder="cm"></div>
+        </div>
+        <div class="measure-form-row">
+          <div class="form-group"><label>Left Bicep</label>
+            <input type="number" id="m_leftBicep" step="0.5" inputmode="decimal" placeholder="cm"></div>
+          <div class="form-group"><label>Right Bicep</label>
+            <input type="number" id="m_rightBicep" step="0.5" inputmode="decimal" placeholder="cm"></div>
+        </div>
+        <div class="measure-form-row">
+          <div class="form-group"><label>Left Thigh</label>
+            <input type="number" id="m_leftThigh" step="0.5" inputmode="decimal" placeholder="cm"></div>
+          <div class="form-group"><label>Right Thigh</label>
+            <input type="number" id="m_rightThigh" step="0.5" inputmode="decimal" placeholder="cm"></div>
+        </div>
+        <button class="btn btn-primary" onclick="App.saveMeasurement()">Save Today's Measurements</button>
+      </div>
+
+      <div id="measureHistory" style="margin-top:14px;"></div>
     </div>
 
     <div class="card">
@@ -1701,6 +1823,570 @@ const WORKOUT_PLANS = {
       5: PULL_DAY,         // Fri — Pull
       6: VOLLEYBALL_DAY
     }
+  },
+  arnold_split_6day: {
+    id: 'arnold_split_6day',
+    name: 'Arnold Split',
+    short: 'Chest+Back, Shoulders+Arms, Legs',
+    level: 'Intermediate-Advanced',
+    daysPerWeek: 6,
+    duration: '60-75 min',
+    weeklySetsPerMuscle: '16-20 (2x freq)',
+    description: 'Schwarzenegger\'s classic. Chest+Back day uses antagonist supersets for insane pump. Each muscle hit 2x/week with high volume per session.',
+    bestFor: 'Lifters who want max volume + already recovered well from PPL.',
+    pros: ['Antagonist supersets = great pump', '2x weekly frequency', 'Old-school proven results'],
+    cons: ['Very demanding', 'Requires lots of equipment', 'Long sessions'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Chest + Back A', sub:'Antagonist supersets · 18 sets',
+           tags:['Chest','Back'],
+           rationale:'Chest and back oppose each other — supersetting them = double pump per minute, blood flow battle.',
+           exercises: [
+             { id:'ar1', name:'Bench Press', sets:4, reps:'6-8', rest:'2 min', tempo:'2-1-1', warmup:2, startWeight:30,
+               muscles:[{name:'Chest',sets:4},{name:'Triceps',sets:1}],
+               tip:'Heavy compound to start. Pause at chest, drive feet hard.', demo:'bench' },
+             { id:'ar2', name:'Pull-ups (or Lat Pulldown)', sets:4, reps:'8-10', rest:'2 min', tempo:'2-1-2', warmup:1, startWeight:0,
+               muscles:[{name:'Lats',sets:4},{name:'Biceps',sets:1.5}],
+               tip:'Superset with bench: bench → 90s rest → pull-ups → 90s rest. Repeat.', demo:'pullup',
+               intensity:'Superset with Bench' },
+             { id:'ar3', name:'Incline DB Press', sets:3, reps:'8-10', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:10,
+               muscles:[{name:'Upper Chest',sets:3}], tip:'30° angle. Upper chest specialization.', demo:'press' },
+             { id:'ar4', name:'Barbell Row', sets:3, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:25,
+               muscles:[{name:'Mid Back',sets:3}], tip:'Pull to lower chest. Squeeze at top.', demo:'row',
+               intensity:'Superset with Incline DB Press' },
+             { id:'ar5', name:'Cable Fly', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:15,
+               muscles:[{name:'Chest',sets:3}], tip:'Stretch hard, squeeze hard. Inner chest peak.', demo:'press' },
+             { id:'ar6', name:'Seated Cable Row', sets:3, reps:'10-12', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:20,
+               muscles:[{name:'Mid Back',sets:3}], tip:'Constant tension. Squeeze blades.', demo:'row',
+               intensity:'Superset with Cable Fly' }
+           ]},
+      2: { name:'Shoulders + Arms', sub:'Delts + Biceps + Triceps · 20 sets',
+           tags:['Shoulders','Biceps','Triceps'],
+           rationale:'High-volume arm + delt day. Pump-focused after compound press.',
+           exercises: [
+             { id:'ar7', name:'Standing Overhead Press', sets:4, reps:'6-8', rest:'2 min', tempo:'2-0-1', warmup:2, startWeight:20,
+               muscles:[{name:'Front Delts',sets:4}], tip:'Standing OHP, glutes squeezed.', demo:'press' },
+             { id:'ar8', name:'Cable Lateral Raise', sets:4, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:5,
+               muscles:[{name:'Side Delts',sets:4}], tip:'Cross-body cable. Drop set last.', demo:'raise',
+               intensity:'Drop set on final set' },
+             { id:'ar9', name:'Reverse Pec Deck', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:15,
+               muscles:[{name:'Rear Delts',sets:3}], tip:'Push through walls. Traps down.', demo:'raise' },
+             { id:'ar10', name:'Barbell Curl + Skull Crusher SUPERSET', sets:4, reps:'10/10', rest:'75s', tempo:'2-0-1', warmup:0, startWeight:15,
+               muscles:[{name:'Biceps',sets:4},{name:'Triceps',sets:4}],
+               tip:'Antagonist superset. No rest between curl and skull. 75s rest after pair.', demo:'curl',
+               intensity:'Antagonist superset' },
+             { id:'ar11', name:'Hammer Curl + Cable Pushdown SUPERSET', sets:3, reps:'12/12', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:8,
+               muscles:[{name:'Biceps',sets:3},{name:'Triceps',sets:3}],
+               tip:'Brachialis + tricep pump finisher.', demo:'curl',
+               intensity:'Antagonist superset' }
+           ]},
+      3: LEG_DAY,            // Wed — Legs
+      4: { name:'Chest + Back B', sub:'Volume focus · 18 sets',
+           tags:['Chest','Back'],
+           rationale:'Second chest+back day of week. Different exercise selection for variety.',
+           exercises: [
+             { id:'ar12', name:'Incline Barbell Press', sets:4, reps:'6-8', rest:'2 min', tempo:'2-1-1', warmup:2, startWeight:25,
+               muscles:[{name:'Upper Chest',sets:4}], tip:'30° incline. Upper chest priority.', demo:'bench' },
+             { id:'ar13', name:'T-Bar Row (chest-supported)', sets:4, reps:'8-10', rest:'90s', tempo:'2-1-2', warmup:1, startWeight:20,
+               muscles:[{name:'Mid Back',sets:4}], tip:'Chest-supported = pure back focus.', demo:'row',
+               intensity:'Superset with Incline Press' },
+             { id:'ar14', name:'Decline Press', sets:3, reps:'8-10', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:25,
+               muscles:[{name:'Lower Chest',sets:3}], tip:'Lower chest emphasis.', demo:'bench' },
+             { id:'ar15', name:'One-Arm DB Row', sets:3, reps:'10-12', rest:'60s', tempo:'2-1-2', warmup:0, startWeight:12,
+               muscles:[{name:'Lats',sets:3}], tip:'Pull from low to hip. Long stretch at bottom.', demo:'row',
+               intensity:'Superset with Decline Press' },
+             { id:'ar16', name:'Push-up Burnout', sets:2, reps:'AMRAP', rest:'60s', tempo:'1-0-1', warmup:0, startWeight:0,
+               muscles:[{name:'Chest',sets:2}], tip:'To failure. End with a brutal pump.', demo:'plank' }
+           ]},
+      5: SHOULDER_DAY,       // Fri — Shoulders + arms (reuse)
+      6: VOLLEYBALL_DAY
+    }
+  },
+  strength_5x5: {
+    id: 'strength_5x5',
+    name: '5×5 Strength',
+    short: 'Heavy compounds, simple progression',
+    level: 'Beginner-Intermediate',
+    daysPerWeek: 3,
+    duration: '45-60 min',
+    weeklySetsPerMuscle: '10-15 (compound only)',
+    description: 'Stronglifts-style 3-day. Squat + Bench + Row → Squat + OHP + Deadlift, alternating. Add 2.5kg every session. Brutally simple, brutally effective for raw strength + mass.',
+    bestFor: 'Beginners who want strength foundation. Or anyone hitting hypertrophy plateau and needing strength reset.',
+    pros: ['Dead simple', 'Fast strength gains', 'Only 5 lifts to master', 'Only 3 days/week'],
+    cons: ['Limited muscle isolation', 'Can be boring', 'Needs barbell + power rack'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Workout A — Squat focus', sub:'Squat + Bench + Row · 15 sets',
+           tags:['Strength','Compound','Full Body'],
+           rationale:'Heaviest compound = squat. Bench + row balance push/pull. Add 2.5kg every session you hit all reps.',
+           exercises: [
+             { id:'sa1', name:'Barbell Back Squat', sets:5, reps:'5', rest:'3 min', tempo:'3-1-1', warmup:3, startWeight:30,
+               muscles:[{name:'Quads',sets:5},{name:'Glutes',sets:3},{name:'Hamstrings',sets:1}],
+               tip:'5 sets of 5 at same weight. All sets complete = +2.5kg next time.', demo:'squat' },
+             { id:'sa2', name:'Barbell Bench Press', sets:5, reps:'5', rest:'3 min', tempo:'2-1-1', warmup:2, startWeight:30,
+               muscles:[{name:'Chest',sets:5},{name:'Triceps',sets:1.5}],
+               tip:'5×5 same weight. Pause at chest. Drive feet hard.', demo:'bench' },
+             { id:'sa3', name:'Barbell Row (Pendlay)', sets:5, reps:'5', rest:'2-3 min', tempo:'2-0-1', warmup:1, startWeight:25,
+               muscles:[{name:'Mid Back',sets:5},{name:'Lats',sets:2}],
+               tip:'Bar from floor every rep. Strict torso angle.', demo:'row' }
+           ]},
+      2: REST_DAY,
+      3: { name:'Workout B — Deadlift focus', sub:'Squat + OHP + Deadlift · 11 sets',
+           tags:['Strength','Compound','Full Body'],
+           rationale:'Deadlift only 1×5 (CNS demand high). OHP for shoulders. Squat repeated for frequency.',
+           exercises: [
+             { id:'sb1', name:'Barbell Back Squat', sets:5, reps:'5', rest:'3 min', tempo:'3-1-1', warmup:3, startWeight:30,
+               muscles:[{name:'Quads',sets:5},{name:'Glutes',sets:3}],
+               tip:'Same 5×5. Squat 3x/week = fastest learning curve.', demo:'squat' },
+             { id:'sb2', name:'Standing Overhead Press', sets:5, reps:'5', rest:'3 min', tempo:'2-0-1', warmup:2, startWeight:20,
+               muscles:[{name:'Front Delts',sets:5},{name:'Triceps',sets:1.5}],
+               tip:'Hardest progression. +2.5kg may be too much — use 1.25kg micro-plates.', demo:'press' },
+             { id:'sb3', name:'Conventional Deadlift', sets:1, reps:'5', rest:'3 min', tempo:'1-0-1', warmup:3, startWeight:50,
+               muscles:[{name:'Hamstrings',sets:0.5},{name:'Glutes',sets:1},{name:'Lower Back',sets:1},{name:'Mid Back',sets:0.5}],
+               tip:'ONE work set of 5. Deadlifts fry the CNS — more is worse. +5kg every session.', demo:'deadlift' }
+           ]},
+      4: REST_DAY,
+      5: { name:'Workout A — Squat focus', sub:'Squat + Bench + Row · 15 sets',
+           tags:['Strength','Compound','Full Body'],
+           rationale:'Same as Monday but different weights (you progressed!).',
+           exercises: [
+             { id:'sa1', name:'Barbell Back Squat', sets:5, reps:'5', rest:'3 min', tempo:'3-1-1', warmup:3, startWeight:30,
+               muscles:[{name:'Quads',sets:5},{name:'Glutes',sets:3},{name:'Hamstrings',sets:1}],
+               tip:'+2.5kg from Monday if all reps hit.', demo:'squat' },
+             { id:'sa2', name:'Barbell Bench Press', sets:5, reps:'5', rest:'3 min', tempo:'2-1-1', warmup:2, startWeight:30,
+               muscles:[{name:'Chest',sets:5},{name:'Triceps',sets:1.5}],
+               tip:'+2.5kg from last bench session.', demo:'bench' },
+             { id:'sa3', name:'Barbell Row', sets:5, reps:'5', rest:'2-3 min', tempo:'2-0-1', warmup:1, startWeight:25,
+               muscles:[{name:'Mid Back',sets:5},{name:'Lats',sets:2}],
+               tip:'+2.5kg from last row session.', demo:'row' }
+           ]},
+      6: VOLLEYBALL_DAY
+    }
+  },
+  beginner_mass_3day: {
+    id: 'beginner_mass_3day',
+    name: 'Beginner Mass Builder',
+    short: 'Compounds + light isolation',
+    level: 'Beginner',
+    daysPerWeek: 3,
+    duration: '50-60 min',
+    weeklySetsPerMuscle: '10-13',
+    description: 'Designed for absolute beginners. Compounds + 1 isolation per body part. Easier than 5×5 (lower intensity), more growth-oriented than full body.',
+    bestFor: 'First 8 weeks of training. Or returning after a long break. Builds the foundation.',
+    pros: ['Easy on CNS', '3-day commitment', 'Teaches all compound patterns', 'Mass-focused (not just strength)'],
+    cons: ['Slower strength gains than 5×5', 'Outgrows after 2-3 months'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Day A — Push focus + Squat', sub:'Compounds + chest accessory · 13 sets',
+           tags:['Push','Quads','Chest'],
+           rationale:'Squat first while CNS fresh. Bench, OHP. One isolation each at end.',
+           exercises: [
+             { id:'bm1', name:'Barbell Squat', sets:3, reps:'8-10', rest:'2 min', tempo:'3-1-1', warmup:2, startWeight:25,
+               muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:2}],
+               tip:'Higher reps (8-10) than 5×5. Easier to learn, easier to recover.', demo:'squat' },
+             { id:'bm2', name:'Bench Press (or DB Bench)', sets:3, reps:'8-10', rest:'2 min', tempo:'2-1-1', warmup:1, startWeight:20,
+               muscles:[{name:'Chest',sets:3},{name:'Triceps',sets:1}],
+               tip:'DB OK if barbell intimidates. Same effect.', demo:'bench' },
+             { id:'bm3', name:'Standing Overhead Press', sets:3, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:15,
+               muscles:[{name:'Front Delts',sets:3},{name:'Triceps',sets:1}],
+               tip:'Light weight. Don\'t arch back excessively.', demo:'press' },
+             { id:'bm4', name:'Tricep Pushdown', sets:2, reps:'12-15', rest:'45s', tempo:'2-0-1', warmup:0, startWeight:12,
+               muscles:[{name:'Triceps',sets:2}], tip:'Easy isolation. Higher reps for connective tissue.', demo:'pushdown' },
+             { id:'bm5', name:'Plank', sets:2, reps:'30-45s', rest:'30s', tempo:'hold', warmup:0, startWeight:0,
+               muscles:[{name:'Core',sets:2}], tip:'Brace abs tight, no sagging hips.', demo:'plank' }
+           ]},
+      2: REST_DAY,
+      3: { name:'Day B — Pull focus + Deadlift', sub:'Back-dominant + biceps · 12 sets',
+           tags:['Pull','Back','Biceps'],
+           rationale:'Deadlift is heaviest pull, sets pace for back day. Pull-ups + row build width and thickness.',
+           exercises: [
+             { id:'bm6', name:'Romanian Deadlift', sets:3, reps:'8-10', rest:'2 min', tempo:'3-0-1', warmup:2, startWeight:25,
+               muscles:[{name:'Hamstrings',sets:3},{name:'Glutes',sets:2}],
+               tip:'RDL safer than conventional for beginners. Hinge hips, slight knee bend.', demo:'deadlift' },
+             { id:'bm7', name:'Lat Pulldown (or assisted pull-ups)', sets:3, reps:'10-12', rest:'90s', tempo:'2-1-2', warmup:1, startWeight:25,
+               muscles:[{name:'Lats',sets:3},{name:'Biceps',sets:1}],
+               tip:'If you can\'t do unassisted pull-ups, lat pulldown is identical mechanically.', demo:'pullup' },
+             { id:'bm8', name:'DB Row (one arm)', sets:3, reps:'10-12', rest:'60s', tempo:'2-1-2', warmup:0, startWeight:10,
+               muscles:[{name:'Mid Back',sets:3},{name:'Lats',sets:1}],
+               tip:'Pull from low to hip. Long stretch at bottom.', demo:'row' },
+             { id:'bm9', name:'EZ-Bar Curl', sets:2, reps:'10-12', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:10,
+               muscles:[{name:'Biceps',sets:2}], tip:'Strict form. No swinging.', demo:'curl' },
+             { id:'bm10', name:'Face Pulls', sets:2, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:10,
+               muscles:[{name:'Rear Delts',sets:2}], tip:'Shoulder health insurance.', demo:'facepull' }
+           ]},
+      4: REST_DAY,
+      5: { name:'Day C — Full Body Light', sub:'Lighter compounds, more reps · 11 sets',
+           tags:['Full Body','Volume'],
+           rationale:'Day C complements A and B with higher-rep, lighter approach for volume + recovery balance.',
+           exercises: [
+             { id:'bm11', name:'Goblet Squat', sets:3, reps:'12-15', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:10,
+               muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:1.5}],
+               tip:'Hold DB at chest. Higher reps build endurance + form.', demo:'squat' },
+             { id:'bm12', name:'Push-ups (or DB Bench Light)', sets:3, reps:'AMRAP', rest:'90s', tempo:'2-0-1', warmup:0, startWeight:0,
+               muscles:[{name:'Chest',sets:3},{name:'Triceps',sets:1}],
+               tip:'Bodyweight or light DB. Just get reps in.', demo:'plank' },
+             { id:'bm13', name:'Lat Pulldown (light)', sets:3, reps:'12-15', rest:'60s', tempo:'2-1-2', warmup:0, startWeight:20,
+               muscles:[{name:'Lats',sets:3}], tip:'Lighter than Day B. Pump-focused.', demo:'pullup' },
+             { id:'bm14', name:'DB Lateral Raise', sets:2, reps:'15-20', rest:'45s', tempo:'2-0-1', warmup:0, startWeight:3,
+               muscles:[{name:'Side Delts',sets:2}], tip:'Light. High reps. Burn focus.', demo:'raise' }
+           ]},
+      6: VOLLEYBALL_DAY
+    }
+  },
+  bodyweight_home_4day: {
+    id: 'bodyweight_home_4day',
+    name: 'Home / Bodyweight',
+    short: 'No gym, no equipment',
+    level: 'Beginner-Intermediate',
+    daysPerWeek: 4,
+    duration: '30-45 min',
+    weeklySetsPerMuscle: '10-14',
+    description: 'For when gym is unavailable, traveling, or just starting out. Pure bodyweight + maybe a backpack with books for added resistance.',
+    bestFor: 'No-equipment training. Travel. Building base strength before joining a gym.',
+    pros: ['Zero equipment needed', 'Anywhere, anytime', 'Joint-friendly', 'Mobility built-in'],
+    cons: ['Limited progressive overload', 'Caps out for advanced lifters', 'Need creativity for legs'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Push (Bodyweight)', sub:'Chest + Shoulders + Triceps · 14 sets',
+           tags:['Push','Chest','Bodyweight'],
+           rationale:'Push-up variations cover entire chest. Pike push-ups hit shoulders. Diamond push-ups hit triceps.',
+           exercises: [
+             { id:'bw1', name:'Push-ups (standard)', sets:4, reps:'AMRAP', rest:'90s', tempo:'2-1-1', warmup:1, startWeight:0,
+               muscles:[{name:'Chest',sets:4},{name:'Triceps',sets:1}],
+               tip:'Once you hit 25+ clean reps, progress to decline (feet on chair).', demo:'plank' },
+             { id:'bw2', name:'Decline Push-ups (feet elevated)', sets:3, reps:'8-15', rest:'90s', tempo:'3-1-1', warmup:0, startWeight:0,
+               muscles:[{name:'Upper Chest',sets:3},{name:'Front Delts',sets:1}],
+               tip:'Feet on chair/sofa. Hits upper chest like incline press.', demo:'plank' },
+             { id:'bw3', name:'Pike Push-ups', sets:3, reps:'6-10', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:0,
+               muscles:[{name:'Front Delts',sets:3},{name:'Triceps',sets:1}],
+               tip:'Hands and feet form A-shape. Shoulder-press equivalent.', demo:'press' },
+             { id:'bw4', name:'Diamond Push-ups', sets:2, reps:'AMRAP', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:0,
+               muscles:[{name:'Triceps',sets:2}],
+               tip:'Hands close, thumbs touching. Brutal tricep isolation.', demo:'pushdown' },
+             { id:'bw5', name:'Plank Hold', sets:2, reps:'45-60s', rest:'30s', tempo:'hold', warmup:0, startWeight:0,
+               muscles:[{name:'Core',sets:2}], tip:'Squeeze glutes hard. Brace abs.', demo:'plank' }
+           ]},
+      2: { name:'Pull (Bodyweight)', sub:'Back + Biceps · 12 sets',
+           tags:['Pull','Back','Bodyweight'],
+           rationale:'Pull-ups are the king bodyweight back exercise. Inverted rows hit thickness. Chin-ups for biceps.',
+           exercises: [
+             { id:'bw6', name:'Pull-ups (or band-assisted)', sets:4, reps:'AMRAP', rest:'2 min', tempo:'2-1-2', warmup:1, startWeight:0,
+               muscles:[{name:'Lats',sets:4},{name:'Biceps',sets:1.5}],
+               tip:'No bar? Use a sturdy door frame or strong tree branch. Band assist is fine.', demo:'pullup' },
+             { id:'bw7', name:'Inverted Rows (under table)', sets:3, reps:'10-15', rest:'90s', tempo:'2-1-2', warmup:0, startWeight:0,
+               muscles:[{name:'Mid Back',sets:3},{name:'Biceps',sets:1}],
+               tip:'Lie under sturdy table, grip edge, pull chest to table. Or use rings/TRX.', demo:'row' },
+             { id:'bw8', name:'Chin-ups (palms toward you)', sets:3, reps:'AMRAP', rest:'90s', tempo:'2-1-2', warmup:0, startWeight:0,
+               muscles:[{name:'Biceps',sets:2},{name:'Lats',sets:2}],
+               tip:'Easier than pull-ups, more bicep emphasis.', demo:'pullup' },
+             { id:'bw9', name:'Backpack Bicep Curl (heavy bag)', sets:2, reps:'12-15', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:0,
+               muscles:[{name:'Biceps',sets:2}],
+               tip:'Fill backpack with books. Curl with one or two arms. Improvise!', demo:'curl' }
+           ]},
+      3: REST_DAY,
+      4: { name:'Legs (Bodyweight)', sub:'Quads + Glutes + Calves · 14 sets',
+           tags:['Legs','Bodyweight'],
+           rationale:'Bodyweight leg work has limits but unilateral work + tempo + high reps drives growth.',
+           exercises: [
+             { id:'bw10', name:'Bulgarian Split Squat', sets:4, reps:'10-12/leg', rest:'90s', tempo:'3-1-1', warmup:1, startWeight:0,
+               muscles:[{name:'Quads',sets:2},{name:'Glutes',sets:2.5}],
+               tip:'Back foot on chair. Single-leg = brutal. Add backpack for resistance.', demo:'lunge' },
+             { id:'bw11', name:'Walking Lunges', sets:3, reps:'12/leg', rest:'90s', tempo:'2-0-1', warmup:0, startWeight:0,
+               muscles:[{name:'Quads',sets:1.5},{name:'Glutes',sets:1.5}],
+               tip:'Long step = glutes, short step = quads.', demo:'lunge' },
+             { id:'bw12', name:'Pistol Squat (or assisted)', sets:3, reps:'5-8/leg', rest:'90s', tempo:'3-1-1', warmup:0, startWeight:0,
+               muscles:[{name:'Quads',sets:2},{name:'Glutes',sets:1}],
+               tip:'Hold doorframe for balance if needed. Single-leg squat = strength + balance.', demo:'squat' },
+             { id:'bw13', name:'Single-Leg Calf Raise', sets:3, reps:'15-20', rest:'45s', tempo:'2-2-1', warmup:0, startWeight:0,
+               muscles:[{name:'Calves',sets:3}],
+               tip:'On stairs/edge. Drop heel for stretch, rise on toe.', demo:'calf' },
+             { id:'bw14', name:'Glute Bridge', sets:2, reps:'15-20', rest:'45s', tempo:'2-2-1', warmup:0, startWeight:0,
+               muscles:[{name:'Glutes',sets:2}],
+               tip:'Squeeze glutes hard at top. 2-sec hold.', demo:'plank' }
+           ]},
+      5: { name:'Core + Shoulder Health', sub:'Stability + mobility · 10 sets',
+           tags:['Core','Mobility'],
+           rationale:'Strong core + healthy shoulders = injury-free training. Often skipped, always rewarded.',
+           exercises: [
+             { id:'bw15', name:'Hollow Body Hold', sets:3, reps:'30-45s', rest:'45s', tempo:'hold', warmup:0, startWeight:0,
+               muscles:[{name:'Core',sets:3}],
+               tip:'Lower back pressed into floor. Arms + legs lifted slightly.', demo:'plank' },
+             { id:'bw16', name:'Side Plank', sets:2, reps:'30-45s/side', rest:'30s', tempo:'hold', warmup:0, startWeight:0,
+               muscles:[{name:'Core',sets:2}],
+               tip:'Hips up, body straight line. Obliques fire.', demo:'plank' },
+             { id:'bw17', name:'Y-T-W Raises (lying)', sets:3, reps:'10 each', rest:'60s', tempo:'2-1-2', warmup:0, startWeight:0,
+               muscles:[{name:'Rear Delts',sets:2},{name:'Mid Back',sets:1}],
+               tip:'Lie face down. Lift arms in Y, T, W shapes. Light weights or bodyweight.', demo:'raise' },
+             { id:'bw18', name:'Cobra Stretch + Cat-Cow', sets:2, reps:'10 each', rest:'30s', tempo:'flow', warmup:0, startWeight:0,
+               muscles:[],
+               tip:'Spine mobility. 10 reps slow, controlled.', demo:'stretch' }
+           ]},
+      6: VOLLEYBALL_DAY
+    }
+  },
+  arms_specialization_5day: {
+    id: 'arms_specialization_5day',
+    name: 'Arms Specialization',
+    short: 'Big arms focus, body maintained',
+    level: 'Intermediate',
+    daysPerWeek: 5,
+    duration: '60-75 min',
+    weeklySetsPerMuscle: '24-30 (arms), 8-10 (other)',
+    description: 'For when arms are lagging or you want a 4-6 week arms focus. Hits biceps + triceps 3x/week with high volume while keeping rest of body in maintenance.',
+    bestFor: 'Plateau breakers. Run 4-6 weeks max, then return to balanced plan.',
+    pros: ['Crazy arm growth', 'Rest of body maintained, not neglected', 'Time-efficient'],
+    cons: ['Imbalanced if run too long', 'Not for absolute beginners', 'Only 4-6 week phases'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Arms Day 1 (heavy)', sub:'Compound bicep/tricep · 18 sets',
+           tags:['Biceps','Triceps','Arms'],
+           rationale:'Heaviest arm day. Compound movements first while CNS fresh.',
+           exercises: [
+             { id:'as1', name:'Close-Grip Bench Press', sets:4, reps:'6-8', rest:'2 min', tempo:'2-1-1', warmup:2, startWeight:25,
+               muscles:[{name:'Triceps',sets:4},{name:'Chest',sets:1}],
+               tip:'Hands shoulder-width. Heaviest tricep mass-builder.', demo:'bench' },
+             { id:'as2', name:'EZ-Bar Curl', sets:4, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:15,
+               muscles:[{name:'Biceps',sets:4}],
+               tip:'Strict form. Easier on wrists than straight bar.', demo:'curl' },
+             { id:'as3', name:'Skull Crushers', sets:3, reps:'10-12', rest:'60s', tempo:'3-0-1', warmup:0, startWeight:15,
+               muscles:[{name:'Triceps (long head)',sets:3}],
+               tip:'Lower behind head. Long head = mass.', demo:'pushdown' },
+             { id:'as4', name:'Incline DB Curl', sets:3, reps:'10-12', rest:'60s', tempo:'3-0-1', warmup:0, startWeight:6,
+               muscles:[{name:'Biceps (long head)',sets:3}],
+               tip:'Stretched position curl. Long head focus.', demo:'curl' },
+             { id:'as5', name:'Tricep Pushdown', sets:2, reps:'12-15', rest:'45s', tempo:'2-0-1', warmup:0, startWeight:15,
+               muscles:[{name:'Triceps',sets:2}],
+               tip:'Pump finisher. Light, fast.', demo:'pushdown' },
+             { id:'as6', name:'Hammer Curl', sets:2, reps:'12-15', rest:'45s', tempo:'2-0-1', warmup:0, startWeight:6,
+               muscles:[{name:'Biceps',sets:2}],
+               tip:'Pump finisher. Brachialis = arm thickness.', demo:'curl' }
+           ]},
+      2: { name:'Push (maintenance)', sub:'Chest + Shoulders only · 9 sets',
+           tags:['Chest','Shoulders'],
+           rationale:'Maintenance volume. 6-9 sets enough to retain mass without robbing arm recovery.',
+           exercises: [
+             { id:'as7', name:'Bench Press', sets:3, reps:'6-8', rest:'2 min', tempo:'2-1-1', warmup:2, startWeight:30,
+               muscles:[{name:'Chest',sets:3}], tip:'Maintain strength. No need to push.', demo:'bench' },
+             { id:'as8', name:'Standing OHP', sets:3, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:20,
+               muscles:[{name:'Front Delts',sets:3}], tip:'Maintain. Don\'t fry shoulders.', demo:'press' },
+             { id:'as9', name:'Cable Lateral Raise', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:5,
+               muscles:[{name:'Side Delts',sets:3}], tip:'Maintain delt cap.', demo:'raise' }
+           ]},
+      3: { name:'Arms Day 2 (volume)', sub:'High-volume arms · 22 sets',
+           tags:['Biceps','Triceps','Arms','Volume'],
+           rationale:'Pump-focused arm day. Higher reps, shorter rest. Mid-range tension.',
+           exercises: [
+             { id:'as10', name:'Preacher Curl (machine or DB)', sets:4, reps:'10-12', rest:'60s', tempo:'3-0-1', warmup:1, startWeight:10,
+               muscles:[{name:'Biceps',sets:4}], tip:'Strict isolation. No body english.', demo:'curl' },
+             { id:'as11', name:'Overhead Tricep Extension', sets:4, reps:'10-12', rest:'60s', tempo:'3-1-1', warmup:1, startWeight:10,
+               muscles:[{name:'Triceps (long head)',sets:4}], tip:'Long head needs overhead position.', demo:'pushdown' },
+             { id:'as12', name:'Cable Curl (rope)', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:12,
+               muscles:[{name:'Biceps',sets:3}], tip:'Constant tension throughout.', demo:'curl' },
+             { id:'as13', name:'Cable Pushdown (rope, with spread)', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:15,
+               muscles:[{name:'Triceps',sets:3}], tip:'Spread rope at bottom. Lateral head.', demo:'pushdown' },
+             { id:'as14', name:'Concentration Curl', sets:2, reps:'12-15', rest:'45s', tempo:'3-0-1', warmup:0, startWeight:6,
+               muscles:[{name:'Biceps',sets:2}], tip:'Seated, elbow on inner thigh. Peak focus.', demo:'curl' },
+             { id:'as15', name:'Diamond Push-ups (burnout)', sets:2, reps:'AMRAP', rest:'45s', tempo:'2-0-1', warmup:0, startWeight:0,
+               muscles:[{name:'Triceps',sets:2}], tip:'To failure. Final pump.', demo:'pushdown' }
+           ]},
+      4: { name:'Pull + Legs (maintenance)', sub:'Compounds, low volume · 12 sets',
+           tags:['Back','Legs'],
+           rationale:'Maintenance for back + legs. 9-12 sets total to preserve mass.',
+           exercises: [
+             { id:'as16', name:'Pull-ups', sets:3, reps:'8-10', rest:'2 min', tempo:'2-1-2', warmup:1, startWeight:0,
+               muscles:[{name:'Lats',sets:3}], tip:'Maintain back width.', demo:'pullup' },
+             { id:'as17', name:'Barbell Squat', sets:3, reps:'8-10', rest:'2 min', tempo:'3-1-1', warmup:2, startWeight:30,
+               muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:2}], tip:'Heavy enough to maintain. Not push.', demo:'squat' },
+             { id:'as18', name:'Romanian Deadlift', sets:3, reps:'8-10', rest:'90s', tempo:'3-0-1', warmup:1, startWeight:30,
+               muscles:[{name:'Hamstrings',sets:3},{name:'Glutes',sets:1}], tip:'Maintain hamstring development.', demo:'deadlift' },
+             { id:'as19', name:'Calf Raise', sets:3, reps:'12-15', rest:'45s', tempo:'2-2-1', warmup:0, startWeight:20,
+               muscles:[{name:'Calves',sets:3}], tip:'Calves recover fast — train them anyway.', demo:'calf' }
+           ]},
+      5: { name:'Arms Day 3 (intensity)', sub:'Drop sets + supersets · 18 sets',
+           tags:['Biceps','Triceps','Arms','Intensity'],
+           rationale:'Intensity day. Drop sets, supersets, mechanical drop sets. Total fatigue = total growth.',
+           exercises: [
+             { id:'as20', name:'Barbell Curl + Skull Crusher SUPERSET', sets:4, reps:'10/10', rest:'75s', tempo:'2-0-1', warmup:1, startWeight:15,
+               muscles:[{name:'Biceps',sets:4},{name:'Triceps',sets:4}],
+               tip:'No rest between curl and skull. Antagonist superset.', demo:'curl',
+               intensity:'Antagonist superset' },
+             { id:'as21', name:'Hammer Curl + Cable Pushdown SUPERSET', sets:3, reps:'12/12', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:8,
+               muscles:[{name:'Biceps',sets:3},{name:'Triceps',sets:3}],
+               tip:'Brachialis + tricep finisher.', demo:'curl',
+               intensity:'Antagonist superset' },
+             { id:'as22', name:'21s — Bicep Curl', sets:2, reps:'21 (7+7+7)', rest:'90s', tempo:'2-0-1', warmup:0, startWeight:8,
+               muscles:[{name:'Biceps',sets:2}],
+               tip:'7 bottom-half + 7 top-half + 7 full reps. Brutal.', demo:'curl',
+               intensity:'21s technique' },
+             { id:'as23', name:'Tricep Pushdown DROP SET', sets:2, reps:'10 → 10 → 10', rest:'90s', tempo:'2-0-1', warmup:0, startWeight:20,
+               muscles:[{name:'Triceps',sets:2}],
+               tip:'10 reps, drop weight 30%, 10 more, drop again, 10 more. No rest.', demo:'pushdown',
+               intensity:'Drop set (3 drops)' }
+           ]},
+      6: VOLLEYBALL_DAY
+    }
+  },
+  german_volume_5day: {
+    id: 'german_volume_5day',
+    name: 'German Volume Training',
+    short: '10×10 brutal volume',
+    level: 'Advanced',
+    daysPerWeek: 5,
+    duration: '75-90 min',
+    weeklySetsPerMuscle: '20-25',
+    description: 'Old-school German Volume Training (GVT). 10 sets of 10 reps at 60% 1RM on main lifts. Brutally simple, brutally effective for size when you can recover from it.',
+    bestFor: 'Plateaued advanced lifters. 4-6 week phases ONLY. Eat huge or you\'ll lose strength.',
+    pros: ['Massive hypertrophy in 6 weeks', 'Very simple programming', 'Tests work capacity'],
+    cons: ['Brutal recovery demand', 'Strength can drop short-term', 'Diet must be perfect'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Chest + Back (10×10)', sub:'GVT main pair · 25 sets',
+           tags:['Chest','Back','GVT'],
+           rationale:'10×10 antagonist supersets. 60% of 8-10RM. Same weight all 10 sets. Brutal.',
+           exercises: [
+             { id:'gv1', name:'Bench Press 10×10', sets:10, reps:'10', rest:'90s', tempo:'2-1-1', warmup:2, startWeight:20,
+               muscles:[{name:'Chest',sets:10},{name:'Triceps',sets:2}],
+               tip:'60% of 10RM. Every set 10 reps. Same weight. Last sets WILL be near failure — that\'s the point.',
+               intensity:'GVT 10×10 protocol', demo:'bench' },
+             { id:'gv2', name:'Pull-ups 10×10 (or assisted)', sets:10, reps:'10', rest:'90s', tempo:'2-1-2', warmup:1, startWeight:0,
+               muscles:[{name:'Lats',sets:10},{name:'Biceps',sets:3}],
+               tip:'Use band assist — bodyweight too hard for 10×10. Or lat pulldown.',
+               intensity:'GVT 10×10 protocol', demo:'pullup' },
+             { id:'gv3', name:'DB Fly (light)', sets:3, reps:'10-12', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:5,
+               muscles:[{name:'Chest',sets:3}], tip:'Stretch focus, light weight.', demo:'press' },
+             { id:'gv4', name:'Face Pull', sets:2, reps:'15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:10,
+               muscles:[{name:'Rear Delts',sets:2}], tip:'Shoulder health.', demo:'facepull' }
+           ]},
+      2: { name:'Legs (10×10 squat)', sub:'GVT leg focus · 23 sets',
+           tags:['Legs','GVT'],
+           rationale:'Squats 10×10 = the ultimate leg hypertrophy stimulus. Eat huge today.',
+           exercises: [
+             { id:'gv5', name:'Back Squat 10×10', sets:10, reps:'10', rest:'90s', tempo:'2-1-1', warmup:3, startWeight:25,
+               muscles:[{name:'Quads',sets:10},{name:'Glutes',sets:5}],
+               tip:'60% of 10RM. The hardest 10 sets of your life. You will hate sets 6-10.',
+               intensity:'GVT 10×10 protocol', demo:'squat' },
+             { id:'gv6', name:'Lying Leg Curl 10×10', sets:10, reps:'10', rest:'60s', tempo:'2-1-2', warmup:1, startWeight:10,
+               muscles:[{name:'Hamstrings',sets:10}],
+               tip:'Hamstring focus. 10×10.',
+               intensity:'GVT 10×10 protocol', demo:'legcurl' },
+             { id:'gv7', name:'Calf Raise', sets:3, reps:'15-20', rest:'45s', tempo:'2-2-1', warmup:0, startWeight:20,
+               muscles:[{name:'Calves',sets:3}], tip:'Don\'t skip. Calves still need work.', demo:'calf' }
+           ]},
+      3: REST_DAY,
+      4: { name:'Shoulders + Arms (10×10)', sub:'GVT arms focus · 25 sets',
+           tags:['Shoulders','Arms','GVT'],
+           rationale:'OHP 10×10 + curl/skull superset 10×10. Arms grow while shoulders maintained.',
+           exercises: [
+             { id:'gv8', name:'Standing OHP 10×10', sets:10, reps:'10', rest:'90s', tempo:'2-0-1', warmup:2, startWeight:15,
+               muscles:[{name:'Front Delts',sets:10},{name:'Triceps',sets:2}],
+               tip:'Light enough to actually hit 10×10. ~50% of usual.',
+               intensity:'GVT 10×10 protocol', demo:'press' },
+             { id:'gv9', name:'EZ-Bar Curl 10×10', sets:10, reps:'10', rest:'60s', tempo:'2-0-1', warmup:1, startWeight:10,
+               muscles:[{name:'Biceps',sets:10}],
+               tip:'10×10 superset with skulls. Brutal arm pump.',
+               intensity:'GVT superset with skulls', demo:'curl' },
+             { id:'gv10', name:'Skull Crusher 10×10', sets:10, reps:'10', rest:'60s', tempo:'2-0-1', warmup:1, startWeight:10,
+               muscles:[{name:'Triceps',sets:10}],
+               tip:'Pair with curls. 60s rest between supersets.',
+               intensity:'GVT superset with curls', demo:'pushdown' },
+             { id:'gv11', name:'Cable Lateral Raise', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:5,
+               muscles:[{name:'Side Delts',sets:3}], tip:'Side delt insurance.', demo:'raise' }
+           ]},
+      5: { name:'Deadlift + Accessories', sub:'Heavy pull + weak points · 14 sets',
+           tags:['Back','Hamstrings'],
+           rationale:'Deadlifts 5×5 (NOT 10×10 — would kill you). Plus accessory work for weak points.',
+           exercises: [
+             { id:'gv12', name:'Deadlift', sets:5, reps:'5', rest:'3 min', tempo:'1-0-1', warmup:3, startWeight:40,
+               muscles:[{name:'Hamstrings',sets:2},{name:'Glutes',sets:2.5},{name:'Mid Back',sets:2},{name:'Lower Back',sets:2.5}],
+               tip:'5×5 is plenty after GVT week. Don\'t fry CNS more.', demo:'deadlift' },
+             { id:'gv13', name:'Barbell Row', sets:3, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:25,
+               muscles:[{name:'Mid Back',sets:3}], tip:'Mid-back thickness.', demo:'row' },
+             { id:'gv14', name:'Lat Pulldown', sets:3, reps:'10-12', rest:'60s', tempo:'2-1-2', warmup:0, startWeight:25,
+               muscles:[{name:'Lats',sets:3}], tip:'Width focus.', demo:'pullup' },
+             { id:'gv15', name:'Reverse Pec Deck', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:15,
+               muscles:[{name:'Rear Delts',sets:3}], tip:'Rear delt finisher.', demo:'raise' }
+           ]},
+      6: VOLLEYBALL_DAY
+    }
+  },
+  lean_bulk_hybrid_5day: {
+    id: 'lean_bulk_hybrid_5day',
+    name: 'Lean Bulk Hybrid',
+    short: 'Strength + hypertrophy mix',
+    level: 'Intermediate',
+    daysPerWeek: 5,
+    duration: '60-75 min',
+    weeklySetsPerMuscle: '13-17',
+    description: 'Best of both worlds. Heavy compounds (3-5 reps) + isolation (10-15 reps). Strength foundation + muscle growth simultaneously. Most balanced approach.',
+    bestFor: 'After 6+ months of lifting. When you want strength AND size, not just one.',
+    pros: ['Strength + size simultaneously', 'Sustainable long-term', 'Both rep ranges', 'Works for almost anyone'],
+    cons: ['Sessions can run long', 'Requires good time management', 'Not optimal for pure strength OR pure size'],
+    schedule: {
+      0: REST_DAY,
+      1: { name:'Heavy Push (strength + hypertrophy)', sub:'Bench heavy + accessories · 15 sets',
+           tags:['Push','Strength','Hypertrophy'],
+           rationale:'Heavy bench 5×5 for strength. Then DB press + accessories at higher reps for growth.',
+           exercises: [
+             { id:'lh1', name:'Barbell Bench Press', sets:5, reps:'4-6', rest:'2-3 min', tempo:'2-1-1', warmup:3, startWeight:30,
+               muscles:[{name:'Chest',sets:5},{name:'Triceps',sets:1.5}],
+               tip:'Heavy strength range. 4-6 reps. +2.5kg every 2 weeks.', demo:'bench' },
+             { id:'lh2', name:'Incline DB Press', sets:3, reps:'8-12', rest:'90s', tempo:'2-1-1', warmup:1, startWeight:10,
+               muscles:[{name:'Upper Chest',sets:3}], tip:'Hypertrophy range. Mid-rep.', demo:'press' },
+             { id:'lh3', name:'Seated DB Shoulder Press', sets:3, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:8,
+               muscles:[{name:'Front Delts',sets:3}], tip:'Shoulder development.', demo:'press' },
+             { id:'lh4', name:'Cable Lateral Raise', sets:3, reps:'12-15', rest:'45s', tempo:'2-1-2', warmup:0, startWeight:5,
+               muscles:[{name:'Side Delts',sets:3}], tip:'High reps for delt detail.', demo:'raise' },
+             { id:'lh5', name:'Tricep Pushdown', sets:3, reps:'10-12', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:15,
+               muscles:[{name:'Triceps',sets:3}], tip:'Lateral head focus.', demo:'pushdown' }
+           ]},
+      2: { name:'Heavy Pull', sub:'Deadlift + Pull-up + accessories · 14 sets',
+           tags:['Pull','Strength','Hypertrophy'],
+           rationale:'Heavy deadlift drives back density. Pull-ups + rows for thickness/width.',
+           exercises: [
+             { id:'lh6', name:'Conventional Deadlift', sets:5, reps:'3-5', rest:'3 min', tempo:'1-0-1', warmup:3, startWeight:40,
+               muscles:[{name:'Hamstrings',sets:2.5},{name:'Glutes',sets:2.5},{name:'Lower Back',sets:2.5},{name:'Mid Back',sets:2}],
+               tip:'Heavy 3-5 reps. Top set heaviest.', demo:'deadlift' },
+             { id:'lh7', name:'Weighted Pull-ups', sets:3, reps:'6-10', rest:'2 min', tempo:'2-1-2', warmup:1, startWeight:0,
+               muscles:[{name:'Lats',sets:3},{name:'Biceps',sets:1}], tip:'Add weight when 8+ unweighted.', demo:'pullup' },
+             { id:'lh8', name:'Barbell Row', sets:3, reps:'8-10', rest:'90s', tempo:'2-0-1', warmup:1, startWeight:25,
+               muscles:[{name:'Mid Back',sets:3}], tip:'Hypertrophy range.', demo:'row' },
+             { id:'lh9', name:'EZ-Bar Curl', sets:3, reps:'10-12', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:12,
+               muscles:[{name:'Biceps',sets:3}], tip:'Bicep mass-builder.', demo:'curl' }
+           ]},
+      3: { name:'Heavy Legs', sub:'Squat + RDL + accessories · 16 sets',
+           tags:['Legs','Strength','Hypertrophy'],
+           rationale:'Heavy squat strength + RDL volume + accessory pump.',
+           exercises: [
+             { id:'lh10', name:'Barbell Back Squat', sets:5, reps:'4-6', rest:'3 min', tempo:'3-1-1', warmup:3, startWeight:30,
+               muscles:[{name:'Quads',sets:5},{name:'Glutes',sets:3}], tip:'Heavy strength. +2.5kg/2wk.', demo:'squat' },
+             { id:'lh11', name:'Romanian Deadlift', sets:3, reps:'8-10', rest:'90s', tempo:'3-0-1', warmup:1, startWeight:30,
+               muscles:[{name:'Hamstrings',sets:3},{name:'Glutes',sets:2}], tip:'Hamstring volume.', demo:'deadlift' },
+             { id:'lh12', name:'Leg Press', sets:3, reps:'10-12', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:50,
+               muscles:[{name:'Quads',sets:3}], tip:'Quad pump.', demo:'legpress' },
+             { id:'lh13', name:'Lying Leg Curl', sets:3, reps:'10-12', rest:'60s', tempo:'3-1-1', warmup:0, startWeight:15,
+               muscles:[{name:'Hamstrings',sets:3}], tip:'Direct hamstring isolation.', demo:'legcurl' },
+             { id:'lh14', name:'Standing Calf Raise', sets:4, reps:'12-15', rest:'45s', tempo:'2-2-1', warmup:0, startWeight:20,
+               muscles:[{name:'Calves',sets:4}], tip:'High volume calves.', demo:'calf' }
+           ]},
+      4: REST_DAY,
+      5: { name:'Volume Day (full body, lighter)', sub:'Pump-focused · 14 sets',
+           tags:['Full Body','Volume'],
+           rationale:'Lighter Friday session for extra weekly volume without CNS impact. Pump and recovery focused.',
+           exercises: [
+             { id:'lh15', name:'DB Bench Press', sets:3, reps:'10-12', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:10,
+               muscles:[{name:'Chest',sets:3}], tip:'Lighter than Monday. Pump.', demo:'bench' },
+             { id:'lh16', name:'Cable Row', sets:3, reps:'10-12', rest:'60s', tempo:'2-1-2', warmup:0, startWeight:20,
+               muscles:[{name:'Mid Back',sets:3}], tip:'Constant tension.', demo:'row' },
+             { id:'lh17', name:'Goblet Squat', sets:3, reps:'12-15', rest:'90s', tempo:'2-1-1', warmup:0, startWeight:12,
+               muscles:[{name:'Quads',sets:3},{name:'Glutes',sets:1}], tip:'Higher rep squats.', demo:'squat' },
+             { id:'lh18', name:'Hammer Curl + Pushdown SUPERSET', sets:3, reps:'12/12', rest:'60s', tempo:'2-0-1', warmup:0, startWeight:8,
+               muscles:[{name:'Biceps',sets:3},{name:'Triceps',sets:3}],
+               tip:'Antagonist superset. Arm pump.', demo:'curl', intensity:'Antagonist superset' },
+             { id:'lh19', name:'Plank', sets:2, reps:'45-60s', rest:'30s', tempo:'hold', warmup:0, startWeight:0,
+               muscles:[{name:'Core',sets:2}], tip:'Core stability.', demo:'plank' }
+           ]},
+      6: VOLLEYBALL_DAY
+    }
   }
 };
 
@@ -1818,7 +2504,7 @@ const App = (() => {
   let state = {
     apiUrl: localStorage.getItem(STORAGE_KEY_API) || '',
     profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4, activePlanId:'' },
-    logs: [], workouts: [], exercises: [], meals: [], foods: [],
+    logs: [], workouts: [], exercises: [], meals: [], foods: [], measurements: [],
     expandedDemo: null,
     expandedExLog: null,
     viewingDayDow: new Date().getDay(),
@@ -1928,6 +2614,7 @@ const App = (() => {
         state.logs = c.logs || []; state.workouts = c.workouts || [];
         state.exercises = c.exercises || []; state.meals = c.meals || [];
         state.foods = c.foods || [];
+        state.measurements = c.measurements || [];
         state.lastSyncTs = c.lastSyncTs || null;
       }
     } catch(e){}
@@ -1937,6 +2624,7 @@ const App = (() => {
       profile: state.profile, logs: state.logs, workouts: state.workouts,
       exercises: state.exercises, meals: state.meals,
       foods: state.foods,
+      measurements: state.measurements,
       lastSyncTs: state.lastSyncTs
     }));
   }
@@ -2002,6 +2690,7 @@ const App = (() => {
       state.exercises = all.exercises || [];
       state.meals = all.meals || [];
       state.foods = all.foods || [];
+      state.measurements = all.measurements || [];
       state.lastSyncTs = Date.now();
       const newHash = JSON.stringify({l:state.logs.length, e:state.exercises.length, m:state.meals.length});
       saveCache();
@@ -2327,6 +3016,9 @@ const App = (() => {
     document.getElementById('recoverySleep').textContent = recovery.sleep + 'h';
     document.getElementById('recoveryOverlap').textContent =
       recovery.overlap > 0 ? `OVERLAP WITH YESTERDAY: ${recovery.overlap}` : 'NO MUSCLE OVERLAP';
+
+    renderWaterCard();
+    renderSleepCard();
 
     renderSuggestions(m.cal, m.prot, w, doneEx, totalEx, trend, m.mealCount);
   }
@@ -2944,6 +3636,228 @@ const App = (() => {
     renderTrack();
     renderHome();
     try { await api('deleteFood', { foodId }); } catch(e) {}
+  }
+
+  // ==================== WATER TRACKER ====================
+  const WATER_TARGET = 8;
+
+  function getTodayWater() {
+    const log = todayLog();
+    return Number(log?.water) || 0;
+  }
+
+  async function setWaterGlasses(count) {
+    const today = todayStr();
+    const log = state.logs.find(l => l.date === today);
+    if (log) log.water = count;
+    else state.logs.push({ date: today, water: count, calories: 0, protein: 0 });
+    if (navigator.vibrate) navigator.vibrate(6);
+    saveCache();
+    renderHome();
+    try {
+      await api('saveLog', { date: today, water: count });
+      // No banner — water taps happen often, would be spammy
+    } catch(e) { /* offline ok */ }
+  }
+
+  function tapWaterCup(idx) {
+    const current = getTodayWater();
+    // Tap on filled cup at idx → unfill it (set count to idx)
+    // Tap on empty cup at idx → fill up to and including it (set count to idx+1)
+    const target = (idx + 1 <= current) ? idx : idx + 1;
+    setWaterGlasses(target);
+  }
+
+  // ==================== MEASUREMENTS ====================
+  const MEASURE_FIELDS = ['chest','waist','hips','leftBicep','rightBicep','leftThigh','rightThigh','neck'];
+  const MEASURE_LABELS = {
+    chest:'Chest', waist:'Waist', hips:'Hips',
+    leftBicep:'L Bicep', rightBicep:'R Bicep',
+    leftThigh:'L Thigh', rightThigh:'R Thigh', neck:'Neck'
+  };
+
+  function getLatestMeasurement() {
+    if (!state.measurements || state.measurements.length === 0) return null;
+    const sorted = [...state.measurements].sort((a,b) => b.date.localeCompare(a.date));
+    return sorted[0];
+  }
+
+  function getPreviousMeasurement(beforeDate) {
+    if (!state.measurements) return null;
+    const earlier = state.measurements
+      .filter(m => m.date < beforeDate)
+      .sort((a,b) => b.date.localeCompare(a.date));
+    return earlier[0] || null;
+  }
+
+  function openMeasureForm() {
+    const form = document.getElementById('measureForm');
+    const btn = document.getElementById('measureToggleBtn');
+    const isOpen = form.style.display !== 'none';
+    if (isOpen) {
+      form.style.display = 'none';
+      btn.textContent = '+ Add Measurements';
+    } else {
+      // Pre-fill from latest measurement (so user only has to update changed ones)
+      const latest = getLatestMeasurement();
+      MEASURE_FIELDS.forEach(f => {
+        const inp = document.getElementById('m_' + f);
+        if (inp) inp.value = (latest && Number(latest[f])) ? latest[f] : '';
+      });
+      form.style.display = 'block';
+      btn.textContent = '× Cancel';
+      form.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+
+  async function saveMeasurement() {
+    const today = todayStr();
+    const data = { date: today };
+    let any = false;
+    MEASURE_FIELDS.forEach(f => {
+      const v = parseFloat(document.getElementById('m_' + f).value);
+      if (!isNaN(v) && v > 0) { data[f] = v; any = true; }
+    });
+    if (!any) { toast('Enter at least one measurement', 'bad'); return; }
+
+    // Update local state — replace if same date exists
+    const idx = state.measurements.findIndex(m => m.date === today);
+    if (idx >= 0) state.measurements[idx] = Object.assign({}, state.measurements[idx], data);
+    else state.measurements.push(data);
+
+    saveCache();
+    if (navigator.vibrate) navigator.vibrate(12);
+    document.getElementById('measureForm').style.display = 'none';
+    document.getElementById('measureToggleBtn').textContent = '+ Add Measurements';
+    renderProfile();
+    showUpdateBanner('MEASUREMENTS SAVED');
+    toast('Saved. Track weekly for trends.', 'good');
+    try { await api('saveMeasurement', data); }
+    catch(e) { toast('Saved offline', 'warn'); }
+  }
+
+  function renderMeasurementCard() {
+    const latest = getLatestMeasurement();
+    const grid = document.getElementById('measureCurrentGrid');
+    const badge = document.getElementById('measureBadge');
+
+    if (!latest) {
+      badge.textContent = 'NO DATA';
+      badge.className = 'badge';
+      grid.innerHTML = `
+        <div class="empty" style="grid-column:1/-1;padding:14px 0;">
+          No measurements yet. Take your baseline today, then weekly.
+        </div>`;
+      document.getElementById('measureHistory').innerHTML = '';
+      return;
+    }
+
+    const prev = getPreviousMeasurement(latest.date);
+    const daysSince = Math.floor((Date.now() - new Date(latest.date)) / 86400000);
+    badge.textContent = daysSince === 0 ? 'TODAY' : (daysSince === 1 ? '1 DAY AGO' : `${daysSince} DAYS AGO`);
+    badge.className = 'badge ' + (daysSince <= 7 ? 'good' : daysSince <= 14 ? 'warn' : 'bad');
+
+    grid.innerHTML = MEASURE_FIELDS.map(f => {
+      const v = Number(latest[f]) || 0;
+      if (!v) return '';
+      const pv = prev ? (Number(prev[f]) || 0) : 0;
+      const delta = pv ? +(v - pv).toFixed(1) : 0;
+      const deltaCls = delta > 0.2 ? 'up' : delta < -0.2 ? 'down' : 'flat';
+      const deltaStr = pv ? (delta === 0 ? '— no change' : (delta > 0 ? '+' : '') + delta + ' cm') : 'baseline';
+      return `
+        <div class="measure-item">
+          <div class="measure-label">${escapeHTML(MEASURE_LABELS[f])}</div>
+          <div class="measure-value">
+            <span class="measure-num">${v}</span>
+            <span class="measure-unit">CM</span>
+          </div>
+          <span class="measure-delta ${deltaCls}">${escapeHTML(deltaStr)}</span>
+        </div>`;
+    }).filter(Boolean).join('');
+
+    // History (last 5 entries)
+    const hist = [...state.measurements].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 5);
+    if (hist.length > 1) {
+      document.getElementById('measureHistory').innerHTML = `
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
+                    letter-spacing:1px;margin-bottom:8px;">RECENT HISTORY</div>
+        ${hist.map(m => {
+          const parts = MEASURE_FIELDS
+            .filter(f => Number(m[f]))
+            .map(f => `${MEASURE_LABELS[f]} ${m[f]}`)
+            .join(' · ');
+          return `<div style="font-size:11px;color:var(--text-2);padding:6px 0;border-top:1px solid var(--line-soft);">
+            <strong style="color:var(--text);font-family:'JetBrains Mono',monospace;font-size:10px;">${m.date}</strong>
+            <div style="font-size:11px;color:var(--text-3);margin-top:2px;line-height:1.4;">${escapeHTML(parts)}</div>
+          </div>`;
+        }).join('')}`;
+    } else {
+      document.getElementById('measureHistory').innerHTML = '';
+    }
+  }
+
+  // ==================== SLEEP RENDERING ====================
+  function renderSleepCard() {
+    const last7 = lastNDaysLogs(7).filter(l => Number(l.sleep) > 0);
+    const num = document.getElementById('sleepNum');
+    const badge = document.getElementById('sleepBadge');
+    const hint = document.getElementById('sleepHint');
+    const bar = document.getElementById('sleepBar');
+
+    if (last7.length === 0) {
+      num.textContent = '—';
+      badge.textContent = 'NO DATA';
+      badge.className = 'badge';
+      hint.textContent = 'log on Track tab';
+      bar.innerHTML = '';
+      return;
+    }
+
+    const avg = last7.reduce((s,l) => s + Number(l.sleep), 0) / last7.length;
+    num.textContent = avg.toFixed(1);
+    badge.textContent = avg >= 7.5 ? 'GREAT' : avg >= 7 ? 'OK' : avg >= 6 ? 'LOW' : 'POOR';
+    badge.className = 'badge ' + (avg >= 7.5 ? 'good' : avg >= 6.5 ? 'warn' : 'bad');
+    hint.textContent = avg >= 7.5 ? 'recovery on point' : avg >= 6.5 ? 'aim for 7.5+' : 'recovery suffering';
+
+    // Last 7 day bar chart — chronological L→R
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const ds = formatDate(d);
+      const log = state.logs.find(l => l.date === ds);
+      const sleep = Number(log?.sleep) || 0;
+      days.push({ date: ds, sleep, label: ['S','M','T','W','T','F','S'][d.getDay()] });
+    }
+    bar.innerHTML = days.map(d => {
+      const pct = Math.min(100, (d.sleep / 9) * 100);
+      const cls = d.sleep === 0 ? '' : d.sleep < 6 ? 'bad' : d.sleep < 7 ? 'low' : '';
+      return `<div class="sleep-day">
+        <div class="fill ${cls}" style="height:${pct}%"></div>
+        <span class="lbl">${d.label}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderWaterCard() {
+    const cups = getTodayWater();
+    document.getElementById('waterNum').textContent = cups;
+    document.getElementById('waterBadge').textContent = `${cups}/${WATER_TARGET}`;
+    const badge = document.getElementById('waterBadge');
+    badge.className = 'badge ' + (cups >= WATER_TARGET ? 'good' : cups >= 4 ? 'warn' : '');
+
+    // 7-day average
+    const last7 = lastNDaysLogs(7);
+    const wDays = last7.filter(l => Number(l.water) > 0);
+    if (wDays.length >= 2) {
+      const avg = wDays.reduce((s,l) => s + Number(l.water), 0) / wDays.length;
+      document.getElementById('waterAvg').textContent = `7D AVG: ${avg.toFixed(1)}`;
+    } else {
+      document.getElementById('waterAvg').textContent = '';
+    }
+
+    document.getElementById('waterCups').innerHTML = Array.from({length: WATER_TARGET}, (_, i) =>
+      `<button class="water-cup ${i < cups ? 'filled' : ''}" onclick="App.tapWaterCup(${i})" aria-label="Glass ${i+1}"></button>`
+    ).join('');
   }
 
   function toggleDemo(id) {
@@ -3609,6 +4523,7 @@ const App = (() => {
     document.getElementById('e_targetCalories').value = p.targetCalories;
     document.getElementById('e_targetProtein').value = p.targetProtein;
     document.getElementById('e_weeklyGainTarget').value = p.weeklyGainTarget;
+    renderMeasurementCard();
   }
 
   // Charts
@@ -3767,7 +4682,8 @@ const App = (() => {
     pickPlan, togglePlanCard, confirmPlan, openPlanSwitcher, applyPlanSwitch,
     acceptRecommendation, dismissRecommendation, tryLockedMeal, setMealPortion,
     toggleExLog, saveExerciseLog, applyTDEE,
-    openFoodModal, closeFoodModal, filterFoods, setFoodTag, pickFood, addCustomFood, deleteFood };
+    openFoodModal, closeFoodModal, filterFoods, setFoodTag, pickFood, addCustomFood, deleteFood,
+    tapWaterCup, openMeasureForm, saveMeasurement };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
