@@ -386,6 +386,55 @@ textarea{resize:vertical;min-height:80px;}
   padding:3px 8px;border-radius:999px;background:var(--accent);color:#fff;
   letter-spacing:1px;animation:pulse 2s infinite;}
 
+/* === Food logger modal === */
+.food-modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.5);
+  display:none;align-items:flex-end;justify-content:center;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+.food-modal.show{display:flex;}
+.food-modal-inner{background:var(--bg);width:100%;max-width:480px;max-height:85vh;
+  border-radius:24px 24px 0 0;padding:20px;overflow-y:auto;position:relative;
+  box-shadow:0 -10px 40px rgba(0,0,0,.15);
+  animation:slideUp .3s cubic-bezier(.2,.8,.2,1) both;}
+@keyframes slideUp{from{transform:translateY(100%);} to{transform:translateY(0);}}
+.food-modal h3{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;
+  margin:0 0 4px;}
+.food-modal .modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;
+  border-radius:50%;background:var(--surface-3);display:flex;align-items:center;
+  justify-content:center;font-size:20px;color:var(--text-2);border:0;cursor:pointer;}
+.food-search{width:100%;padding:12px 14px;margin:14px 0;font-size:15px;
+  border:1px solid var(--line);border-radius:12px;background:var(--surface-2);
+  -webkit-appearance:none;}
+.food-list{display:flex;flex-direction:column;gap:6px;}
+.food-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;
+  background:var(--surface-2);cursor:pointer;transition:all .15s;border:1px solid transparent;}
+.food-item:active{background:var(--surface-3);transform:scale(.98);}
+.food-item .food-name{flex:1;font-size:14px;font-weight:500;}
+.food-item .food-meta{font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--text-3);letter-spacing:.5px;margin-top:2px;}
+.food-item .food-add{width:30px;height:30px;border-radius:50%;background:var(--accent);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.food-tags{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;}
+.food-tag{padding:6px 12px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;font-size:11px;color:var(--text-2);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;}
+.food-tag.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* Logged extra foods on Track tab */
+.extra-food{display:flex;align-items:center;gap:10px;padding:10px 0;
+  border-top:1px solid var(--line-soft);}
+.extra-food:first-of-type{border-top:0;padding-top:4px;}
+.extra-food-icon{width:34px;height:34px;border-radius:8px;background:var(--accent-soft);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;}
+.extra-food-body{flex:1;min-width:0;}
+.extra-food-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.extra-food-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);
+  letter-spacing:.5px;margin-top:2px;}
+.extra-food-del{width:30px;height:30px;border-radius:8px;background:transparent;
+  color:var(--text-3);display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;border:0;flex-shrink:0;}
+.extra-food-del:active{background:rgba(220,38,38,.10);color:var(--bad);}
+
 /* === Plan selection cards === */
 .plan-card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;
   padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;position:relative;}
@@ -624,6 +673,21 @@ textarea{resize:vertical;min-height:80px;}
       <div class="workout-sub" id="mealSub">~2800 kcal · ~110g protein</div>
       <div class="progress"><i id="mealProgress" style="width:0%"></i></div>
       <div id="mealList" style="margin-top:6px;"></div>
+    </div>
+
+    <!-- Off-plan foods card -->
+    <div class="card">
+      <div class="card-title">
+        <span>Off-Plan Foods</span>
+        <span class="badge" id="extraFoodBadge">0 items</span>
+      </div>
+      <p style="font-size:11px;color:var(--text-3);margin:0 0 12px;line-height:1.5;">
+        Anything you ate outside the plan — chai, samosa, restaurant meals. Adds to today's totals.
+      </p>
+      <div id="extraFoodsList"></div>
+      <button class="btn btn-secondary" onclick="App.openFoodModal()" style="margin-top:8px;">
+        + Add Food
+      </button>
     </div>
 
     <!-- Quick metrics -->
@@ -865,6 +929,36 @@ textarea{resize:vertical;min-height:80px;}
       </button>
     </div>
   </nav>
+
+  <!-- Food picker modal -->
+  <div id="foodModal" class="food-modal" onclick="if(event.target===this)App.closeFoodModal()">
+    <div class="food-modal-inner">
+      <button class="modal-close" onclick="App.closeFoodModal()" aria-label="Close">×</button>
+      <h3>ADD <span style="color:var(--accent)">FOOD</span></h3>
+      <p style="color:var(--text-2);font-size:13px;margin:0;">Common Indian foods. Tap to add.</p>
+      <input id="foodSearch" class="food-search" type="text" placeholder="Search: chai, paneer, samosa…" oninput="App.filterFoods(this.value)" autocomplete="off" />
+      <div id="foodTags" class="food-tags"></div>
+      <div id="foodList" class="food-list"></div>
+
+      <h3 style="margin-top:24px;font-size:18px;">Custom entry</h3>
+      <p style="color:var(--text-3);font-size:12px;margin:0 0 8px;">Not in the list? Add manually:</p>
+      <div class="form-group" style="margin-bottom:8px;">
+        <label>Food name</label>
+        <input id="customFoodName" type="text" placeholder="e.g., Restaurant pasta" autocomplete="off" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Calories</label>
+          <input id="customFoodKcal" type="number" inputmode="numeric" placeholder="0" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Protein (g)</label>
+          <input id="customFoodProt" type="number" inputmode="numeric" placeholder="0" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="App.addCustomFood()" style="margin-top:8px;">Add Custom Food</button>
+    </div>
+  </div>
 
   <div class="toast" id="toast"></div>
 </div>
@@ -1617,20 +1711,103 @@ const DIET_PLAN = [
 // 15-minute grace window — meal can be ticked 15 min before scheduled time.
 const MEAL_GRACE_MINUTES = 15;
 
+/* === COMMON INDIAN FOODS DATABASE ===
+ * For quick off-plan food logging. kcal & protein per default unit.
+ * Sourced from USDA + ICMR-NIN food composition tables.
+ * Tags used for category filter chips: indian, snack, drink, fruit, protein, junk
+ */
+const FOOD_DB = [
+  // Indian staples
+  { name:'Roti / Chapati (1 medium)',           unit:'piece',   kcal:80,  protein:3,  tags:['indian'] },
+  { name:'Rice (1 katori, ~150g cooked)',       unit:'katori',  kcal:200, protein:4,  tags:['indian'] },
+  { name:'Dal (1 katori)',                       unit:'katori',  kcal:180, protein:9,  tags:['indian','protein'] },
+  { name:'Paneer (100g)',                        unit:'g',       kcal:265, protein:18, tags:['indian','protein'] },
+  { name:'Curd / Dahi (1 katori)',               unit:'katori',  kcal:100, protein:7,  tags:['indian','protein'] },
+  { name:'Idli (1 piece)',                       unit:'piece',   kcal:40,  protein:2,  tags:['indian'] },
+  { name:'Dosa (plain, 1)',                      unit:'piece',   kcal:170, protein:4,  tags:['indian'] },
+  { name:'Masala Dosa (1)',                      unit:'piece',   kcal:380, protein:8,  tags:['indian'] },
+  { name:'Upma (1 katori)',                      unit:'katori',  kcal:200, protein:6,  tags:['indian'] },
+  { name:'Poha (1 plate)',                       unit:'plate',   kcal:250, protein:5,  tags:['indian'] },
+  { name:'Paratha (plain, 1)',                   unit:'piece',   kcal:130, protein:3,  tags:['indian'] },
+  { name:'Aloo Paratha (1)',                     unit:'piece',   kcal:280, protein:6,  tags:['indian'] },
+  { name:'Rajma (1 katori)',                     unit:'katori',  kcal:200, protein:11, tags:['indian','protein'] },
+  { name:'Chole (1 katori)',                     unit:'katori',  kcal:230, protein:10, tags:['indian','protein'] },
+  { name:'Chicken curry (1 katori)',             unit:'katori',  kcal:280, protein:25, tags:['indian','protein'] },
+  { name:'Mutton curry (1 katori)',              unit:'katori',  kcal:330, protein:24, tags:['indian','protein'] },
+  { name:'Fish curry (1 katori)',                unit:'katori',  kcal:200, protein:22, tags:['indian','protein'] },
+  { name:'Sabzi / Mixed veg (1 katori)',         unit:'katori',  kcal:120, protein:4,  tags:['indian'] },
+  { name:'Biryani (1 plate)',                    unit:'plate',   kcal:550, protein:18, tags:['indian'] },
+  { name:'Pulao (1 plate)',                      unit:'plate',   kcal:400, protein:8,  tags:['indian'] },
+  // Snacks
+  { name:'Samosa (1)',                           unit:'piece',   kcal:260, protein:4,  tags:['snack','junk'] },
+  { name:'Pakora (5 pieces)',                    unit:'serving', kcal:200, protein:5,  tags:['snack'] },
+  { name:'Vada Pav (1)',                         unit:'piece',   kcal:290, protein:7,  tags:['snack'] },
+  { name:'Bhel Puri (1 plate)',                  unit:'plate',   kcal:150, protein:4,  tags:['snack'] },
+  { name:'Pani Puri (6 pieces)',                 unit:'serving', kcal:120, protein:3,  tags:['snack'] },
+  { name:'Dhokla (3 pieces)',                    unit:'serving', kcal:160, protein:5,  tags:['snack'] },
+  // Drinks
+  { name:'Chai with sugar (1 cup)',              unit:'cup',     kcal:60,  protein:2,  tags:['drink'] },
+  { name:'Black coffee (1 cup)',                 unit:'cup',     kcal:5,   protein:0,  tags:['drink'] },
+  { name:'Coffee with milk + sugar',             unit:'cup',     kcal:80,  protein:3,  tags:['drink'] },
+  { name:'Lassi (1 glass, sweet)',               unit:'glass',   kcal:200, protein:6,  tags:['drink'] },
+  { name:'Buttermilk / Chaas (1 glass)',         unit:'glass',   kcal:60,  protein:3,  tags:['drink'] },
+  { name:'Coconut water (1 glass)',              unit:'glass',   kcal:45,  protein:1,  tags:['drink'] },
+  { name:'Whey protein shake (1 scoop)',         unit:'scoop',   kcal:130, protein:25, tags:['protein','drink'] },
+  // Fruits
+  { name:'Banana (1 medium)',                    unit:'piece',   kcal:105, protein:1,  tags:['fruit'] },
+  { name:'Apple (1 medium)',                     unit:'piece',   kcal:95,  protein:0,  tags:['fruit'] },
+  { name:'Orange (1)',                           unit:'piece',   kcal:60,  protein:1,  tags:['fruit'] },
+  { name:'Mango (1 medium)',                     unit:'piece',   kcal:200, protein:3,  tags:['fruit'] },
+  { name:'Papaya (1 katori)',                    unit:'katori',  kcal:60,  protein:1,  tags:['fruit'] },
+  { name:'Watermelon (1 katori)',                unit:'katori',  kcal:50,  protein:1,  tags:['fruit'] },
+  // Eggs / dairy / nuts
+  { name:'Whole egg (1 large)',                  unit:'piece',   kcal:78,  protein:6,  tags:['protein'] },
+  { name:'Egg white (1)',                        unit:'piece',   kcal:17,  protein:4,  tags:['protein'] },
+  { name:'Boiled egg (1)',                       unit:'piece',   kcal:78,  protein:6,  tags:['protein'] },
+  { name:'Omelette (3 eggs)',                    unit:'serving', kcal:230, protein:18, tags:['protein'] },
+  { name:'Milk (1 glass, 250ml)',                unit:'glass',   kcal:150, protein:8,  tags:['protein','drink'] },
+  { name:'Almonds (10 pieces)',                  unit:'serving', kcal:70,  protein:3,  tags:['snack'] },
+  { name:'Peanut butter (1 tbsp)',               unit:'tbsp',    kcal:90,  protein:4,  tags:['protein'] },
+  { name:'Bread slice (1)',                      unit:'slice',   kcal:80,  protein:3,  tags:[] },
+  { name:'Oats (50g dry)',                       unit:'serving', kcal:190, protein:7,  tags:[] },
+  // Junk / occasional
+  { name:'Pizza slice (1, regular)',             unit:'slice',   kcal:285, protein:12, tags:['junk'] },
+  { name:'Burger (veg)',                         unit:'piece',   kcal:340, protein:10, tags:['junk'] },
+  { name:'Burger (chicken)',                     unit:'piece',   kcal:430, protein:22, tags:['junk'] },
+  { name:'French fries (medium)',                unit:'serving', kcal:340, protein:4,  tags:['junk'] },
+  { name:'Cold drink / Soda (300ml)',            unit:'glass',   kcal:130, protein:0,  tags:['drink','junk'] },
+  { name:'Ice cream (1 scoop)',                  unit:'scoop',   kcal:140, protein:3,  tags:['junk'] },
+  { name:'Chocolate (50g bar)',                  unit:'serving', kcal:270, protein:4,  tags:['junk'] },
+  { name:'Biscuit (4 marie)',                    unit:'serving', kcal:100, protein:2,  tags:['snack'] },
+  { name:'Maggi (1 packet)',                     unit:'serving', kcal:310, protein:8,  tags:['junk'] }
+];
+
+const FOOD_TAGS = [
+  { id:'all',     label:'ALL' },
+  { id:'indian',  label:'INDIAN' },
+  { id:'protein', label:'PROTEIN' },
+  { id:'snack',   label:'SNACKS' },
+  { id:'drink',   label:'DRINKS' },
+  { id:'fruit',   label:'FRUITS' },
+  { id:'junk',    label:'JUNK' }
+];
+
 
 // ============================================================
 const App = (() => {
   let state = {
     apiUrl: localStorage.getItem(STORAGE_KEY_API) || '',
     profile: { currentWeight:51, targetWeight:60, targetCalories:2800, targetProtein:110, weeklyGainTarget:0.4, activePlanId:'' },
-    logs: [], workouts: [], exercises: [], meals: [],
+    logs: [], workouts: [], exercises: [], meals: [], foods: [],
     expandedDemo: null,
     expandedExLog: null,
     viewingDayDow: new Date().getDay(),
     lastSyncTs: null,
     pickedPlanId: null,
     expandedPlanCardId: null,
-    dismissedRecommendation: null
+    dismissedRecommendation: null,
+    foodFilter: '',
+    foodTagFilter: 'all'
   };
 
   // Plan helpers — must be inside IIFE for `state` access
@@ -1730,6 +1907,7 @@ const App = (() => {
         state.profile = c.profile || state.profile;
         state.logs = c.logs || []; state.workouts = c.workouts || [];
         state.exercises = c.exercises || []; state.meals = c.meals || [];
+        state.foods = c.foods || [];
         state.lastSyncTs = c.lastSyncTs || null;
       }
     } catch(e){}
@@ -1738,6 +1916,7 @@ const App = (() => {
     localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify({
       profile: state.profile, logs: state.logs, workouts: state.workouts,
       exercises: state.exercises, meals: state.meals,
+      foods: state.foods,
       lastSyncTs: state.lastSyncTs
     }));
   }
@@ -1802,6 +1981,7 @@ const App = (() => {
       state.workouts = all.workouts || [];
       state.exercises = all.exercises || [];
       state.meals = all.meals || [];
+      state.foods = all.foods || [];
       state.lastSyncTs = Date.now();
       const newHash = JSON.stringify({l:state.logs.length, e:state.exercises.length, m:state.meals.length});
       saveCache();
@@ -2009,23 +2189,34 @@ const App = (() => {
 
   function getTodayMacros() {
     const log = todayLog();
+    const today = todayStr();
     const mealMap = getTodayMealMap();
 
+    // Plan meals (currently checked only)
     const checkedMeals = Object.values(mealMap).filter(m => m.done === 'YES');
-    const autoCal = checkedMeals.reduce((s,m) => {
+    const planCal = checkedMeals.reduce((s,m) => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
       return s + (meal ? meal.kcal : 0);
     }, 0);
-    const autoProt = checkedMeals.reduce((s,m) => {
+    const planProt = checkedMeals.reduce((s,m) => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
       return s + (meal ? meal.protein : 0);
     }, 0);
 
-    // Prefer auto-calc when meals checked; fall back to manual log only when nothing checked.
-    const cal  = checkedMeals.length > 0 ? autoCal  : (Number(log?.calories) || 0);
-    const prot = checkedMeals.length > 0 ? autoProt : (Number(log?.protein) || 0);
+    // Off-plan foods logged today
+    const todayFoods = (state.foods || []).filter(f => f.date === today);
+    const extraCal  = todayFoods.reduce((s,f) => s + (Number(f.calories) || 0), 0);
+    const extraProt = todayFoods.reduce((s,f) => s + (Number(f.protein)  || 0), 0);
 
-    return { cal, prot, autoCal, autoProt, mealCount: checkedMeals.length };
+    const autoCal  = planCal + extraCal;
+    const autoProt = planProt + extraProt;
+
+    // Prefer auto-calc when ANY data exists; manual log only when nothing logged.
+    const hasAuto = checkedMeals.length > 0 || todayFoods.length > 0;
+    const cal  = hasAuto ? autoCal  : (Number(log?.calories) || 0);
+    const prot = hasAuto ? autoProt : (Number(log?.protein) || 0);
+
+    return { cal, prot, autoCal, autoProt, mealCount: checkedMeals.length, extraFoodCount: todayFoods.length };
   }
 
   function renderHome() {
@@ -2414,6 +2605,24 @@ const App = (() => {
         </div>`;
     }).join('');
 
+    // Off-plan foods rendering
+    const todayFoods = (state.foods || []).filter(f => f.date === today);
+    const totalExtraCal = todayFoods.reduce((s,f) => s + Number(f.calories), 0);
+    document.getElementById('extraFoodBadge').textContent =
+      todayFoods.length === 0 ? '0 items'
+      : `${todayFoods.length} item${todayFoods.length>1?'s':''} · ${totalExtraCal} kcal`;
+    document.getElementById('extraFoodsList').innerHTML = todayFoods.length === 0
+      ? '<div class="empty" style="padding:12px 0;font-size:12px;">Nothing extra logged. Tap "+ Add Food" for off-plan eating.</div>'
+      : todayFoods.map(f => `
+        <div class="extra-food">
+          <div class="extra-food-icon">🍽</div>
+          <div class="extra-food-body">
+            <div class="extra-food-name">${escapeHTML(f.foodName)}</div>
+            <div class="extra-food-meta">${f.calories} kcal · ${f.protein}g protein</div>
+          </div>
+          <button class="extra-food-del" onclick="App.deleteFood('${f.foodId}')" aria-label="Remove">×</button>
+        </div>`).join('');
+
     const log = todayLog();
     if (log) {
       if (Number(log.weight) && !document.getElementById('t_weight').value) document.getElementById('t_weight').value = log.weight;
@@ -2566,6 +2775,99 @@ const App = (() => {
     } else {
       toast(`🔒 Available ${formatCountdown(lock.minutesUntil)} (at ${meal.time})`, 'warn');
     }
+  }
+
+  // ==================== FOOD LOGGER ====================
+  function openFoodModal() {
+    state.foodFilter = '';
+    state.foodTagFilter = 'all';
+    document.getElementById('foodSearch').value = '';
+    document.getElementById('customFoodName').value = '';
+    document.getElementById('customFoodKcal').value = '';
+    document.getElementById('customFoodProt').value = '';
+    document.getElementById('foodModal').classList.add('show');
+    renderFoodTags();
+    renderFoodList();
+    // Lock body scroll while modal open
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFoodModal() {
+    document.getElementById('foodModal').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  function filterFoods(query) {
+    state.foodFilter = (query || '').toLowerCase().trim();
+    renderFoodList();
+  }
+
+  function setFoodTag(tag) {
+    state.foodTagFilter = tag;
+    renderFoodTags();
+    renderFoodList();
+  }
+
+  function renderFoodTags() {
+    document.getElementById('foodTags').innerHTML = FOOD_TAGS.map(t =>
+      `<span class="food-tag ${state.foodTagFilter===t.id?'active':''}" onclick="App.setFoodTag('${t.id}')">${t.label}</span>`
+    ).join('');
+  }
+
+  function renderFoodList() {
+    const q = state.foodFilter;
+    const tag = state.foodTagFilter;
+    const filtered = FOOD_DB.filter(f => {
+      if (tag !== 'all' && !(f.tags || []).includes(tag)) return false;
+      if (q && !f.name.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    document.getElementById('foodList').innerHTML = filtered.length === 0
+      ? '<div class="empty" style="padding:20px 0;">No matches. Try Custom entry below.</div>'
+      : filtered.slice(0, 60).map(f => `
+        <div class="food-item" onclick="App.pickFood('${escapeAttr(f.name)}', ${f.kcal}, ${f.protein}, '${f.unit}')">
+          <div style="flex:1;min-width:0;">
+            <div class="food-name">${escapeHTML(f.name)}</div>
+            <div class="food-meta">${f.kcal} kcal · ${f.protein}g protein</div>
+          </div>
+          <div class="food-add">+</div>
+        </div>`).join('');
+  }
+
+  async function pickFood(name, kcal, protein, unit) {
+    const today = todayStr();
+    const foodId = 'food_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+    const food = {
+      date: today, foodId, foodName: name, quantity: 1,
+      unit, calories: kcal, protein, timestamp: new Date().toISOString()
+    };
+    state.foods.push(food);
+    saveCache();
+    if (navigator.vibrate) navigator.vibrate(12);
+    closeFoodModal();
+    renderTrack();
+    renderHome();
+    showUpdateBanner('FOOD ADDED');
+    try { await api('logFood', food); }
+    catch(e) { toast('Saved offline', 'warn'); }
+  }
+
+  async function addCustomFood() {
+    const name = document.getElementById('customFoodName').value.trim();
+    const kcal = parseInt(document.getElementById('customFoodKcal').value) || 0;
+    const protein = parseInt(document.getElementById('customFoodProt').value) || 0;
+    if (!name) { toast('Enter food name', 'bad'); return; }
+    if (kcal <= 0) { toast('Enter calories', 'bad'); return; }
+    pickFood(name, kcal, protein, 'serving');
+  }
+
+  async function deleteFood(foodId) {
+    state.foods = state.foods.filter(f => f.foodId !== foodId);
+    saveCache();
+    if (navigator.vibrate) navigator.vibrate(8);
+    renderTrack();
+    renderHome();
+    try { await api('deleteFood', { foodId }); } catch(e) {}
   }
 
   function toggleDemo(id) {
@@ -3388,7 +3690,8 @@ const App = (() => {
     installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay,
     pickPlan, togglePlanCard, confirmPlan, openPlanSwitcher, applyPlanSwitch,
     acceptRecommendation, dismissRecommendation, tryLockedMeal,
-    toggleExLog, saveExerciseLog, applyTDEE };
+    toggleExLog, saveExerciseLog, applyTDEE,
+    openFoodModal, closeFoodModal, filterFoods, setFoodTag, pickFood, addCustomFood, deleteFood };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);
