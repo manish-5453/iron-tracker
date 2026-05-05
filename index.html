@@ -220,6 +220,26 @@ textarea{resize:vertical;min-height:80px;}
 .meal-countdown{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-3);
   letter-spacing:.5px;margin-top:2px;display:block;}
 .meal-countdown.now{color:var(--accent);animation:pulse 1.5s infinite;}
+
+/* Per-meal quantity adjuster */
+.meal-portion{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:6px;
+  border-top:1px dashed var(--line-soft);flex-wrap:wrap;}
+.meal-portion .portion-label{font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--text-3);letter-spacing:1px;text-transform:uppercase;margin-right:2px;}
+.meal-portion .portion-btn{padding:4px 10px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:600;border-radius:999px;background:var(--surface-3);
+  color:var(--text-2);border:1px solid transparent;cursor:pointer;transition:all .15s;
+  letter-spacing:.5px;}
+.meal-portion .portion-btn:active{transform:scale(.95);}
+.meal-portion .portion-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.meal-portion .portion-custom{padding:3px 8px;width:50px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;text-align:center;border:1px solid var(--line);border-radius:6px;
+  background:var(--surface-2);color:var(--text);
+  -webkit-appearance:none;}
+.meal-portion .portion-custom::-webkit-outer-spin-button,
+.meal-portion .portion-custom::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.meal-portion .portion-actual{font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--accent);letter-spacing:.5px;margin-left:auto;font-weight:600;}
 .meal-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);
   letter-spacing:1px;width:64px;flex-shrink:0;}
 .meal-food{flex:1;font-size:13px;line-height:1.4;}
@@ -2192,15 +2212,17 @@ const App = (() => {
     const today = todayStr();
     const mealMap = getTodayMealMap();
 
-    // Plan meals (currently checked only)
+    // Plan meals (currently checked only) — scaled by per-meal quantity
     const checkedMeals = Object.values(mealMap).filter(m => m.done === 'YES');
     const planCal = checkedMeals.reduce((s,m) => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
-      return s + (meal ? meal.kcal : 0);
+      const qty = Number(m.quantity) || 1;
+      return s + (meal ? meal.kcal * qty : 0);
     }, 0);
     const planProt = checkedMeals.reduce((s,m) => {
       const meal = DIET_PLAN.find(d => d.id === m.mealId);
-      return s + (meal ? meal.protein : 0);
+      const qty = Number(m.quantity) || 1;
+      return s + (meal ? meal.protein * qty : 0);
     }, 0);
 
     // Off-plan foods logged today
@@ -2208,8 +2230,8 @@ const App = (() => {
     const extraCal  = todayFoods.reduce((s,f) => s + (Number(f.calories) || 0), 0);
     const extraProt = todayFoods.reduce((s,f) => s + (Number(f.protein)  || 0), 0);
 
-    const autoCal  = planCal + extraCal;
-    const autoProt = planProt + extraProt;
+    const autoCal  = Math.round(planCal + extraCal);
+    const autoProt = Math.round(planProt + extraProt);
 
     // Prefer auto-calc when ANY data exists; manual log only when nothing logged.
     const hasAuto = checkedMeals.length > 0 || todayFoods.length > 0;
@@ -2581,7 +2603,9 @@ const App = (() => {
     document.getElementById('mealProgress').style.width = mPct + '%';
 
     document.getElementById('mealList').innerHTML = DIET_PLAN.map(meal => {
-      const done = mealMap[meal.id] && mealMap[meal.id].done === 'YES';
+      const rec = mealMap[meal.id];
+      const done = rec && rec.done === 'YES';
+      const qty = (rec && Number(rec.quantity)) || 1;
       const lock = getMealLockStatus(meal);
       const isLocked = !lock.unlocked && !done;
       const countdown = isLocked
@@ -2591,6 +2615,21 @@ const App = (() => {
         ? `onclick="App.tryLockedMeal('${meal.id}')"`
         : `onclick="App.toggleMeal('${meal.id}', '${meal.time}', '${escapeAttr(meal.name)}')"`;
       const checkContent = done ? '✓' : (isLocked ? '🔒' : '');
+      const actualKcal = Math.round(meal.kcal * qty);
+      const actualProt = Math.round(meal.protein * qty);
+
+      // Portion buttons — only shown when meal is checked done
+      const portionUI = done ? `
+        <div class="meal-portion">
+          <span class="portion-label">PORTION</span>
+          <button class="portion-btn ${qty===0.5?'active':''}" onclick="App.setMealPortion('${meal.id}', 0.5)">½×</button>
+          <button class="portion-btn ${qty===1?'active':''}" onclick="App.setMealPortion('${meal.id}', 1)">1×</button>
+          <button class="portion-btn ${qty===1.5?'active':''}" onclick="App.setMealPortion('${meal.id}', 1.5)">1½×</button>
+          <input type="number" class="portion-custom" step="0.25" min="0.25" max="3"
+                 value="${qty}" onchange="App.setMealPortion('${meal.id}', this.value)" />
+          <span class="portion-actual">${actualKcal}kcal · ${actualProt}g</span>
+        </div>` : '';
+
       return `
         <div class="meal ${isLocked?'locked':''}">
           <button class="meal-check ${done?'done':''} ${isLocked?'locked':''}" ${onclickAttr}>
@@ -2599,8 +2638,9 @@ const App = (() => {
           <div class="meal-time">${meal.time}</div>
           <div class="meal-food ${done?'done':''}">
             <div class="meal-name">${escapeHTML(meal.name)}</div>
-            <div class="meal-macros">${meal.kcal} kcal · ${meal.protein}g protein</div>
+            <div class="meal-macros">${meal.kcal} kcal · ${meal.protein}g protein <span style="opacity:.6;">(at 1×)</span></div>
             ${countdown ? `<div class="meal-countdown ${lock.isNow?'now':''}">${countdown}</div>` : ''}
+            ${portionUI}
           </div>
         </div>`;
     }).join('');
@@ -2736,19 +2776,19 @@ const App = (() => {
     }
 
     const newDone = !isCurrentlyDone;
-
-    // Find ALL existing rows for this (date, mealId) and update the latest one;
-    // mark older duplicates so they don't interfere (the sheet's logMeal_ does
-    // single-row update keyed on date+mealId, so this stays clean going forward).
     const existing = state.meals.find(m => m.date === today && m.mealId === id);
     const nowTs = new Date().toISOString();
+    // Preserve existing quantity if present, else default to 1
+    const quantity = existing && Number(existing.quantity) ? Number(existing.quantity) : 1;
+
     if (existing) {
       existing.done = newDone ? 'YES' : 'NO';
+      existing.quantity = quantity;
       existing.timestamp = nowTs;
     } else {
       state.meals.push({
         date: today, mealId: id, mealTime: time, mealName: name,
-        done: newDone ? 'YES' : 'NO', timestamp: nowTs
+        done: newDone ? 'YES' : 'NO', quantity, timestamp: nowTs
       });
     }
     if (navigator.vibrate) navigator.vibrate(newDone ? 12 : 6);
@@ -2756,8 +2796,44 @@ const App = (() => {
     renderTrack();
     renderHome();
     try {
-      await api('logMeal', { date: today, mealId: id, mealTime: time, mealName: name, done: newDone });
+      await api('logMeal', { date: today, mealId: id, mealTime: time, mealName: name, done: newDone, quantity });
       showUpdateBanner(newDone ? 'MEAL LOGGED' : 'UPDATED');
+    } catch(e) { toast('Saved offline', 'warn'); }
+  }
+
+  /**
+   * Adjust portion size for an already-checked meal.
+   * Updates locally, then syncs to sheet.
+   * Validates: 0.25–3.0 range; <= 0 unticks meal.
+   */
+  async function setMealPortion(id, qtyRaw) {
+    const today = todayStr();
+    const meal = DIET_PLAN.find(d => d.id === id);
+    if (!meal) return;
+
+    let qty = parseFloat(qtyRaw);
+    if (isNaN(qty) || qty <= 0) qty = 1;
+    qty = Math.max(0.25, Math.min(3, qty));
+    qty = Math.round(qty * 100) / 100; // snap to 0.01 precision
+
+    const existing = state.meals.find(m => m.date === today && m.mealId === id);
+    if (!existing || existing.done !== 'YES') {
+      // shouldn't happen — UI only shows portion controls when meal is checked
+      return;
+    }
+    existing.quantity = qty;
+    existing.timestamp = new Date().toISOString();
+    if (navigator.vibrate) navigator.vibrate(6);
+    saveCache();
+    renderTrack();
+    renderHome();
+    try {
+      await api('logMeal', {
+        date: today, mealId: id,
+        mealTime: meal.time, mealName: meal.name,
+        done: true, quantity: qty
+      });
+      showUpdateBanner(`PORTION ${qty}×`);
     } catch(e) { toast('Saved offline', 'warn'); }
   }
 
@@ -3689,7 +3765,7 @@ const App = (() => {
   return { init, go, refresh, saveTrack, saveProfile, saveApiUrl, resetApiUrl,
     installPwa, toggleExercise, toggleMeal, toggleDemo, addCustomExercise, viewDay,
     pickPlan, togglePlanCard, confirmPlan, openPlanSwitcher, applyPlanSwitch,
-    acceptRecommendation, dismissRecommendation, tryLockedMeal,
+    acceptRecommendation, dismissRecommendation, tryLockedMeal, setMealPortion,
     toggleExLog, saveExerciseLog, applyTDEE,
     openFoodModal, closeFoodModal, filterFoods, setFoodTag, pickFood, addCustomFood, deleteFood };
 })();
